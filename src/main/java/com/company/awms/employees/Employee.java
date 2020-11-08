@@ -1,7 +1,8 @@
-package com.company.awms
+package com.company.awms.employees;
 
 import org.springframework.data.annotation.ID;
 
+//Main employyee class
 public class Employee {
 	
 	@Id
@@ -24,10 +25,12 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 	
+	//Get employyee information
 	public String info() {
 		return String.format("Employee: %s \n %s %s \n %s \n %s \n Access Level: %s \n IBAN: %s", id, firstName, lastName, nationalID, email, accessLevel, iban);
 	}
 	
+	//Create a reference for this employyee with information about his work hours and date 
 	public EmployeeDailyReference createEmployeeDailyReference(String date, int[] workTime) {
 		EmployeeDailyReference empDayRef = new EmployeeDailyReference(nationalID);
 		empDayRef.setDate(date);
