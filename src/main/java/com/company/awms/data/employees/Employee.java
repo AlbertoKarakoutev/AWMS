@@ -10,7 +10,7 @@ public class Employee {
 	@Id
 	public String id;
 
-	public int nationalID;
+	public String nationalID;
 	public String firstName;
 	public String lastName;
 	public String email;
@@ -18,22 +18,23 @@ public class Employee {
 	public String accessLevel;
 	public int salary;
 
-	public Employee(int nationalID) {
+	public Employee(String nationalID) {
 		this.nationalID = nationalID;
 	}
 
-	public Employee(String firstName, String lastName, int nationalID) {
+	public Employee(String firstName, String lastName, String nationalID) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.nationalID = nationalID;
 	}
 
-	//Get employyee information
+	// Get employee information
 	public String info() {
-		return String.format("Employee: %s \n %s %s \n %s \n %s \n Access Level: %s \n IBAN: %s", id, firstName, lastName, nationalID, email, accessLevel, iban);
+		return String.format("Employee: %s \n %s %s \n %s \n %s \n Access Level: %s \n IBAN: %s", id, firstName,
+				lastName, nationalID, email, accessLevel, iban);
 	}
 
-	//Create a reference for this employyee with information about his work hours and date 
+	// Create a reference for this employee with information about his work hours and date
 	public EmployeeDailyReference createEmployeeDailyReference(String date, int[] workTime) {
 		EmployeeDailyReference empDayRef = new EmployeeDailyReference(nationalID);
 		empDayRef.setDate(date);
