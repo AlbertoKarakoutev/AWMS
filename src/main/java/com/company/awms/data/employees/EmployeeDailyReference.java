@@ -11,11 +11,9 @@ public class EmployeeDailyReference extends Employee{
 	public int[] workTime = new int[4];
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	public String date;
-	public int nationalID;
 	
 	public EmployeeDailyReference(int nationalID) {
 		super(nationalID);
-		this.nationalID = nationalID;
 	}
 	
 	public void addTask(Task task) {

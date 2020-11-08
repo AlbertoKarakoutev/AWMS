@@ -1,8 +1,10 @@
 package com.company.awms.data.employees;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 //Main employyee class
+@Document
 public class Employee {
 
 	@Id
