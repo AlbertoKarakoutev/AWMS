@@ -26,6 +26,6 @@ public class EmployeeController {
 
     public void addSampleData() {
         System.out.println("Adding sample data");
-        employeeRepo.save(new Employee("Jack", " Bauer", 1234567890));
+        employeeRepo.save(new Employee("Gosho", " Goshev", "1234567890"));
     }
 }

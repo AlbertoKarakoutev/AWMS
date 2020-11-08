@@ -12,8 +12,6 @@ public class EmployeeDailyReference extends Employee {
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	public String date;
 
-	public String nationalID;
-
 	public EmployeeDailyReference(String nationalID) {
 		super(nationalID);
 	}
