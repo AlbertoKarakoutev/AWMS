@@ -1,6 +1,10 @@
 package com.company.awms.data.schedule;
 
+import com.company.awms.data.employees.Employee;
+import com.company.awms.data.employees.EmployeeDailyReference;
 import org.springframework.data.annotation.Id;
+
+import java.util.ArrayList;
 
 public class Day {
 
@@ -16,10 +20,10 @@ public class Day {
   }
 
   //Create a employee reference with apropriate information and add to the current day employyees array
-  public void addEmployee(int nationalID, int[] workTime) {
+  /*public void addEmployee(int nationalID, int[] workTime) {
 	  Employee employee = findByNationalID(nationalID);
 	  EmployeeDailyReference edr= employee.createEmployeeDailyReference(date, workTime);
 	  employees.add(newEmployeeDailyReference);
-  }
+  }*/
   
 }
