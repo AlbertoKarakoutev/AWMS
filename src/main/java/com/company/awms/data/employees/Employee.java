@@ -1,4 +1,4 @@
-package com.company.awms.employees;
+package com.company.awms.data.employees;
 
 import org.springframework.data.annotation.ID;
 

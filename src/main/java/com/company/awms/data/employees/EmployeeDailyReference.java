@@ -1,4 +1,4 @@
-package com.company.awms.employees;
+package com.company.awms.data.employees;
 
 import com.company.awms.schedule.Task;
 

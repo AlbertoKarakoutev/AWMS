@@ -1,4 +1,4 @@
-package com.company.awms.schedule;
+package com.company.awms.data.schedule;
 
 import org.springframework.data.annotation.Id;
 

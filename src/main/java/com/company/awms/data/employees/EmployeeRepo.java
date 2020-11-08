@@ -1,4 +1,4 @@
-package com.example.accessingdatemongodb;
+package com.company.awms.data.employees;
 
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;

@@ -1,4 +1,4 @@
-package com.company.awms.schedule;
+package com.company.awms.data.schedule;
 
 public class Task{
 	
