@@ -8,6 +8,8 @@ public class AwmsApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(AwmsApplication.class, args);
+
+
 	}
 
 }

@@ -3,7 +3,7 @@ package com.company.awms.data.employees;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-//Main employyee class
+//Main employee class
 @Document
 public class Employee {
 
@@ -16,9 +16,10 @@ public class Employee {
 	public String email;
 	public String iban;
 	public String accessLevel;
-	public int salary;
+	public String phoneNumber;
+	public double salary;
 
-	public Employee(){}
+	public Employee() {}
 
 	public Employee(String nationalID) {
 		this.nationalID = nationalID;
@@ -32,8 +33,8 @@ public class Employee {
 
 	// Get employee information
 	public String info() {
-		return String.format("Employee: %s \n %s %s \n %s \n %s \n Access Level: %s \n IBAN: %s", id, firstName,
-				lastName, nationalID, email, accessLevel, iban);
+		return String.format("Employee ID: %s \nName: %s %s \nNational ID: %s \nE-mail: %s \nAccess Level: %s \nIBAN: %s\nPhone number: %s", id, firstName,
+				lastName, nationalID, email, accessLevel, iban, phoneNumber);
 	}
 
 	// Create a reference for this employee with information about his work hours and date
@@ -42,6 +43,12 @@ public class Employee {
 		empDayRef.setDate(date);
 		empDayRef.setWorkTime(workTime);
 		return empDayRef;
+	}
+	
+	public void requestSwap(String requesterID, String date, String message) {
+		/*Employee will be prompted and he will decide whether he wants to swap 
+		 * with that person on that date. If he agrees, Day.swapEmployees(requesterID, this.id) will be called
+		 */
 	}
 
 	public void setFirstName(String firstName) {
@@ -64,8 +71,12 @@ public class Employee {
 		this.accessLevel = accessLevel;
 	}
 
-	public void setSalary(int salary) {
+	public void setSalary(double salary) {
 		this.salary = salary;
+	}
+	
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
 	public String getFirstName() {
@@ -88,7 +99,10 @@ public class Employee {
 		return this.accessLevel;
 	}
 
-	public int getSalary() {
+	public String getPhoneNumber() {
+		return this.phoneNumber;
+	}
+	public double getSalary() {
 		return this.salary;
 	}
 }
