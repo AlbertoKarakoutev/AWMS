@@ -1,1 +1,1 @@
-# AWMS-Server
+# AWMS
