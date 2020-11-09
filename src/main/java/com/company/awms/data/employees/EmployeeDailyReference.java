@@ -3,7 +3,9 @@ package com.company.awms.data.employees;
 import com.company.awms.data.schedule.Task;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
 @Document
@@ -12,13 +14,18 @@ public class EmployeeDailyReference extends Employee {
 	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
 	public int[] workTime = new int[4];
 	public ArrayList<Task> tasks = new ArrayList<Task>();
-	public String date;
+	public LocalDate date;
 
 	public EmployeeDailyReference() {
 	}
 
 	public EmployeeDailyReference(String nationalID) {
 		super(nationalID);
+	}
+
+	public EmployeeDailyReference(LocalDate date, int[] workTime) {
+		this.date = date;
+		this.workTime = workTime;
 	}
 
 	public void addTask(Task task) {
@@ -33,7 +40,7 @@ public class EmployeeDailyReference extends Employee {
 		return this.workTime;
 	}
 
-	public String getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
@@ -45,7 +52,7 @@ public class EmployeeDailyReference extends Employee {
 		this.workTime = workTime;
 	}
 
-	public void setDate(String date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 

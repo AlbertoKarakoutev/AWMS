@@ -53,5 +53,16 @@ public class File {
 	public void setAccessLevel(String accessLevel) {
 		this.accessLevel = accessLevel;
 	}
-	
+	public void setUploaderID(String uploaderID) {
+		this.uploaderID = uploaderID;
+	}
+	public void setUploadDate(String uploadDate) {
+		this.uploadDate = uploadDate;
+	}
+	public void setDownloaderIDs(ArrayList<String> downloaderIDs) {
+		this.downloaderIDs = downloaderIDs;
+	}
+	public void setSize(double size) {
+		this.size = size;
+	}
 }

@@ -37,20 +37,6 @@ public class Employee {
 				lastName, nationalID, email, accessLevel, iban, phoneNumber);
 	}
 
-	// Create a reference for this employee with information about his work hours and date
-	public EmployeeDailyReference createEmployeeDailyReference(String date, int[] workTime) {
-		EmployeeDailyReference empDayRef = new EmployeeDailyReference(nationalID);
-		empDayRef.setDate(date);
-		empDayRef.setWorkTime(workTime);
-		return empDayRef;
-	}
-	
-	public void requestSwap(String requesterID, String date, String message) {
-		/*Employee will be prompted and he will decide whether he wants to swap 
-		 * with that person on that date. If he agrees, Day.swapEmployees(requesterID, this.id) will be called
-		 */
-	}
-
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
@@ -79,6 +65,10 @@ public class Employee {
 		this.phoneNumber = phoneNumber;
 	}
 
+	public void setNationalID(String nationalID) {
+		this.nationalID = nationalID;
+	}
+
 	public String getFirstName() {
 		return this.firstName;
 	}
@@ -102,6 +92,11 @@ public class Employee {
 	public String getPhoneNumber() {
 		return this.phoneNumber;
 	}
+
+	public String getNationalID() {
+		return nationalID;
+	}
+
 	public double getSalary() {
 		return this.salary;
 	}

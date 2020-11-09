@@ -26,20 +26,20 @@ public class Task{
 		return taskReceiverID;
 	}
 
-	public void setTaskReceiverID(String taskReceiverID) {
-		this.taskReceiverID = taskReceiverID;
-	}
-
 	public String getTaskBody() {
 		return taskBody;
 	}
 
-	public void setTaskBody(String taskBody) {
-		this.taskBody = taskBody;
-	}
-
 	public String getTaskTitle() {
 		return taskTitle;
+	}
+
+	public void setTaskReceiverID(String taskReceiverID) {
+		this.taskReceiverID = taskReceiverID;
+	}
+
+	public void setTaskBody(String taskBody) {
+		this.taskBody = taskBody;
 	}
 
 	public void setTaskTitle(String taskTitle) {

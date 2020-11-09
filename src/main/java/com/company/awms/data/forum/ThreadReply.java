@@ -3,6 +3,8 @@ package com.company.awms.data.forum;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Document
 public class ThreadReply {
 	
@@ -15,7 +17,7 @@ public class ThreadReply {
 	public String replyBody;
 	
 	//Should be in the HH:MM:SS-DD.MM.YYYY format
-	public String time;
+	public LocalDateTime time;
 	
 	public ThreadReply() {}
 	
@@ -35,7 +37,7 @@ public class ThreadReply {
 	public String getIssuerID() {
 		return this.issuerID;
 	}
-	public String getTime() {
+	public LocalDateTime getTime() {
 		return this.time;
 	}
 	public String getReplyBody() {
@@ -47,7 +49,7 @@ public class ThreadReply {
 	public void setIssuerID(String issuerID) {
 		this.issuerID = issuerID;
 	}
-	public void setTime(String time) {
+	public void setTime(LocalDateTime time) {
 		this.time = time;
 	}
 	public void setBody(String replyBody) {
