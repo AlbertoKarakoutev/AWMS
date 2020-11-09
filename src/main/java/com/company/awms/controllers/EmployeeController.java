@@ -19,9 +19,14 @@ public class EmployeeController {
     public String getByFirstName(@PathVariable String firstName){
 
         //addSampleData();
-
-        System.out.println("After adding");
-        return "neshto si";
+    	
+        try {
+        	System.out.println(employeeRepo.findByFirstName(firstName).get(0).info());
+        	return employeeRepo.findByFirstName(firstName).get(0).info();
+        }catch(Exception e) {
+        	System.out.println("No such user!");
+        	return "No such user!";
+        }
     }
 
     public void addSampleData() {

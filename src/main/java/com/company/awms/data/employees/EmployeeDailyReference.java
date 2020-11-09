@@ -20,7 +20,11 @@ public class EmployeeDailyReference extends Employee {
 		tasks.add(task);
 	}
 
-	public String getWorkTime() {
+	public int[] getWorkTime() {
+		return this.workTime;
+	}
+	
+	public String getWorkTimeInfo() {
 		return String.format("%d:%d - %d:%d", workTime[0], workTime[1], workTime[2], workTime[3]);
 	}
 
