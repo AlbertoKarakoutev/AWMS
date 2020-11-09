@@ -1,5 +1,7 @@
 package com.company.awms.data.employees;
 
+import java.util.ArrayList;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,6 +19,7 @@ public class Employee {
 	public String iban;
 	public String accessLevel;
 	public String phoneNumber;
+	public ArrayList<Integer> rewards = new ArrayList<Integer>();
 	public double salary;
 
 	public Employee() {}
@@ -99,5 +102,13 @@ public class Employee {
 
 	public double getSalary() {
 		return this.salary;
+	}
+	
+	public void addReward(int reward) {
+		this.rewards.add(reward);
+	}
+	
+	public ArrayList<Integer> getRewards(){
+		return this.rewards;
 	}
 }

@@ -3,6 +3,8 @@ package com.company.awms.controllers;
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.services.EmployeeService;
+import com.company.awms.services.SalaryService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,9 +62,7 @@ public class EmployeeController {
     //Testing connection to MongoDB cloud database
     @GetMapping("/employee/{firstName}")
     public ResponseEntity<Employee> getByFirstName(@PathVariable String firstName){
-
         //addSampleData();
-
         try {
             Employee employee = employeeRepo.findByFirstName(firstName).get(0);
             System.out.println(employee.info());

@@ -27,7 +27,11 @@ public class EmployeeDailyReference extends Employee {
 		this.date = date;
 		this.workTime = workTime;
 	}
-
+	
+	public String getID() {
+		return this.id;
+	}
+	
 	public void addTask(Task task) {
 		tasks.add(task);
 	}

@@ -20,7 +20,6 @@ public class Day {
 	public LocalDate date;
 	public ArrayList<EmployeeDailyReference> employees;
 
-	// Should be in DD.MM.YYYY format
 	public Day(LocalDate date) {
 		this.date = date;
 	}
