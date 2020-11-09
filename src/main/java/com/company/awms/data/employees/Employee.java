@@ -18,6 +18,8 @@ public class Employee {
 	public String accessLevel;
 	public int salary;
 
+	public Employee(){}
+
 	public Employee(String nationalID) {
 		this.nationalID = nationalID;
 	}

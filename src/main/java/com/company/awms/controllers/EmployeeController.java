@@ -4,28 +4,32 @@ import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class EmployeeController {
+    //EmployeeService employeeService;
+
     @Autowired
-    EmployeeRepo employeeRepo;
-
-    //Testing connection to MongoDB cloud database
-    @GetMapping("/employee/{firstName}")
-    public String getByFirstName(@PathVariable String firstName){
-
-        //addSampleData();
-
-        System.out.println("After adding");
-        return "neshto si";
+    public EmployeeController(/*EmployeeService employeeService*/) {
+        //this.employeeService = employeeService;
     }
 
-    public void addSampleData() {
-        System.out.println("Adding sample data");
-        employeeRepo.save(new Employee("Gosho", " Goshev", "1234567890"));
+    @PostMapping(value = "register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> register(@RequestBody Employee newEmployee){
+        try{
+            //this.employeeService.Register(newEmployee);
+
+        } catch (Exception e){
+
+        }
+
+        return new ResponseEntity<String>("something", HttpStatus.OK);
     }
 }
