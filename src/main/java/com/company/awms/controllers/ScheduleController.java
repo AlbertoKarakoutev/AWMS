@@ -23,9 +23,9 @@ public class ScheduleController {
     @Autowired
     public ScheduleController(ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
-
     }
     
+    //@TestMethod
     //Populate DB with this month's dates
     public String addDays() {
     	LocalDate now = LocalDate.now();
@@ -76,6 +76,21 @@ public class ScheduleController {
         return "Done";
     }
     
+    //@TestMethod
+    //Populate schedule with a test employee with default working hours 09:00-17:00
+    public String addWorkHours() {
+    	LocalDate now = LocalDate.now();
+    	//Certain 1-28 days
+    	for (int i = 1; i < 31; i++) {	
+	    	LocalDate correctDate = now.withDayOfMonth(i);
+	    	int[] workTime = {9,0,17,0};
+	    	scheduleService.addEmployee("1234567890", correctDate, workTime);
+	    	System.out.println(correctDate);
+    	}
+    	
+    	return "Done!";
+    }
+
     @GetMapping("day/{DOM}")
     public ResponseEntity<String> dayID(@PathVariable String DOM) {
     	LocalDate date = LocalDate.now();
@@ -90,26 +105,14 @@ public class ScheduleController {
     	return new ResponseEntity<>(day.getID(), HttpStatus.OK);
     }
     
-    //Populate schedule with a test employee with default working hours 09:00-17:00
-    public String addWorkHours() {
-    	LocalDate now = LocalDate.now();
-    	//Certain 1-28 days
-    	for (int i = 1; i < 31; i++) {	
-	    	LocalDate correctDate = now.withDayOfMonth(i);
-	    	int[] workTime = {9,0,17,0};
-	    	scheduleService.addEmployee("1234567890", correctDate, workTime);
-	    	System.out.println(correctDate);
+    @GetMapping("/schedule/task/{taskDay}/{receiverNationalID}")
+    public ResponseEntity<String> addTask( @PathVariable String taskDay, @PathVariable String receiverNationalID){
+    	boolean successful = scheduleService.addTask(taskDay, receiverNationalID);
+    	if(successful) {
+    		return new ResponseEntity<>("Added task for " + receiverNationalID, HttpStatus.OK);
+    	}else {
+    		return new ResponseEntity<>("Error adding task for " + receiverNationalID, HttpStatus.BAD_REQUEST);
     	}
-    	
-    	return "Done!";
+        
     }
-    
-    /*@Autowired
-    TaskRepo taskRepo;
-
-    @GetMapping("/schedule/task")
-    public ResponseEntity<String> addTask(){
-        this.taskRepo.save(new Task());
-        return new ResponseEntity<>("asdads", HttpStatus.OK);
-    }*/
 }

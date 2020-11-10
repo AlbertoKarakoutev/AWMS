@@ -19,7 +19,7 @@ public class SalaryController {
 		this.salaryService = salaryService;
 	}
 
-	@GetMapping("/salary/{nationalID}")
+	@GetMapping("/workHours/{nationalID}")
 	public ResponseEntity<String> getByName(@PathVariable String nationalID) {
 		return new ResponseEntity<>(String.format("%3.2f hours of work this month", salaryService.calculateWorkHours(nationalID)), HttpStatus.OK);
 	}

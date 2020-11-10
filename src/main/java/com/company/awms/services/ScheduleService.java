@@ -10,6 +10,7 @@ import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
 import com.company.awms.data.schedule.Day;
 import com.company.awms.data.schedule.ScheduleRepo;
+import com.company.awms.data.schedule.Task;
 
 @Service
 public class ScheduleService {
@@ -66,7 +67,41 @@ public class ScheduleService {
 //		 }
 //		 employees.remove
 	}
+	
+	public boolean addTask(String taskDay, String receiverNationalID) {
+		Day currentDay;
+    	try {
+    		LocalDate taskDate = LocalDate.parse(taskDay);
+    		currentDay = getRepository().findByDate(taskDate.withDayOfMonth(taskDate.getDayOfMonth()+1));
+    	}catch(Exception e) {
+    		System.err.println("Invalid date!");
+    		e.printStackTrace();
+    		return false;
+    	}
+    	Task task;
+    	for(EmployeeDailyReference edr : currentDay.getEmployees()) {
+    		if(edr.getNationalID().equals(receiverNationalID)) {
+    			task = createTask(receiverNationalID, currentDay, "Test task title", "Test task body");
+    			if(edr.getTasks()!=null) {
+    				edr.getTasks().add(task);  
+    				getRepository().save(currentDay);
+    				return true;
+    			}else{
+    				ArrayList<Task> taskList = new ArrayList<>();
+    				taskList.add(task);
+    				edr.setTasks(taskList);
+    				getRepository().save(currentDay);
+    				return true;
+    			}
+    		}
+    	}
+		return false;	
+	}
 
+	public Task createTask(String receiverNationalID, Day date, String taskBody, String taskTitle) {
+		return new Task(receiverNationalID, date, taskBody, taskTitle);
+	}
+	
 	public static ScheduleRepo getRepository() {
 		return scheduleRepo;
 	}
