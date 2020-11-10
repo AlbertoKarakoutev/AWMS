@@ -56,15 +56,12 @@ public class EmployeeController {
         return employee;
     }*/
 
-    @Autowired
-    EmployeeRepo employeeRepo;
-
     //Testing connection to MongoDB cloud database
     @GetMapping("/employee/{firstName}")
     public ResponseEntity<Employee> getByFirstName(@PathVariable String firstName){
         //addSampleData();
         try {
-            Employee employee = employeeRepo.findByFirstName(firstName).get(0);
+            Employee employee = EmployeeService.getRepository().findByFirstName(firstName).get(0);
             System.out.println(employee.info());
             return new ResponseEntity<>(employee, HttpStatus.OK);
         } catch(Exception e) {

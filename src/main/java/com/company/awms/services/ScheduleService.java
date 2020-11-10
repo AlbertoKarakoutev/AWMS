@@ -14,24 +14,27 @@ import java.util.Date;
 
 @Service
 public class ScheduleService {
-    private ScheduleRepo scheduleRepo;
-    private EmployeeRepo employeeRepo;
+    private static ScheduleRepo scheduleRepo;
 
+    EmployeeService employeeService;
+    
     @Autowired
-    public ScheduleService(ScheduleRepo scheduleRepo, EmployeeRepo employeeRepo) {
-        this.scheduleRepo = scheduleRepo;
-        this.employeeRepo = employeeRepo;
+    public ScheduleService(ScheduleRepo scheduleRepo) {
+        ScheduleService.scheduleRepo = scheduleRepo;
     }
 
     // Create a employee reference with appropriate information and add to the
     // current day employees array
-    public void addEmployee(String nationalID, int[] workTime) {
-        LocalDate date = LocalDate.now();
-
-        Employee employee = employeeRepo.findByNationalID(nationalID);
-        EmployeeDailyReference edr = new EmployeeDailyReference(date, workTime);
-
-        this.scheduleRepo.findByDate(date).employees.add(edr);
+    public void addEmployee(String nationalID, LocalDate date, int[] workTime) {
+        Employee employee;
+        try {
+        	employee = EmployeeService.getRepository().findByNationalID(nationalID);
+        }catch (Exception e) {
+        	System.err.println("Error finding user!");
+        	return;
+        }
+        EmployeeDailyReference edr = employeeService.createEmployeeDailyReference(employee, date, workTime);
+        ScheduleService.scheduleRepo.findByDate(date).getEmployees().add(edr);
     }
 
     public void swapEmployees(String requestorID, String receiverID, String requestorDate) {
@@ -46,5 +49,9 @@ public class ScheduleService {
             //}
         //}
         //employees.remove
+    }
+    
+    public static ScheduleRepo getRepository() {
+    	return scheduleRepo;
     }
 }

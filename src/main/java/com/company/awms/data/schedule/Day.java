@@ -39,4 +39,8 @@ public class Day {
 	public void setEmployees(ArrayList<EmployeeDailyReference> employees) {
 		this.employees = employees;
 	}
+
+	public String getID() {
+		return this.id;
+	}
 }

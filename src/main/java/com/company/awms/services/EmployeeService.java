@@ -11,11 +11,11 @@ import java.util.Date;
 
 @Service
 public class EmployeeService {
-    private EmployeeRepo employeeRepo;
+    private static EmployeeRepo employeeRepo;
 
     @Autowired
     public EmployeeService(EmployeeRepo employeeRepo) {
-        this.employeeRepo = employeeRepo;
+        EmployeeService.employeeRepo = employeeRepo;
     }
 
     // Create a reference for this employee with information about his work hours and date
@@ -31,4 +31,9 @@ public class EmployeeService {
          * with that person on that date. If he agrees, Day.swapEmployees(requesterID, this.id) will be called
          */
     }
+    
+    public static EmployeeRepo getRepository() {
+    	return employeeRepo;
+    }
+    
 }

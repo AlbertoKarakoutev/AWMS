@@ -15,22 +15,16 @@ import com.company.awms.data.schedule.TaskRepo;
 @Service
 public class SalaryService {
 
-	public EmployeeRepo employeeRepo;
-	public TaskRepo taskRepo;
-	public ScheduleRepo scheduleRepo;
 	
 	@Autowired
-	public SalaryService(EmployeeRepo employeeRepo, TaskRepo taskRepo, ScheduleRepo scheduleRepo) {
-		this.employeeRepo = employeeRepo;
-		this.taskRepo = taskRepo;
-		this.scheduleRepo = scheduleRepo;
+	public SalaryService() {
 	}
 	
 	//Rewards for specific tasks in a user's rewards array
 	public boolean rewardBonus(String userID, int reward, Task task){
 		if(task.getCompleted() && !task.getPaidFor()) {
 			try {
-				Employee rewarded = employeeRepo.findById(userID).get();
+				Employee rewarded = EmployeeService.getRepository().findById(userID).get();
 				rewarded.addReward(reward);
 			}catch(Exception e) {
 				System.out.println("User not found!");
@@ -48,7 +42,7 @@ public class SalaryService {
 		double hours = 0;
 		Employee worker;
 		try {
-			worker = employeeRepo.findByLastName(id).get(0); 
+			worker =  EmployeeService.getRepository().findByLastName(id).get(0); 
 			
 		}catch(Exception e) {
 			System.out.println("User not found!");
@@ -61,7 +55,7 @@ public class SalaryService {
 			for(int i = 1; i < date.getDayOfMonth(); i++) {
 				LocalDate dateTemplate = date.withDayOfMonth(i);
 				System.out.println(dateTemplate);
-				Day thisDay = scheduleRepo.findByDate(dateTemplate);
+				Day thisDay = ScheduleService.getRepository().findByDate(dateTemplate);
 				for(EmployeeDailyReference edr : thisDay.getEmployees()) {
 					if(edr.getID().equals(id)) {
 						hours+=(edr.getWorkTime()[2]+(edr.getWorkTime()[3]/60))-(edr.getWorkTime()[0]+(edr.getWorkTime()[1]/60));

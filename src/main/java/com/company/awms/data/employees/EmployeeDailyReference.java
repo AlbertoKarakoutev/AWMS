@@ -1,6 +1,8 @@
 package com.company.awms.data.employees;
 
 import com.company.awms.data.schedule.Task;
+import com.company.awms.services.EmployeeService;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
@@ -11,8 +13,12 @@ import java.util.Date;
 @Document
 public class EmployeeDailyReference extends Employee {
 
+	EmployeeRepo employeeRepo;
+	
 	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
 	public int[] workTime = new int[4];
+	public String firstNameLocal;
+	public String lastNameLocal;
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	public LocalDate date;
 
@@ -21,11 +27,12 @@ public class EmployeeDailyReference extends Employee {
 
 	public EmployeeDailyReference(String nationalID) {
 		super(nationalID);
-	}
-
-	public EmployeeDailyReference(LocalDate date, int[] workTime) {
-		this.date = date;
-		this.workTime = workTime;
+		try {
+			this.firstNameLocal = employeeRepo.findByNationalID(nationalID).getFirstName();
+			this.lastNameLocal = employeeRepo.findByNationalID(nationalID).getLastName();
+		}catch(Exception e) {
+			System.err.println("Error finding user!");
+		}
 	}
 	
 	public String getID() {

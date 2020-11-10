@@ -6,10 +6,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ForumService {
-    private ForumRepo forumRepo;
+    private static ForumRepo forumRepo;
 
     @Autowired
     public ForumService(ForumRepo forumRepo) {
-        this.forumRepo = forumRepo;
+        ForumService.forumRepo = forumRepo;
+    }
+    
+    public static ForumRepo getRepository() {
+    	return forumRepo;
     }
 }
