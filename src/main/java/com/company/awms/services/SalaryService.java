@@ -15,18 +15,17 @@ import com.company.awms.data.schedule.TaskRepo;
 @Service
 public class SalaryService {
 
-	
 	@Autowired
 	public SalaryService() {
 	}
-	
-	//Rewards for specific tasks in a user's rewards array
-	public boolean rewardBonus(String userID, int reward, Task task){
-		if(task.getCompleted() && !task.getPaidFor()) {
+
+	// Rewards for specific tasks in a user's rewards array
+	public boolean rewardBonus(String userID, int reward, Task task) {
+		if (task.getCompleted() && !task.getPaidFor()) {
 			try {
 				Employee rewarded = EmployeeService.getRepository().findById(userID).get();
 				rewarded.addReward(reward);
-			}catch(Exception e) {
+			} catch (Exception e) {
 				System.out.println("User not found!");
 				e.printStackTrace();
 				return false;
@@ -34,36 +33,28 @@ public class SalaryService {
 			task.setPaidFor(true);
 		}
 		return true;
-		
+
 	}
-	
-	//Calculate work hours in the past 30 days
-	public double calculateWorkHours(String id) {
+
+	// Calculate work hours for this month
+	public double calculateWorkHours(String nationalID) {
 		double hours = 0;
-		Employee worker;
-		try {
-			worker =  EmployeeService.getRepository().findByLastName(id).get(0); 
-			
-		}catch(Exception e) {
-			System.out.println("User not found!");
-			e.printStackTrace();
-			return 0;
-		}
 
 		LocalDate date = LocalDate.now();
 		try {
-			for(int i = 1; i < date.getDayOfMonth(); i++) {
+			
+			for (int i = 1; i < date.getDayOfMonth(); i++) {
 				LocalDate dateTemplate = date.withDayOfMonth(i);
 				System.out.println(dateTemplate);
 				Day thisDay = ScheduleService.getRepository().findByDate(dateTemplate);
-				for(EmployeeDailyReference edr : thisDay.getEmployees()) {
-					if(edr.getID().equals(id)) {
-						hours+=(edr.getWorkTime()[2]+(edr.getWorkTime()[3]/60))-(edr.getWorkTime()[0]+(edr.getWorkTime()[1]/60));
+				for (EmployeeDailyReference edr : thisDay.getEmployees()) {
+					if (edr.getNationalID().equals(nationalID)) {
+						hours += (edr.getWorkTime()[2] + (edr.getWorkTime()[3] / 60))
+								- (edr.getWorkTime()[0] + (edr.getWorkTime()[1] / 60));
 					}
 				}
-				
 			}
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return hours;

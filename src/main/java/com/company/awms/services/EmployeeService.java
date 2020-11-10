@@ -20,7 +20,7 @@ public class EmployeeService {
 
     // Create a reference for this employee with information about his work hours and date
     public EmployeeDailyReference createEmployeeDailyReference(Employee employee, LocalDate date, int[] workTime) {
-        EmployeeDailyReference empDayRef = new EmployeeDailyReference(employee.nationalID);
+        EmployeeDailyReference empDayRef = new EmployeeDailyReference(employeeRepo, employee.nationalID);
         empDayRef.setDate(date);
         empDayRef.setWorkTime(workTime);
         return empDayRef;

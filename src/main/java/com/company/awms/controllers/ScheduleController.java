@@ -1,20 +1,16 @@
 package com.company.awms.controllers;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.company.awms.data.employees.Employee;
-import com.company.awms.data.employees.EmployeeDailyReference;
-import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.data.schedule.Day;
-import com.company.awms.data.schedule.ScheduleRepo;
 import com.company.awms.services.EmployeeService;
 import com.company.awms.services.ScheduleService;
 
@@ -29,7 +25,8 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
 
     }
-    //Populate DB with this month's dated
+    
+    //Populate DB with this month's dates
     public String addDays() {
     	LocalDate now = LocalDate.now();
     	//Certain 1-28 days
@@ -80,7 +77,7 @@ public class ScheduleController {
     }
     
     @GetMapping("day/{DOM}")
-    public String dayID(@PathVariable String DOM) {
+    public ResponseEntity<String> dayID(@PathVariable String DOM) {
     	LocalDate date = LocalDate.now();
     	LocalDate dateQuery = date.withDayOfMonth(Integer.parseInt(DOM));
     	Day day = null;
@@ -88,9 +85,23 @@ public class ScheduleController {
     		day =  ScheduleService.getRepository().findByDate(dateQuery);
     	}catch(Exception e) {
     		System.err.println("Invalid date!");
-    		return null;
+    		return new ResponseEntity<>("Date not found!", HttpStatus.NOT_FOUND);
     	}
-    	return day.getID();
+    	return new ResponseEntity<>(day.getID(), HttpStatus.OK);
+    }
+    
+    //Populate schedule with a test employee with default working hours 09:00-17:00
+    public String addWorkHours() {
+    	LocalDate now = LocalDate.now();
+    	//Certain 1-28 days
+    	for (int i = 1; i < 31; i++) {	
+	    	LocalDate correctDate = now.withDayOfMonth(i);
+	    	int[] workTime = {9,0,17,0};
+	    	scheduleService.addEmployee("1234567890", correctDate, workTime);
+	    	System.out.println(correctDate);
+    	}
+    	
+    	return "Done!";
     }
     
     /*@Autowired

@@ -1,42 +1,48 @@
 package com.company.awms.data.employees;
 
-import com.company.awms.data.schedule.Task;
-import com.company.awms.services.EmployeeService;
-
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.company.awms.data.schedule.Task;
 
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
 @Document
 public class EmployeeDailyReference extends Employee {
 
+	@Autowired
 	EmployeeRepo employeeRepo;
 	
 	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
 	public int[] workTime = new int[4];
-	public String firstNameLocal;
-	public String lastNameLocal;
+	public String refFirstName;
+	public String refLastName;
+	public String refNationalID;
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	public LocalDate date;
 
-	public EmployeeDailyReference() {
+	public EmployeeDailyReference() {}
+	
+	public EmployeeDailyReference(EmployeeRepo employeeRepo) {
+		this.employeeRepo = employeeRepo;
 	}
 
-	public EmployeeDailyReference(String nationalID) {
-		super(nationalID);
+	public EmployeeDailyReference(EmployeeRepo employeeRepo, String nationalID) {
+		this.employeeRepo = employeeRepo;
+		this.refNationalID = nationalID;
 		try {
-			this.firstNameLocal = employeeRepo.findByNationalID(nationalID).getFirstName();
-			this.lastNameLocal = employeeRepo.findByNationalID(nationalID).getLastName();
+			this.refFirstName = employeeRepo.findByNationalID(nationalID).getFirstName();
+			this.refLastName = employeeRepo.findByNationalID(nationalID).getLastName();
 		}catch(Exception e) {
-			System.err.println("Error finding user!");
+			e.printStackTrace();
+			System.err.println("Error finding edr!");
 		}
 	}
 	
-	public String getID() {
-		return this.id;
+	public String getNationalID() {
+		return this.refNationalID;
 	}
 	
 	public void addTask(Task task) {
