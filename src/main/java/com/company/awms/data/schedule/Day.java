@@ -1,15 +1,12 @@
 package com.company.awms.data.schedule;
 
-import com.company.awms.data.employees.Employee;
-import com.company.awms.data.employees.EmployeeDailyReference;
-import com.company.awms.data.employees.EmployeeRepo;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
+import com.company.awms.data.employees.EmployeeDailyReference;
 
 @Document
 public class Day {

@@ -1,7 +1,6 @@
 package com.company.awms.data.schedule;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

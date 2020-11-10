@@ -26,8 +26,6 @@ public class SalaryController {
 	
 	@GetMapping("/salary/{nationalID}")
 	public ResponseEntity<String> getSalary(@PathVariable String nationalID){
-		
-		
 		return new ResponseEntity<>(String.format("Approximately %3.2f leva for this month", salaryService.estimateSalary(nationalID, 1.0)), HttpStatus.OK);
 	}
 }

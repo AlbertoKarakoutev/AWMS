@@ -1,13 +1,13 @@
 package com.company.awms.services;
 
-import com.company.awms.data.employees.Employee;
-import com.company.awms.data.employees.EmployeeDailyReference;
-import com.company.awms.data.employees.EmployeeRepo;
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.Date;
+import com.company.awms.data.employees.Employee;
+import com.company.awms.data.employees.EmployeeDailyReference;
+import com.company.awms.data.employees.EmployeeRepo;
 
 @Service
 public class EmployeeService {
@@ -26,7 +26,7 @@ public class EmployeeService {
         return empDayRef;
     }
 
-    public void requestSwap(String requesterID, String date, String message) {
+    public void requestSwap(String requestorID, String date, String message) {
         /*Employee will be prompted and he will decide whether he wants to swap
          * with that person on that date. If he agrees, Day.swapEmployees(requesterID, this.id) will be called
          */
