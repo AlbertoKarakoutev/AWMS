@@ -1,16 +1,14 @@
 package com.company.awms.services;
 
 import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
-import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.data.schedule.Day;
-import com.company.awms.data.schedule.ScheduleRepo;
 import com.company.awms.data.schedule.Task;
-import com.company.awms.data.schedule.TaskRepo;
 
 @Service
 public class SalaryService {
@@ -19,21 +17,33 @@ public class SalaryService {
 	public SalaryService() {
 	}
 
-	// Rewards for specific tasks in a user's rewards array
-	public boolean rewardBonus(String userID, int reward, Task task) {
-		if (task.getCompleted() && !task.getPaidFor()) {
-			try {
-				Employee rewarded = EmployeeService.getRepository().findById(userID).get();
-				rewarded.addReward(reward);
-			} catch (Exception e) {
-				System.out.println("User not found!");
-				e.printStackTrace();
-				return false;
+	// Rewards for user's completed tasks
+	public double taskRewardBonus(String nationalID) {
+		double taskRewards = 0;	
+		LocalDate date = LocalDate.now();
+		for (int i = 1; i < date.getDayOfMonth(); i++) {
+			LocalDate dateTemplate = date.withDayOfMonth(i);
+			Day thisDay = ScheduleService.getRepository().findByDate(dateTemplate);
+			for (EmployeeDailyReference edr : thisDay.getEmployees()) {
+				if (edr.getNationalID().equals(nationalID)) {
+					for(Task currentTask : edr.getTasks()) {	
+						if (currentTask.getCompleted() && !currentTask.getPaidFor() && currentTask.getTaskReward()!=0.0) {
+							currentTask.setPaidFor(true);
+							taskRewards+=currentTask.getTaskReward();
+							ScheduleService.getRepository().save(thisDay);
+						}
+					}
+				}
 			}
-			task.setPaidFor(true);
 		}
-		return true;
-
+		return taskRewards;
+	}
+	
+	public double estimateSalary(String nationalID, Double payPerHour) {
+		double salary = 0;
+		salary+=calculateWorkHours(nationalID)*payPerHour;
+		salary+=taskRewardBonus(nationalID);	
+		return salary;
 	}
 
 	// Calculate work hours for this month
@@ -45,7 +55,6 @@ public class SalaryService {
 			
 			for (int i = 1; i < date.getDayOfMonth(); i++) {
 				LocalDate dateTemplate = date.withDayOfMonth(i);
-				System.out.println(dateTemplate);
 				Day thisDay = ScheduleService.getRepository().findByDate(dateTemplate);
 				for (EmployeeDailyReference edr : thisDay.getEmployees()) {
 					if (edr.getNationalID().equals(nationalID)) {

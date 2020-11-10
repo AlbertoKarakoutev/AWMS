@@ -19,7 +19,7 @@ public class Employee {
 	public String iban;
 	public String accessLevel;
 	public String phoneNumber;
-	public ArrayList<Integer> rewards = new ArrayList<Integer>();
+	public ArrayList<Double> rewards = new ArrayList<Double>();
 	public double salary;
 
 	public Employee() {}
@@ -104,11 +104,11 @@ public class Employee {
 		return this.salary;
 	}
 	
-	public void addReward(int reward) {
+	public void addReward(double reward) {
 		this.rewards.add(reward);
 	}
 	
-	public ArrayList<Integer> getRewards(){
+	public ArrayList<Double> getRewards(){
 		return this.rewards;
 	}
 }

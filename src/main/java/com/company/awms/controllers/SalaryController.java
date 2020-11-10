@@ -23,4 +23,11 @@ public class SalaryController {
 	public ResponseEntity<String> getByName(@PathVariable String nationalID) {
 		return new ResponseEntity<>(String.format("%3.2f hours of work this month", salaryService.calculateWorkHours(nationalID)), HttpStatus.OK);
 	}
+	
+	@GetMapping("/salary/{nationalID}")
+	public ResponseEntity<String> getSalary(@PathVariable String nationalID){
+		
+		
+		return new ResponseEntity<>(String.format("Approximately %3.2f leva for this month", salaryService.estimateSalary(nationalID, 1.0)), HttpStatus.OK);
+	}
 }

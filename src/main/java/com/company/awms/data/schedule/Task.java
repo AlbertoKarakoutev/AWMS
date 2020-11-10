@@ -12,7 +12,6 @@ public class Task {
 	public String receiverNationalID;
 	public String taskBody;
 	public String taskTitle;
-	public String reward;
 	public boolean completed;
 	public boolean paidFor;
 	public double taskReward = 0;
