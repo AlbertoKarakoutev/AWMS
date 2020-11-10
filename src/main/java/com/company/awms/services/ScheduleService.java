@@ -54,42 +54,44 @@ public class ScheduleService {
 		scheduleRepo.save(currentDay);
 	}
 
-	public boolean swapEmployees(String requestorNationalID, String receiverNationalID, String requestorDate, String receiverDate) {
-		
+	public boolean swapEmployees(String requestorNationalID, String receiverNationalID, String requestorDate,
+			String receiverDate) {
+
 		EmployeeDailyReference requestor = null;
 		EmployeeDailyReference receiver = null;
 		LocalDate thisRequestorDate = LocalDate.parse(requestorDate);
 		LocalDate thisReceiverDate = LocalDate.parse(receiverDate);
-		Day requestorDay = scheduleRepo.findByDate(thisRequestorDate.withDayOfMonth(thisRequestorDate.getDayOfMonth() + 1));
-		Day receiverDay = scheduleRepo.findByDate(thisReceiverDate.withDayOfMonth(thisReceiverDate.getDayOfMonth() + 1));
-		
-		for(EmployeeDailyReference edr : requestorDay.getEmployees()) {
-			if(edr.getNationalID().equals(requestorNationalID)){
+		Day requestorDay = scheduleRepo
+				.findByDate(thisRequestorDate.withDayOfMonth(thisRequestorDate.getDayOfMonth() + 1));
+		Day receiverDay = scheduleRepo
+				.findByDate(thisReceiverDate.withDayOfMonth(thisReceiverDate.getDayOfMonth() + 1));
+
+		for (EmployeeDailyReference edr : requestorDay.getEmployees()) {
+			if (edr.getNationalID().equals(requestorNationalID)) {
 				requestor = edr;
-				System.out.println(requestor.getNationalID());
 			}
 		}
-		for(EmployeeDailyReference edr : receiverDay.getEmployees()) {
-			if(edr.getNationalID().equals(receiverNationalID)){
+		for (EmployeeDailyReference edr : receiverDay.getEmployees()) {
+			if (edr.getNationalID().equals(receiverNationalID)) {
 				receiver = edr;
 			}
 		}
-		
-		if(requestor!=null && receiver!=null) {
+
+		if (requestor != null && receiver != null) {
 			requestorDay.getEmployees().remove(requestor);
 			receiverDay.getEmployees().remove(receiver);
-			
+
 			int[] workTimeTemp = requestor.getWorkTime();
 			requestor.setWorkTime(receiver.getWorkTime());
 			receiver.setWorkTime(workTimeTemp);
-			
+
 			requestorDay.getEmployees().add(receiver);
 			receiverDay.getEmployees().add(requestor);
-			
+
 			scheduleRepo.save(requestorDay);
 			scheduleRepo.save(receiverDay);
 			return true;
-		}else {
+		} else {
 			return false;
 		}
 	}
@@ -126,6 +128,22 @@ public class ScheduleService {
 
 	public Task createTask(String receiverNationalID, Day date, String taskBody, String taskTitle) {
 		return new Task(receiverNationalID, date, taskBody, taskTitle);
+	}
+
+	//Get all equivalent access level employees with their schedules, by iterating over dates up to a month ahead
+	public ArrayList<EmployeeDailyReference> viewSchedule(String accessLevel) {
+		ArrayList<EmployeeDailyReference> sameLevelEmployees = new ArrayList<>();
+		for (LocalDate startDate = LocalDate.now(); startDate
+				.isBefore(LocalDate.now().plusMonths(1)); startDate = startDate.plusDays(1)) {
+			Day thisDay = scheduleRepo.findByDate(startDate);
+			for (int i = 0; i < thisDay.getEmployees().size(); i++) {
+				if (EmployeeService.getRepository().findByNationalID(thisDay.getEmployees().get(i).getNationalID())
+						.getAccessLevel() == accessLevel) {
+						sameLevelEmployees.add(thisDay.getEmployees().get(i));
+				}
+			}
+		}
+		return sameLevelEmployees;
 	}
 
 	public static ScheduleRepo getRepository() {

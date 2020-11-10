@@ -15,6 +15,7 @@ public class Employee {
 	public String lastName;
 	public String email;
 	public String iban;
+	//Should be in the form %c%d, where %c is a department of the company, and %d is vertical access level in that department
 	public String accessLevel;
 	public String phoneNumber;
 	public double salary;
