@@ -1,27 +1,28 @@
 package com.company.awms.data.documents;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class File {
+public class Doc {
 
 	@Id
 	public String id;
 	
 	public String path;
 	public String accessLevel;
-	public String uploaderID;
-	public String uploadDate;
+	public String uploaderNationalID;
+	public LocalDate uploadDate;
 	public ArrayList<String> downloaderIDs = new ArrayList<String>();
 	public double size;
 	
-	public File() {
+	public Doc() {
 	}
 	
-	public File(String path, String accessLevel) {
+	public Doc(String path, String accessLevel) {
 		this.path = path;
 		this.accessLevel = accessLevel;
 	}
@@ -39,12 +40,12 @@ public class File {
 		return size;
 	}
 	public String getUploader() {
-		return this.uploaderID;
+		return this.uploaderNationalID;
 	}
 	public ArrayList<String> getDownloaders() {
 		return this.downloaderIDs;
 	}
-	public String getUploadDate() {
+	public LocalDate getUploadDate() {
 		return this.uploadDate;
 	}
 	public void setPath(String path){
@@ -53,10 +54,10 @@ public class File {
 	public void setAccessLevel(String accessLevel) {
 		this.accessLevel = accessLevel;
 	}
-	public void setUploaderID(String uploaderID) {
-		this.uploaderID = uploaderID;
+	public void setUploaderID(String uploaderNationalID) {
+		this.uploaderNationalID = uploaderNationalID;
 	}
-	public void setUploadDate(String uploadDate) {
+	public void setUploadDate(LocalDate uploadDate) {
 		this.uploadDate = uploadDate;
 	}
 	public void setDownloaderIDs(ArrayList<String> downloaderIDs) {
