@@ -10,6 +10,7 @@ public class ForumThread {
 	
 	@Id
 	private String id;
+
 	private String title;
 	private String body;
 	private String issuerId;

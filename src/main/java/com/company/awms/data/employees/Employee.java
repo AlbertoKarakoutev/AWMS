@@ -8,17 +8,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Employee {
 
 	@Id
-	public String id;
+	private String id;
 
-	public String nationalID;
-	public String firstName;
-	public String lastName;
-	public String email;
-	public String iban;
+	private String nationalID;
+	private String firstName;
+	private String lastName;
+	private String email;
+	private String iban;
 	//Should be in the form %c%d, where %c is a department of the company, and %d is vertical access level in that department
-	public String accessLevel;
-	public String phoneNumber;
-	public double salary;
+	private String accessLevel;
+	private String phoneNumber;
+	private double salary;
 
 	public Employee() {}
 

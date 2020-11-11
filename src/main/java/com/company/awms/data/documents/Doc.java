@@ -10,14 +10,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Doc {
 
 	@Id
-	public String id;
+	private String id;
 	
-	public String path;
-	public String accessLevel;
-	public String uploaderNationalID;
-	public LocalDate uploadDate;
-	public ArrayList<String> downloaderIDs = new ArrayList<String>();
-	public double size;
+	private String path;
+	private String accessLevel;
+	private String uploaderNationalID;
+	private LocalDate uploadDate;
+	private ArrayList<String> downloaderIDs = new ArrayList<String>();
+	private double size;
 	
 	public Doc() {
 	}

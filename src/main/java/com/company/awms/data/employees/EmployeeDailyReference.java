@@ -16,12 +16,12 @@ public class EmployeeDailyReference extends Employee {
 	EmployeeRepo employeeRepo;
 	
 	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
-	public int[] workTime = new int[4];
-	public String refFirstName;
-	public String refLastName;
-	public String refNationalID;
-	public ArrayList<Task> tasks = new ArrayList<Task>();
-	public LocalDate date;
+	private int[] workTime = new int[4];
+	private String refFirstName;
+	private String refLastName;
+	private String refNationalID;
+	private ArrayList<Task> tasks = new ArrayList<Task>();
+	private LocalDate date;
 
 	public EmployeeDailyReference() {}
 	
@@ -41,7 +41,7 @@ public class EmployeeDailyReference extends Employee {
 		}
 	}
 	
-	public String getNationalID() {
+	public String getRefNationalID() {
 		return this.refNationalID;
 	}
 	
@@ -55,6 +55,10 @@ public class EmployeeDailyReference extends Employee {
 
 	public int[] getWorkTime() {
 		return this.workTime;
+	}
+
+	public String getRefFirstName() {
+		return refFirstName;
 	}
 
 	public LocalDate getDate() {

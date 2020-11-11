@@ -61,7 +61,9 @@ public class DocumentService {
     	document.setSize(size);
     	documentRepo.save(document);
     }
-    
+
+    // Check if documentRepo.findById(documentID) is present before calling .get().
+	// If not throw an IOException and catch it in the controller and return 404 Not Found
     public Doc downloadDocument(String documentID, String downloaderNationalID) {
     	Doc documentToDownload;
     	try {

@@ -57,8 +57,8 @@ public class SalaryService {
 				Day thisDay = ScheduleService.getRepository().findByDate(dateTemplate);
 				for (EmployeeDailyReference edr : thisDay.getEmployees()) {
 					if (edr.getNationalID().equals(nationalID)) {
-						hours += (edr.getWorkTime()[2] + (edr.getWorkTime()[3] / 60))
-								- (edr.getWorkTime()[0] + (edr.getWorkTime()[1] / 60));
+						hours += (edr.getWorkTime()[2] + ((double)edr.getWorkTime()[3] / 60))
+								- (edr.getWorkTime()[0] + ((double)edr.getWorkTime()[1] / 60));
 					}
 				}
 			}

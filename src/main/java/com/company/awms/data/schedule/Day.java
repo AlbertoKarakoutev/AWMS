@@ -12,10 +12,10 @@ import com.company.awms.data.employees.EmployeeDailyReference;
 public class Day {
 	
 	@Id
-	public String id;
+	private String id;
 
-	public LocalDate date;
-	public ArrayList<EmployeeDailyReference> employees;
+	private LocalDate date;
+	private ArrayList<EmployeeDailyReference> employees;
 
 	public Day(LocalDate date) {
 		this.date = date;

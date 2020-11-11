@@ -25,6 +25,9 @@ public class ScheduleService {
 		ScheduleService.scheduleRepo = scheduleRepo;
 	}
 
+	// Call employeeService.createEmployeeDailyReference(...) in the ScheduleController and them get edr from the arguments
+	// And remove injection of employeeService.
+
 	// Create a employee reference with appropriate information and add to the
 	// current day employees array
 	public void addEmployee(String nationalID, LocalDate date, int[] workTime) {
@@ -49,7 +52,7 @@ public class ScheduleService {
 			ArrayList<EmployeeDailyReference> singleEmployee = new ArrayList<>();
 			singleEmployee.add(edr);
 			currentDay.setEmployees(singleEmployee);
-			System.out.println(edr.refFirstName);
+			System.out.println(edr.getRefFirstName());
 		}
 		scheduleRepo.save(currentDay);
 	}
@@ -138,7 +141,7 @@ public class ScheduleService {
 			Day thisDay = scheduleRepo.findByDate(startDate);
 			for (int i = 0; i < thisDay.getEmployees().size(); i++) {
 				if (EmployeeService.getRepository().findByNationalID(thisDay.getEmployees().get(i).getNationalID())
-						.getAccessLevel() == accessLevel) {
+						.getAccessLevel().equals(accessLevel)) {
 						sameLevelEmployees.add(thisDay.getEmployees().get(i));
 				}
 			}

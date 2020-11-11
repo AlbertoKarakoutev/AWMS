@@ -10,6 +10,7 @@ public class ForumReply {
 
 	@Id
 	private String id;
+
 	private String threadId;
 	private String issuerId;
 	private String body;

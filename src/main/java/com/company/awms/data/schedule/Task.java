@@ -7,14 +7,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Task {
 
 	@Id
-	public String id;
+	private String id;
 
-	public String receiverNationalID;
-	public String taskBody;
-	public String taskTitle;
-	public boolean completed;
-	public boolean paidFor;
-	public double taskReward = 0;
+	private String receiverNationalID;
+	private String taskBody;
+	private String taskTitle;
+	private boolean completed;
+	private boolean paidFor;
+	private double taskReward = 0;
 
 	public Task(String receiverNationalID, Day date, String taskTitle, String taskBody) {
 		this.receiverNationalID = receiverNationalID;
