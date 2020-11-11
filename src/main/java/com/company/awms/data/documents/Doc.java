@@ -3,6 +3,7 @@ package com.company.awms.data.documents;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,7 +13,7 @@ public class Doc {
 	@Id
 	private String id;
 	
-	private String path;
+	private Binary data;
 	private String accessLevel;
 	private String uploaderNationalID;
 	private LocalDate uploadDate;
@@ -22,13 +23,12 @@ public class Doc {
 	public Doc() {
 	}
 	
-	public Doc(String path, String accessLevel) {
-		this.path = path;
+	public Doc(String accessLevel) {
 		this.accessLevel = accessLevel;
 	}
 	
-	public String getPath() {
-		return path;
+	public Binary getData() {
+		return data;
 	}
 	public String getID() {
 		return id;
@@ -48,8 +48,8 @@ public class Doc {
 	public LocalDate getUploadDate() {
 		return this.uploadDate;
 	}
-	public void setPath(String path){
-		this.path = path;
+	public void setData(Binary data){
+		this.data = data;
 	}
 	public void setAccessLevel(String accessLevel) {
 		this.accessLevel = accessLevel;

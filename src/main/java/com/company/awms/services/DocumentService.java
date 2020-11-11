@@ -1,15 +1,18 @@
 package com.company.awms.services;
 
 import java.io.File;
-
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.company.awms.data.documents.DocumentRepo;
 import com.company.awms.data.documents.Doc;
+import com.company.awms.data.documents.DocumentRepo;
 import com.company.awms.data.employees.Employee;
 
 @Service
@@ -44,7 +47,7 @@ public class DocumentService {
 		return accessableDocumentIDs;
 	}
     
-    public void uploadDocument(String path, String uploaderNationalID) {
+    public void uploadDocument(MultipartFile file, String uploaderNationalID) {
     	Employee uploader = null;
     	LocalDate date = LocalDate.now();
     	try {
@@ -54,10 +57,16 @@ public class DocumentService {
     		System.out.println("User not found!");
     		return;
     	}
-    	Doc document = new Doc(path, uploader.getAccessLevel());
+    	Doc document = new Doc(uploader.getAccessLevel());
     	document.setUploaderID(uploaderNationalID);
+    	try {
+			document.setData(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	document.setUploadDate(date);
-    	double size = new File(path).length();
+    	double size = ((File) file).length();
     	document.setSize(size);
     	documentRepo.save(document);
     }
@@ -76,7 +85,6 @@ public class DocumentService {
     		documentToDownload.getDownloaders().add(downloaderNationalID);
     	}
     	documentRepo.save(documentToDownload);
-    	System.out.println(documentToDownload.getAccessLevel());
     	return documentToDownload;
     }
     

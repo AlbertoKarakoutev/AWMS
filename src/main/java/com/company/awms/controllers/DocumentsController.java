@@ -1,11 +1,20 @@
 package com.company.awms.controllers;
 
-import com.company.awms.services.DocumentService;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.company.awms.data.documents.Doc;
+import com.company.awms.services.DocumentService;
 
 @RestController
 public class DocumentsController {
@@ -17,27 +26,16 @@ public class DocumentsController {
         this.documentService = documentService;
     }
     
-    //Test method
-    @GetMapping("upload")
-    public ResponseEntity<String> uploadDocument(){
-        documentService.uploadDocument("documentation/Architecture.docx", "1234567890");
-        return new ResponseEntity<>("success", HttpStatus.OK);
+    @PostMapping("upload")
+    public ResponseEntity<String> uploadDocument(@RequestParam("file") MultipartFile file, Model model)throws IOException{
+        documentService.uploadDocument(file, "1234567890");
+        return new ResponseEntity<>("redirect:/photos/", HttpStatus.OK);
     }
     
-    //Test method
-    @GetMapping("download")
-    public ResponseEntity<String> downloadDocument(){
-        documentService.downloadDocument("5fabdb4582227516d1e9e219", "1234567890");
-        return new ResponseEntity<>("success", HttpStatus.OK);
+    @GetMapping("download/{id}")
+    public ResponseEntity<Doc> downloadDocument(@PathVariable String id, Model model){
+        Doc downloaded = documentService.downloadDocument(id, "1234567890");
+        //model.addAttribute("data", downloaded.getData());
+        return new ResponseEntity<>(downloaded, HttpStatus.OK);
     }
-    
-  /*@Autowired
-  DocumentRepo documentRepo;
-
-    @GetMapping("/document")
-    public ResponseEntity<String> addDocument(){
-        this.documentRepo.save(new File());
-        this.documentRepo.findById("дасд").
-        return new ResponseEntity<>("asdads", HttpStatus.OK);
-    }*/
 }
