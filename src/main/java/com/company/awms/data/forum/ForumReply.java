@@ -6,27 +6,27 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Document
-public class ForumThread {
-	
+public class ForumReply {
+
 	@Id
 	private String id;
-	private String title;
-	private String body;
+	private String threadId;
 	private String issuerId;
+	private String body;
 	//Should be in the YYYY-MM-DDTHH:MM:SS format
 	private LocalDateTime time;
 	
-	public ForumThread() {}
-	
-	public ForumThread(String issuerId, String body, String title, LocalDateTime time) {
+	public ForumReply() {}
+
+	public ForumReply(String threadId, String issuerId, String body, LocalDateTime time) {
+		this.threadId = threadId;
 		this.issuerId = issuerId;
-		this.title = title;
 		this.body = body;
 		this.time = time;
 	}
 
-	public String getID() {
-		return this.id;
+	public String getId() {
+		return id;
 	}
 	public String getIssuerId() {
 		return this.issuerId;
@@ -34,11 +34,11 @@ public class ForumThread {
 	public LocalDateTime getTime() {
 		return this.time;
 	}
-	public String getTitle() {
-		return this.title;
+	public String getThreadId() {
+		return threadId;
 	}
 	public String getBody() {
-		return this.body;
+		return body;
 	}
 	public void setIssuerId(String issuerId) {
 		this.issuerId = issuerId;
@@ -46,8 +46,8 @@ public class ForumThread {
 	public void setTime(LocalDateTime time) {
 		this.time = time;
 	}
-	public void setTitle(String title) {
-		this.title = title;
+	public void setThreadId(String threadId) {
+		this.threadId = threadId;
 	}
 	public void setBody(String body) {
 		this.body = body;
