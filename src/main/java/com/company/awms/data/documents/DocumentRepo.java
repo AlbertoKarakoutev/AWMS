@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface DocumentRepo extends MongoRepository<File, String> {
+public interface DocumentRepo extends MongoRepository<Doc, String> {
 
-	public File findByPath(String path);
-	public ArrayList<File> findByAccessLevel(String accessLevel);
+	public Doc findByPath(String path);
+	public ArrayList<Doc> findByAccessLevel(String accessLevel);
 }

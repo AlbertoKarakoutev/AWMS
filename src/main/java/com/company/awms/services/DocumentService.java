@@ -1,12 +1,16 @@
 package com.company.awms.services;
 
+import java.io.File;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.company.awms.data.documents.DocumentRepo;
-import com.company.awms.data.documents.File;
+import com.company.awms.data.documents.Doc;
+import com.company.awms.data.employees.Employee;
 
 @Service
 public class DocumentService {
@@ -32,13 +36,47 @@ public class DocumentService {
 			return null;
 		}
 		for(int i = 0; i <= level; i++) {
-			ArrayList<File> thisLevelDocuments = documentRepo.findByAccessLevel(Character.toString(department) + Integer.toString(i));
-			for(File document : thisLevelDocuments) {
+			ArrayList<Doc> thisLevelDocuments = documentRepo.findByAccessLevel(Character.toString(department) + Integer.toString(i));
+			for(Doc document : thisLevelDocuments) {
 				accessableDocumentIDs.add(document.getID());
 			}
 		}
 		return accessableDocumentIDs;
 	}
+    
+    public void uploadDocument(String path, String uploaderNationalID) {
+    	Employee uploader = null;
+    	LocalDate date = LocalDate.now();
+    	try {
+    		uploader = EmployeeService.getRepository().findByNationalID(uploaderNationalID);
+    		
+    	}catch(Exception e) {
+    		System.out.println("User not found!");
+    		return;
+    	}
+    	Doc document = new Doc(path, uploader.getAccessLevel());
+    	document.setUploaderID(uploaderNationalID);
+    	document.setUploadDate(date);
+    	double size = new File(path).length();
+    	document.setSize(size);
+    	documentRepo.save(document);
+    }
+    
+    public Doc downloadDocument(String documentID, String downloaderNationalID) {
+    	Doc documentToDownload;
+    	try {
+    		documentToDownload = documentRepo.findById(documentID).get();
+    	}catch(Exception e) {
+    		System.out.println("Document not found!");
+    		return null;
+    	}
+    	if(!documentToDownload.getDownloaders().contains(downloaderNationalID)) {
+    		documentToDownload.getDownloaders().add(downloaderNationalID);
+    	}
+    	documentRepo.save(documentToDownload);
+    	System.out.println(documentToDownload.getAccessLevel());
+    	return documentToDownload;
+    }
     
     public static DocumentRepo getRepository() {
     	return documentRepo;
