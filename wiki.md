@@ -91,8 +91,8 @@
       	**Main forum reply object, containing _variables_, as well as their appropriate getters and setters**
         - **Variables:**
 			- String _id_
-			- String _threadId_
-			- String _issuerId_
+			- String _threadID_
+			- String _issuerID_
 			- String _body_
 			- LocalDateTime _time_
 	
@@ -102,7 +102,7 @@
         - **Variables:**
 			- String _id_
 			- String _title_
-			- String _issuerId_
+			- String _issuerID_
 			- String _body_
 			- LocalDateTime _time_
 	
@@ -117,15 +117,15 @@
 		***(Interface)***  
       	**Forum thread repository, responsible for access to the database and object retrieval**
         - **Methods:**
-			- List _findByIssuerId(Strind issuerId)_
+			- List _findByIssuerID(Strind issuerID)_
 	
 	- ### **com.company.awms.data.forum.ForumReplyRepo**  
 		***(Interface)***  
       	**Forum reply repository, responsible for access to the database and object retrieval**
         - **Methods:**
-			- List _findByThreadId(String threadId)_
+			- List _findByThreadID(String threadID)_
 			
-			- List _findByIssuerId(Strind issuerId)_
+			- List _findByIssuerID(Strind issuerID)_
 	
 	- ### **com.company.awms.data.schedule.Day**  
 		***(Class)***  
@@ -183,20 +183,20 @@
 			- ***@GetMapping*** ResponseEntity _getAllThreads()_  
 			Handles requests for all the threads and retrieving them from the database through _forumService.getAllThreads()_ and responds appropriately  
 			
-			- ***@GetMapping*** ResponseEntity _getThread(String threadId)_  
-			Handles requests for a specific thread and if found, retrieves it from the database through _forumService.getThreadWithRepliesById()_ and responds appropriately
+			- ***@GetMapping*** ResponseEntity _getThread(String threadID)_  
+			Handles requests for a specific thread and if found, retrieves it from the database through _forumService.getThreadWithRepliesByID()_ and responds appropriately
 			
-			- ***@GetMapping*** ResponseEntity _getAllThreadsFromEmployee(String employeeId)_  
+			- ***@GetMapping*** ResponseEntity _getAllThreadsFromEmployee(String employeeID)_  
 			Handles requests by for all the threads by a specific employee, retrieving them from the database through _forumService.getAllThreadsFromEmployee()_ and responds appropriately
 			
-			- ***@GetMapping*** ResponseEntity _getAllRepliesFromEmployee(String employeeId)_  
+			- ***@GetMapping*** ResponseEntity _getAllRepliesFromEmployee(String employeeID)_  
 			Handles requests by for all the replies by a specific employee, retrieving them from the database through _forumService.getAllRepliesFromEmployee()_ and responds appropriately
 			
 			- ***@PostMapping*** ResponseEntity _addThread(ForumThread forumThread)_  
 			Handles thread addition requests by calling 
 _forumService.addNewThread()_ and sends appropriate response 
 
-			- ***@PostMapping*** ResponseEntity _addReply(ForumReply forumReply, String threadId)_  
+			- ***@PostMapping*** ResponseEntity _addReply(ForumReply forumReply, String threadID)_  
 			Handles reply addition requests by calling _forumService.addNewReply()_ and responds appropriately
 			
 	- ### com.company.awms.controllers.SalaryController
@@ -213,7 +213,7 @@ _forumService.addNewThread()_ and sends appropriate response
 		***(Class)***  
       	**Schedule controller, responsible for the requests' getting and posting and their appropriate _methods_**
         - **Methods:**
-			- ***@GetMapping*** ResponseEntity _swapEmployees(String requestorID, String receiverID, String requestorDate, String receiverDate)_  
+			- ***@GetMapping*** ResponseEntity _swapEmployees(String requestorNationalID, String receiverNationalID, String requestorDate, String receiverDate)_  
 			Handles requests for swapping employee shifts in the schedule through _scheduleService.swapEmployees()_ and responds appropriately  
 			
 			- ***@GetMapping*** ResponseEntity _dayID(String DOM)_  
@@ -225,18 +225,18 @@ _forumService.addNewThread()_ and sends appropriate response
 - # **com.company.awms.services**
 	*This package contains all the services, which are run by the software. All services have a private reference to their repos, as well as a public getter to access them from elsewhere.*
 
-	- ### com.company.awms.services.ScheduleService
+	- ### com.company.awms.services.DocumentService
 		***(Class)***  
       	**Main schedule backend logic, responsible for the executing the neccessary algorithms and actions, running in the system with their appropriate _methods_.**
         - **Methods:**
 			- ArrayList _getAccessableDocumentIDs(String accessLevel)_  
 			Splits the provided access level into a _char_ and _int_ and tries to parse into variables for them. If successful, a for loop iterates over the levels upto the given one and adds the documents, that match that level to the _ArrayList accessableDocumentIDs_. Returns that _ArrayList_
 			
-			- void _uploadDocument(MultipartFile file, String uploaderNationalID)_
-			Finds the user by his national ID. If successfull, it creates a new _Day_ object and fills it with the information for the uploader and the data from _file_. Sets the upload date and size. Uploads to the database.
+			- void _uploadDocument(MultipartFile file, String uploaderID)_
+			Finds the user by his ID. If successfull, it creates a new _Day_ object and fills it with the information for the uploader and the data from _file_. Sets the upload date and size. Uploads to the database.
 			 
-			- Doc _downloadDocument(String documentID, String downloaderNationalID)_
-			Tries to create a _Doc_ object through the document ID. If successful, it add the downloader national ID into the list of downloaders and re-uploads it. Returns the document.
+			- Doc _downloadDocument(String documentID, String downloaderID)_
+			Tries to create a _Doc_ object through the document ID. If successful, it add the downloader ID into the list of downloaders and re-uploads it. Returns the document.
 			
 	- ### com.company.awms.services.EmployeeService
 		***(Class)***  
@@ -251,7 +251,7 @@ _forumService.addNewThread()_ and sends appropriate response
 		***(Class)***  
       	**Main forum backend logic, responsible for the executing the neccessary algorithms and actions, running in the system with their appropriate _methods_.**
         - **Methods:**
-			- ThreadReplyDTO _getThreadWithRepliesById(String threadId)_  
+			- ThreadReplyDTO _getThreadWithRepliesByID(String threadID)_  
 			Tries to find the specified thread with all its replies through the id, and returns a _DTO_ with them
 			
 			- List _getAllThreads()  
