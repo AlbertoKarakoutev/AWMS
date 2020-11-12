@@ -84,21 +84,23 @@ public class ScheduleController {
 		for (int i = 1; i < 31; i++) {
 			LocalDate correctDate = now.withDayOfMonth(i);
 			int[] workTime = { 9, 0, 17, 0 };
-			scheduleService.addEmployee("1234567890", correctDate, workTime);
-			System.out.println(correctDate);
+			boolean success = scheduleService.addEmployee("1234567890", correctDate, workTime);
+			if(!success) {
+				return "Error adding work hours!";
+			}
 		}
 
 		return "Done!";
 	}
 
-	@GetMapping("/schedule/swap/{requestorID}/{receiverID}/{requestorDate}/{receiverDate}")
-	public ResponseEntity<String> swapEmployees(@PathVariable String requestorID, @PathVariable String receiverID,
+	@GetMapping("/schedule/swap/{requestorNationalID}/{receiverNationalID}/{requestorDate}/{receiverDate}")
+	public ResponseEntity<String> swapEmployees(@PathVariable String requestorNationalID, @PathVariable String receiverNationalID,
 			@PathVariable String requestorDate, @PathVariable String receiverDate) {
-		boolean success = scheduleService.swapEmployees(requestorID, receiverID, requestorDate, receiverDate);
+		boolean success = scheduleService.swapEmployees(requestorNationalID, receiverNationalID, requestorDate, receiverDate);
 		if(success) {
-			return new ResponseEntity<String>("Successfully swapped " + requestorID + " and " + receiverID, HttpStatus.OK);
+			return new ResponseEntity<String>("Successfully swapped " + requestorNationalID + " and " + receiverNationalID, HttpStatus.OK);
 		}else {
-			return new ResponseEntity<String>("Error swapping " + requestorID + " and " + receiverID, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>("Error swapping " + requestorNationalID + " and " + receiverNationalID, HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -118,8 +120,8 @@ public class ScheduleController {
 
 	@GetMapping("/schedule/task/{taskDay}/{receiverNationalID}")
 	public ResponseEntity<String> addTask(@PathVariable String taskDay, @PathVariable String receiverNationalID) {
-		boolean successful = scheduleService.addTask(taskDay, receiverNationalID);
-		if (successful) {
+		boolean success = scheduleService.addTask(taskDay, receiverNationalID);
+		if (success) {
 			return new ResponseEntity<>("Added task for " + receiverNationalID, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>("Error adding task for " + receiverNationalID, HttpStatus.BAD_REQUEST);

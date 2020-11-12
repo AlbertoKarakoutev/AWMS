@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface ForumReplyRepo extends MongoRepository<ForumReply, String> {
 
-    List<ForumReply> findByThreadId(String threadId);
+    List<ForumReply> findByThreadID(String threadID);
 
-    List<ForumReply> findByIssuerId(String issuerId);
+    List<ForumReply> findByIssuerID(String issuerID);
 
 }

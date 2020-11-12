@@ -41,14 +41,14 @@ public class EmployeeDailyReference extends Employee {
 		}
 	}
 	
+	public void addTask(Task task) {
+		tasks.add(task);
+	}
+	
 	public String getRefNationalID() {
 		return this.refNationalID;
 	}
 	
-	public void addTask(Task task) {
-		tasks.add(task);
-	}
-
 	public String getWorkTimeInfo() {
 		return String.format("%d:%d - %d:%d", workTime[0], workTime[1], workTime[2], workTime[3]);
 	}
@@ -59,6 +59,9 @@ public class EmployeeDailyReference extends Employee {
 
 	public String getRefFirstName() {
 		return refFirstName;
+	}
+	public String getRefLastName() {
+		return refLastName;
 	}
 
 	public LocalDate getDate() {

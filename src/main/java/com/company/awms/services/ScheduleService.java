@@ -30,13 +30,13 @@ public class ScheduleService {
 
 	// Create a employee reference with appropriate information and add to the
 	// current day employees array
-	public void addEmployee(String nationalID, LocalDate date, int[] workTime) {
+	public boolean addEmployee(String employeeID, LocalDate date, int[] workTime) {
 		Employee employee;
 		try {
-			employee = EmployeeService.getRepository().findByNationalID(nationalID);
+			employee = EmployeeService.getRepository().findById(employeeID).get();
 		} catch (Exception e) {
 			System.err.println("Error finding user!");
-			return;
+			return false;
 		}
 		EmployeeDailyReference edr = employeeService.createEmployeeDailyReference(employee, date, workTime);
 		Day currentDay;
@@ -44,7 +44,7 @@ public class ScheduleService {
 			currentDay = scheduleRepo.findByDate(date);
 		} catch (Exception e) {
 			System.err.println("Date not dound!");
-			return;
+			return false;
 		}
 		if (currentDay.getEmployees() != null) {
 			scheduleRepo.findByDate(date).getEmployees().add(edr);
@@ -52,9 +52,9 @@ public class ScheduleService {
 			ArrayList<EmployeeDailyReference> singleEmployee = new ArrayList<>();
 			singleEmployee.add(edr);
 			currentDay.setEmployees(singleEmployee);
-			System.out.println(edr.getRefFirstName());
 		}
 		scheduleRepo.save(currentDay);
+		return true;
 	}
 
 	public boolean swapEmployees(String requestorNationalID, String receiverNationalID, String requestorDate,

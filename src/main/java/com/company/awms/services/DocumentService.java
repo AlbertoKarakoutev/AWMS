@@ -47,33 +47,34 @@ public class DocumentService {
 		return accessableDocumentIDs;
 	}
     
-    public void uploadDocument(MultipartFile file, String uploaderNationalID) {
+    public boolean uploadDocument(MultipartFile file, String uploaderID) {
     	Employee uploader = null;
     	LocalDate date = LocalDate.now();
     	try {
-    		uploader = EmployeeService.getRepository().findByNationalID(uploaderNationalID);
+    		uploader = EmployeeService.getRepository().findById(uploaderID).get();
     		
     	}catch(Exception e) {
     		System.out.println("User not found!");
-    		return;
+    		return false;
     	}
     	Doc document = new Doc(uploader.getAccessLevel());
-    	document.setUploaderID(uploaderNationalID);
+    	document.setUploaderID(uploaderID);
     	try {
 			document.setData(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
     	document.setUploadDate(date);
     	double size = ((File) file).length();
     	document.setSize(size);
     	documentRepo.save(document);
+    	return true;
     }
 
     // Check if documentRepo.findById(documentID) is present before calling .get().
 	// If not throw an IOException and catch it in the controller and return 404 Not Found
-    public Doc downloadDocument(String documentID, String downloaderNationalID) {
+    public Doc downloadDocument(String documentID, String downloaderID) {
     	Doc documentToDownload;
     	try {
     		documentToDownload = documentRepo.findById(documentID).get();
@@ -81,8 +82,8 @@ public class DocumentService {
     		System.out.println("Document not found!");
     		return null;
     	}
-    	if(!documentToDownload.getDownloaders().contains(downloaderNationalID)) {
-    		documentToDownload.getDownloaders().add(downloaderNationalID);
+    	if(!documentToDownload.getDownloaders().contains(downloaderID)) {
+    		documentToDownload.getDownloaders().add(downloaderID);
     	}
     	documentRepo.save(documentToDownload);
     	return documentToDownload;

@@ -13,14 +13,13 @@ public class ForumThread {
 
 	private String title;
 	private String body;
-	private String issuerId;
-	//Should be in the YYYY-MM-DDTHH:MM:SS format
+	private String issuerID;
 	private LocalDateTime time;
 	
 	public ForumThread() {}
 	
-	public ForumThread(String issuerId, String body, String title, LocalDateTime time) {
-		this.issuerId = issuerId;
+	public ForumThread(String issuerID, String body, String title, LocalDateTime time) {
+		this.issuerID = issuerID;
 		this.title = title;
 		this.body = body;
 		this.time = time;
@@ -29,8 +28,8 @@ public class ForumThread {
 	public String getID() {
 		return this.id;
 	}
-	public String getIssuerId() {
-		return this.issuerId;
+	public String getIssuerID() {
+		return this.issuerID;
 	}
 	public LocalDateTime getTime() {
 		return this.time;
@@ -41,8 +40,8 @@ public class ForumThread {
 	public String getBody() {
 		return this.body;
 	}
-	public void setIssuerId(String issuerId) {
-		this.issuerId = issuerId;
+	public void setIssuerID(String issuerID) {
+		this.issuerID = issuerID;
 	}
 	public void setTime(LocalDateTime time) {
 		this.time = time;

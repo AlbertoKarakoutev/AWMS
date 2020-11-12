@@ -15,7 +15,7 @@ public class Doc {
 	
 	private Binary data;
 	private String accessLevel;
-	private String uploaderNationalID;
+	private String uploaderID;
 	private LocalDate uploadDate;
 	private ArrayList<String> downloaderIDs = new ArrayList<String>();
 	private double size;
@@ -40,7 +40,7 @@ public class Doc {
 		return size;
 	}
 	public String getUploader() {
-		return this.uploaderNationalID;
+		return this.uploaderID;
 	}
 	public ArrayList<String> getDownloaders() {
 		return this.downloaderIDs;
@@ -54,8 +54,8 @@ public class Doc {
 	public void setAccessLevel(String accessLevel) {
 		this.accessLevel = accessLevel;
 	}
-	public void setUploaderID(String uploaderNationalID) {
-		this.uploaderNationalID = uploaderNationalID;
+	public void setUploaderID(String uploaderID) {
+		this.uploaderID = uploaderID;
 	}
 	public void setUploadDate(LocalDate uploadDate) {
 		this.uploadDate = uploadDate;

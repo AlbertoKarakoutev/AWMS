@@ -11,17 +11,16 @@ public class ForumReply {
 	@Id
 	private String id;
 
-	private String threadId;
-	private String issuerId;
+	private String threadID;
+	private String issuerID;
 	private String body;
-	//Should be in the YYYY-MM-DDTHH:MM:SS format
 	private LocalDateTime time;
 	
 	public ForumReply() {}
 
-	public ForumReply(String threadId, String issuerId, String body, LocalDateTime time) {
-		this.threadId = threadId;
-		this.issuerId = issuerId;
+	public ForumReply(String threadID, String issuerID, String body, LocalDateTime time) {
+		this.threadID = threadID;
+		this.issuerID = issuerID;
 		this.body = body;
 		this.time = time;
 	}
@@ -29,26 +28,26 @@ public class ForumReply {
 	public String getId() {
 		return id;
 	}
-	public String getIssuerId() {
-		return this.issuerId;
+	public String getIssuerID() {
+		return this.issuerID;
 	}
 	public LocalDateTime getTime() {
 		return this.time;
 	}
-	public String getThreadId() {
-		return threadId;
+	public String getThreadID() {
+		return threadID;
 	}
 	public String getBody() {
 		return body;
 	}
-	public void setIssuerId(String issuerId) {
-		this.issuerId = issuerId;
+	public void setIssuerID(String issuerID) {
+		this.issuerID = issuerID;
 	}
 	public void setTime(LocalDateTime time) {
 		this.time = time;
 	}
-	public void setThreadId(String threadId) {
-		this.threadId = threadId;
+	public void setThreadID(String threadID) {
+		this.threadID = threadID;
 	}
 	public void setBody(String body) {
 		this.body = body;

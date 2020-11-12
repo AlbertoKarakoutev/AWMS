@@ -19,14 +19,14 @@ public class ForumService {
         this.forumReplyRepo = forumReplyRepo;
     }
     
-    public ThreadReplyDTO getThreadWithRepliesById(String threadId) throws IOException {
-        Optional<ForumThread> thread = this.forumThreadRepo.findById(threadId);
+    public ThreadReplyDTO getThreadWithRepliesByID(String threadID) throws IOException {
+        Optional<ForumThread> thread = this.forumThreadRepo.findById(threadID);
 
         if(thread.isEmpty()){
             throw new IOException("Thread not found!");
         }
 
-        List<ForumReply> replies = this.forumReplyRepo.findByThreadId(threadId);
+        List<ForumReply> replies = this.forumReplyRepo.findByThreadID(threadID);
 
         return new ThreadReplyDTO(thread.get(), replies);
     }
@@ -35,12 +35,12 @@ public class ForumService {
         return this.forumThreadRepo.findAll();
     }
 
-    public List<ForumThread> getAllThreadsFromEmployee(String issuerId) {
-        return this.forumThreadRepo.findByIssuerId(issuerId);
+    public List<ForumThread> getAllThreadsFromEmployee(String issuerID) {
+        return this.forumThreadRepo.findByIssuerID(issuerID);
     }
 
-    public List<ForumReply> getAllRepliesFromEmployee(String issuerId) {
-        return this.forumReplyRepo.findByIssuerId(issuerId);
+    public List<ForumReply> getAllRepliesFromEmployee(String issuerID) {
+        return this.forumReplyRepo.findByIssuerID(issuerID);
     }
 
     public void addNewThread(ForumThread newThread) {

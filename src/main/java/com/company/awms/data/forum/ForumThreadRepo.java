@@ -9,5 +9,5 @@ public interface ForumThreadRepo extends MongoRepository<ForumThread, String> {
 
 	//Optional<ForumThread> findByTitle(String title);
 
-	List<ForumThread> findByIssuerId(String issuerId);
+	List<ForumThread> findByIssuerID(String issuerID);
 }

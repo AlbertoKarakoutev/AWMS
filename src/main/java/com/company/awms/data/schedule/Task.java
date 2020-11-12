@@ -65,7 +65,7 @@ public class Task {
 		this.taskReward = taskReward;
 	}
 
-	public void setTaskReceiverID(String receiverNationalID) {
+	public void setTaskReceiverNationalID(String receiverNationalID) {
 		this.receiverNationalID = receiverNationalID;
 	}
 

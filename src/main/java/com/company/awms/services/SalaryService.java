@@ -20,20 +20,24 @@ public class SalaryService {
 	public double taskRewardBonus(String nationalID) {
 		double taskRewards = 0;	
 		LocalDate date = LocalDate.now();
-		for (int i = 1; i < date.getDayOfMonth(); i++) {
-			LocalDate dateTemplate = date.withDayOfMonth(i);
-			Day thisDay = ScheduleService.getRepository().findByDate(dateTemplate);
-			for (EmployeeDailyReference edr : thisDay.getEmployees()) {
-				if (edr.getNationalID().equals(nationalID)) {
-					for(Task currentTask : edr.getTasks()) {	
-						if (currentTask.getCompleted() && !currentTask.getPaidFor() && currentTask.getTaskReward()!=0.0) {
-							currentTask.setPaidFor(true);
-							taskRewards+=currentTask.getTaskReward();
-							ScheduleService.getRepository().save(thisDay);
+		try {
+			for (int i = 1; i < date.getDayOfMonth(); i++) {
+				LocalDate dateTemplate = date.withDayOfMonth(i);
+				Day thisDay = ScheduleService.getRepository().findByDate(dateTemplate);
+				for (EmployeeDailyReference edr : thisDay.getEmployees()) {
+					if (edr.getNationalID().equals(nationalID)) {
+						for(Task currentTask : edr.getTasks()) {	
+							if (currentTask.getCompleted() && !currentTask.getPaidFor() && currentTask.getTaskReward()!=0.0) {
+								currentTask.setPaidFor(true);
+								taskRewards+=currentTask.getTaskReward();
+								ScheduleService.getRepository().save(thisDay);
+							}
 						}
 					}
 				}
 			}
+		}catch(Exception e) {
+			return 0;
 		}
 		return taskRewards;
 	}
@@ -64,6 +68,7 @@ public class SalaryService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			return 0;
 		}
 		return hours;
 	}
