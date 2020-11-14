@@ -44,6 +44,9 @@ public class DocumentService {
 				accessableDocumentIDs.add(document.getID());
 			}
 		}
+		if(accessableDocumentIDs.isEmpty()) {
+			System.out.println("You do not have access to this module!");
+		}
 		return accessableDocumentIDs;
 	}
     

@@ -58,7 +58,9 @@
 			- String _accessLevel_  -  _In the form **char-int**, char being a department code, and int being the employee level in that department_
 			- String _phoneNumber_
 			- double _salary_
-			
+			- int[] _workWeek
+			- ArrayList<Dictionary<String, Object>> leaves - _Employee paid/unpaid leaves, in the form ("Start":Date, "End":Date, "Paid":boolean)  
+  
 	 - ### **com.company.awms.data.employees.EmployeeDailyReference**  
 		***(Class)***  
       	**Reference object, child of Employee, containing all of its information. It is used in the schedule, and is intended to be instantiated each day, which that employee is at work. It contains work time and tasks for the specific day, ass well as all getters and setters for it's _variables_**
@@ -218,6 +220,9 @@ _forumService.addNewThread()_ and sends appropriate response
 			
 			- ***@GetMapping*** ResponseEntity _dayID(String DOM)_  
 			Handles requests for an ID for a specific DOM (Day Of Month)through the repository and responds appropriately
+		
+			- ***@GetMapping*** ResponseEntity _applyRegularSchedule()_  
+			Calls scheduleService.applyRegularSchedule() and responds appropriately
 			 
 			- ***@GetMapping*** ResponseEntity _addTask(String taskDay, String receiverNationalID)_  
 			Handles requests for a new task on an employee on a specific day by calling _scheduleService.addTask()_ and responds appropriately
@@ -243,8 +248,11 @@ _forumService.addNewThread()_ and sends appropriate response
       	**Main employee actions backend logic, responsible for the executing the neccessary algorithms and running in the system with their appropriate _methods_.**
         - **Methods:**
 			- EmployeeDailyReference _createEmployeeDailyReference(Employee employee, LocalDate date, int[] workTime)_  
-			Creates new _EDR_ object from the employee. Feeds it the date and work hours. Returns that _EDR_ object
-			
+			Creates new _EDR_ object from the employee. Feeds it the date and work hours. Returns that _EDR_ object  
+
+			- void _addLeave(String employeeID, LocalDate start, LocalDate end, boolean paid)_  
+			Creates a new paid/unpaid leave and adds it to the employee object, and updates the database  
+
 			- void _requestSwap(String requestorID, LocalDate date, Strign message)_
 			
 	- ### com.company.awms.services.ForumService
@@ -286,7 +294,7 @@ _forumService.addNewThread()_ and sends appropriate response
 		***(Class)***  
       	**Main schedule module backend logic, responsible for the executing the neccessary algorithms and actions, running in the system with their appropriate _methods_.**
         - **Methods:**
-			- double _addEmployee(String nationalID, LocalDate date, int[] workTime)_  
+			- double _addWorkDay(String nationalID, LocalDate date, int[] workTime)_  
 			Tries to get the employee from the DB. If successfull, makes a new _EDR_ object from it. Tries to find the _Day_ from the DB. Adds the new _EDR_ to the _Day.employees_ list and updates the _Day_ in the DB
 			
 			- boolean _swapEmployees(String requestorNationalID, String receiverNationalID, String requestorDate, String receiverDate)  
@@ -296,7 +304,10 @@ _forumService.addNewThread()_ and sends appropriate response
 			Tries to get the _Day_ and _EDR_ from that day form the DB. If successful, creates a new _Task_ and loads the information into it. Saves the updated _Day_ into the DB and returns true if successful
 			
 			- Task _createTask(String receiverNationalID, Day date, String taskBody, String taskTitle)_  
-			Creates a bew _Task_ objects and returns it
+			Creates a bew _Task_ objects and returns it  
+
+			- boolean _applyRegularSchedule(String department, int level)_  
+			Loads all employees from the specified accessLevel. Parses the _departments.json_ configuration file and finds the current department. Applies the first scheduling algorithm to that department, if it is specified in the file. 
 			
 			- ArrayList _viewSchedule(String accessLevel)_  
 			Iterates through all the dates upto the current one. Finds the _Day_ and all _EDR_ objects from it. Aggregates all _EDR_'s with equal and lower access levels. Returns that list

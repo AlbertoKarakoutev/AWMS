@@ -72,6 +72,14 @@ public class EmployeeDailyReference extends Employee {
 		return tasks;
 	}
 
+	public void setRefFirstName(String refFirstName) {
+		this.refFirstName = refFirstName;
+	}
+	
+	public void setRefLastName(String refLastName) {
+		this.refLastName = refLastName;
+	}
+	
 	public void setWorkTime(int[] workTime) {
 		this.workTime = workTime;
 	}

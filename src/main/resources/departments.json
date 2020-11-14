@@ -1,0 +1,68 @@
+{ 
+	"a":{
+		"name":"Accounting",
+		
+		"universalSchedule":true,
+		
+		"scheduleType":"Regular",
+		
+		"dailyHours":[9,0,18,0],
+		
+		"shiftLength":8
+	},
+	"b":{ 
+		"name":"Storage",
+		
+		"universalSchedule":false,
+		
+		"levels":{
+		
+			"1":{ 
+			
+				"scheduleType":"Irregular",
+			
+				"dailyHours":[6,0,20,0],
+			
+				"shiftLength":10,
+		
+				"workOnWeekends":true,
+			
+				"breakBetweenDays":12,
+		
+				"workloadRequirement":50
+			},
+			"2":{ 
+			
+				"scheduleType":"Regular",
+				
+				"dailyHours":[6,0,20,0],
+			
+				"shiftLength":8,
+		
+				"workOnWeekends":false,
+			
+				"breakBetweenDays":12,
+		
+				"workloadRequirement":16
+			}
+		}
+		
+	},
+	"c":{ 
+		"name":"Security",
+		
+		"universalSchedule":true,
+		
+		"scheduleType":"OnCall",
+		
+		"dailyHours":[0,0,23,59],
+		
+		"shiftLength":12,
+		
+		"workOnWeekends":true,
+		
+		"breakBetweenDays":14,
+		
+		"workloadRequirement":12
+	}
+} 

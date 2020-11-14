@@ -1,8 +1,14 @@
 package com.company.awms.services;
 
+import java.io.FileReader;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Iterator;
 
+import org.json.simple.*;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +36,7 @@ public class ScheduleService {
 
 	// Create a employee reference with appropriate information and add to the
 	// current day employees array
-	public boolean addEmployee(String employeeID, LocalDate date, int[] workTime) {
+	public boolean addWorkDay(String employeeID, LocalDate date, int[] workTime) {
 		Employee employee;
 		try {
 			employee = EmployeeService.getRepository().findById(employeeID).get();
@@ -39,15 +45,16 @@ public class ScheduleService {
 			return false;
 		}
 		EmployeeDailyReference edr = employeeService.createEmployeeDailyReference(employee, date, workTime);
+		
 		Day currentDay;
 		try {
 			currentDay = scheduleRepo.findByDate(date);
 		} catch (Exception e) {
-			System.err.println("Date not dound!");
+			System.err.println("Date not found!");
 			return false;
 		}
 		if (currentDay.getEmployees() != null) {
-			scheduleRepo.findByDate(date).getEmployees().add(edr);
+			currentDay.addEmployee(edr);
 		} else {
 			ArrayList<EmployeeDailyReference> singleEmployee = new ArrayList<>();
 			singleEmployee.add(edr);
@@ -149,6 +156,77 @@ public class ScheduleService {
 		return sameLevelEmployees;
 	}
 
+	public boolean applyRegularSchedule(String department, int level) {
+		
+		JSONObject departments;
+		JSONObject thisDepartment;
+		try {
+			departments = (JSONObject)new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
+			thisDepartment = (JSONObject) departments.get(department);
+		}catch(Exception e) {
+			System.out.println("Could not parse JSON file!");
+			e.printStackTrace();
+			return false;
+		}
+		
+		if(!((String)thisDepartment.get("scheduleType")).equals("Regular")) {
+			System.out.println("Incorrect schedule type!");
+			return false;
+		}
+		
+		for(Employee employee : EmployeeService.getRepository().findByAccessLevel(department + Integer.toString(level))) {
+			dayLoop:
+			for(Day day : scheduleRepo.findAll()) {
+				if(day.getDate().getDayOfWeek()!= DayOfWeek.SUNDAY && day.getDate().getDayOfWeek()!= DayOfWeek.SATURDAY) {
+					if(!employee.getLeaves().isEmpty()) {
+						for(Dictionary<String, Object> leave : employee.getLeaves()) {
+							if(day.getDate().isAfter((LocalDate)leave.get("Start")) && day.getDate().isBefore((LocalDate)leave.get("End"))) {
+								continue dayLoop;
+							}else {
+								if(Boolean.parseBoolean((String)thisDepartment.get("universalSchedule"))) {
+									int[] workTime = new int[4];
+									JSONArray workTimeJSON = (JSONArray) thisDepartment.get("dailyHours");
+									Iterator<?> iterator = workTimeJSON.iterator();
+									try {
+										for(int i = 0; i < 4; i++) {
+											workTime[i] = (int) iterator.next();
+										}
+										addWorkDay(employee.getID(), day.getDate(), workTime);				
+									}catch(Exception e) {
+										System.out.println("Iterator error!");
+									
+									}
+								}
+								
+							}
+						}
+					}else {
+						if((boolean)thisDepartment.get("universalSchedule")) {
+							int[] workTime = new int[4];
+							JSONArray workTimeJSON = (JSONArray)thisDepartment.get("dailyHours");
+							Iterator<?> iterator = workTimeJSON.iterator();
+							try {
+								for(int i = 0; i < 4; i++) {
+									long value = (long) iterator.next();
+									workTime[i] = (int)value;
+								}
+								addWorkDay(employee.getID(), day.getDate(), workTime);				
+							}catch(Exception e) {
+								System.out.println(day.getDate() + " Iterator error!");
+								e.printStackTrace();
+								return false;
+							}
+						}
+					}
+				}else {
+					continue dayLoop;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	public static ScheduleRepo getRepository() {
 		return scheduleRepo;
 	}

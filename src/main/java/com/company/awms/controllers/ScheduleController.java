@@ -1,7 +1,9 @@
 package com.company.awms.controllers;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,7 @@ public class ScheduleController {
 
 	// @TestMethod
 	// Populate DB with this month's dates
+	@GetMapping("/schedule/days")
 	public String addDays() {
 		LocalDate now = LocalDate.now();
 		// Certain 1-28 days
@@ -68,7 +71,7 @@ public class ScheduleController {
 			YearMonth yearMonthObject = YearMonth.of(now.getYear(), now.getMonthValue());
 			if (yearMonthObject.lengthOfMonth() == 31) {
 				LocalDate correctDate31 = now.withDayOfMonth(31);
-				Day day31 = new Day(correctDate31);
+				Day day31 = new Day(correctDate31.plus(1, ChronoUnit.DAYS));
 				System.out.println(correctDate31);
 				ScheduleService.getRepository().save(day31);
 			}
@@ -84,13 +87,23 @@ public class ScheduleController {
 		for (int i = 1; i < 31; i++) {
 			LocalDate correctDate = now.withDayOfMonth(i);
 			int[] workTime = { 9, 0, 17, 0 };
-			boolean success = scheduleService.addEmployee("1234567890", correctDate, workTime);
+			boolean success = scheduleService.addWorkDay("1234567890", correctDate, workTime);
 			if(!success) {
 				return "Error adding work hours!";
 			}
 		}
 
 		return "Done!";
+	}
+	
+	@GetMapping("/schedule/apply")
+	public ResponseEntity<String> applyRegularSchedule() {
+		boolean success = scheduleService.applyRegularSchedule("a", 2);
+		if(success) {
+			return new ResponseEntity<String>("Successfully applied schedule!", HttpStatus.OK);
+		}else {
+			return new ResponseEntity<String>("Error applying scheduole!", HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping("/schedule/swap/{requestorNationalID}/{receiverNationalID}/{requestorDate}/{receiverDate}")

@@ -1,5 +1,9 @@
 package com.company.awms.data.employees;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Dictionary;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,6 +23,9 @@ public class Employee {
 	private String accessLevel;
 	private String phoneNumber;
 	private double salary;
+	private int[] workWeek = new int[2];
+	//Shoult be in the form ("Start":Date, "End":Date, "Paid":boolean)
+	private ArrayList<Dictionary<String, Object>> leaves = new ArrayList<>();
 
 	public Employee() {}
 
@@ -69,7 +76,19 @@ public class Employee {
 	public void setNationalID(String nationalID) {
 		this.nationalID = nationalID;
 	}
+	
+	public void setWorkWeek(int[] workWeek) {
+		this.workWeek = workWeek;
+	}
+	
+	public void setLeaves(ArrayList<Dictionary<String, Object>> leaves) {
+		this.leaves = leaves;
+	}
 
+	public String getID() {
+		return this.id;
+	}
+	
 	public String getFirstName() {
 		return this.firstName;
 	}
@@ -95,10 +114,18 @@ public class Employee {
 	}
 
 	public String getNationalID() {
-		return nationalID;
+		return this.nationalID;
 	}
 
 	public double getSalary() {
 		return this.salary;
+	}
+	
+	public int[] getWorkWeek() {
+		return this.workWeek;
+	}
+	
+	public ArrayList<Dictionary<String, Object>> getLeaves(){
+		return this.leaves;
 	}
 }
