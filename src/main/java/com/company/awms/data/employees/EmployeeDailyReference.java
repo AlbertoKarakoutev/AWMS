@@ -1,6 +1,7 @@
 package com.company.awms.data.employees;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class EmployeeDailyReference extends Employee {
 	EmployeeRepo employeeRepo;
 	
 	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
-	private int[] workTime = new int[4];
+	private LocalTime[] workTime = new LocalTime[2];
 	private String refFirstName;
 	private String refLastName;
 	private String refNationalID;
@@ -53,7 +54,7 @@ public class EmployeeDailyReference extends Employee {
 		return String.format("%d:%d - %d:%d", workTime[0], workTime[1], workTime[2], workTime[3]);
 	}
 
-	public int[] getWorkTime() {
+	public LocalTime[] getWorkTime() {
 		return this.workTime;
 	}
 
@@ -80,7 +81,7 @@ public class EmployeeDailyReference extends Employee {
 		this.refLastName = refLastName;
 	}
 	
-	public void setWorkTime(int[] workTime) {
+	public void setWorkTime(LocalTime[] workTime) {
 		this.workTime = workTime;
 	}
 

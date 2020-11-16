@@ -15,9 +15,11 @@ Software, intended for a functional and utilised company worflow. It incomporate
     
 # Salary
 *   If the company philosophy would allow it, the employees are able to estimate their monthly salary by the provided algorythm. It works on the basis of calculating their monthly completed tasks, as well as the solid stable they get paid by the hour.
-.
-.
-.
+  
+.  
+.  
+. 
+  
 # The system offers administrative functionallity. Pages contain useful tools, through which the system administrator can perform appropriate CRUD operations, in order to fix or resolve issues from within the software.
 
 ## departments.json
@@ -38,13 +40,18 @@ Software, intended for a functional and utilised company worflow. It incomporate
 *   **int** _breakBetweenDays_ - Specifies the minimal amount (in hours) that employees must be allowed to rest between shifts  
   
 *   **int** _workloadRequirement_ - Specifies the required combined work hours per day (_workloadRequirement = employeesPerDay * shiftlength_)  
-.
-.
-.
+  
+*   **int** _dailyBreakDurationTotal_ - Specifies the accumulated break time per one day for that department/level  
+  
+.  
+.  
+.  
   
 ## Schedule Types  
   
 ***!Work week refers to the cyclic ratio of work/break days of an employee!***  
+  
+***!Due to different date formats, MongoDB displays times 2 hours behind, and dates 1 day behind. This does not impact normal system function, but is misleading to the eyes. No attempt to fix is should be made, as the system is working fine.***  
   
 **In order to provide a better and more equipped service, the scheduling is divided into three main types. Depending on the type of department/level, each one can be selected in order to best suit the needs of the workers and the company.**  
   

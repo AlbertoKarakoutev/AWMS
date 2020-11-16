@@ -15,7 +15,7 @@ public class Day {
 	private String id;
 
 	private LocalDate date;
-	private ArrayList<EmployeeDailyReference> employees;
+	private ArrayList<EmployeeDailyReference> employees = new ArrayList<>();
 
 	public Day(LocalDate date) {
 		this.date = date;

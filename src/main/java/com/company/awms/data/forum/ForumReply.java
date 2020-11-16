@@ -1,9 +1,9 @@
 package com.company.awms.data.forum;
 
+import java.time.LocalTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
 
 @Document
 public class ForumReply {
@@ -14,11 +14,11 @@ public class ForumReply {
 	private String threadID;
 	private String issuerID;
 	private String body;
-	private LocalDateTime time;
+	private LocalTime time;
 	
 	public ForumReply() {}
 
-	public ForumReply(String threadID, String issuerID, String body, LocalDateTime time) {
+	public ForumReply(String threadID, String issuerID, String body, LocalTime time) {
 		this.threadID = threadID;
 		this.issuerID = issuerID;
 		this.body = body;
@@ -31,7 +31,7 @@ public class ForumReply {
 	public String getIssuerID() {
 		return this.issuerID;
 	}
-	public LocalDateTime getTime() {
+	public LocalTime getTime() {
 		return this.time;
 	}
 	public String getThreadID() {
@@ -43,7 +43,7 @@ public class ForumReply {
 	public void setIssuerID(String issuerID) {
 		this.issuerID = issuerID;
 	}
-	public void setTime(LocalDateTime time) {
+	public void setTime(LocalTime time) {
 		this.time = time;
 	}
 	public void setThreadID(String threadID) {

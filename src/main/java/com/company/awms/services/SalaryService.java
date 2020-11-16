@@ -1,5 +1,6 @@
 package com.company.awms.services;
 
+import java.time.Duration;
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +62,8 @@ public class SalaryService {
 				Day thisDay = ScheduleService.getRepository().findByDate(dateTemplate);
 				for (EmployeeDailyReference edr : thisDay.getEmployees()) {
 					if (edr.getNationalID().equals(nationalID)) {
-						hours += (edr.getWorkTime()[2] + ((double)edr.getWorkTime()[3] / 60))
-								- (edr.getWorkTime()[0] + ((double)edr.getWorkTime()[1] / 60));
+						Duration shiftLength =  Duration.between(edr.getWorkTime()[1], edr.getWorkTime()[0]);
+						hours += (double)shiftLength.toHours();
 					}
 				}
 			}

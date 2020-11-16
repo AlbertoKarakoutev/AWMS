@@ -1,6 +1,7 @@
 package com.company.awms.services;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -21,7 +22,7 @@ public class EmployeeService {
     }
 
     // Create a reference for this employee with information about his work hours and date
-    public EmployeeDailyReference createEmployeeDailyReference(Employee employee, LocalDate date, int[] workTime) {
+    public EmployeeDailyReference createEmployeeDailyReference(Employee employee, LocalDate date, LocalTime[] workTime) {
         EmployeeDailyReference empDayRef = new EmployeeDailyReference(employeeRepo, employee.getNationalID());
         empDayRef.setRefFirstName(employee.getFirstName());
         empDayRef.setRefLastName(employee.getLastName());

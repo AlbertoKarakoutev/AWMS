@@ -1,6 +1,6 @@
 package com.company.awms.data.documents;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.bson.types.Binary;
@@ -16,7 +16,7 @@ public class Doc {
 	private Binary data;
 	private String accessLevel;
 	private String uploaderID;
-	private LocalDate uploadDate;
+	private LocalDateTime uploadDateTime;
 	private ArrayList<String> downloaderIDs = new ArrayList<String>();
 	private double size;
 	
@@ -45,8 +45,8 @@ public class Doc {
 	public ArrayList<String> getDownloaders() {
 		return this.downloaderIDs;
 	}
-	public LocalDate getUploadDate() {
-		return this.uploadDate;
+	public LocalDateTime getUploadDateTime() {
+		return this.uploadDateTime;
 	}
 	public void setData(Binary data){
 		this.data = data;
@@ -57,8 +57,8 @@ public class Doc {
 	public void setUploaderID(String uploaderID) {
 		this.uploaderID = uploaderID;
 	}
-	public void setUploadDate(LocalDate uploadDate) {
-		this.uploadDate = uploadDate;
+	public void setUploadDateTime(LocalDateTime uploadDateTime) {
+		this.uploadDateTime = uploadDateTime;
 	}
 	public void setDownloaderIDs(ArrayList<String> downloaderIDs) {
 		this.downloaderIDs = downloaderIDs;

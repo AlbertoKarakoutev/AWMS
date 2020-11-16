@@ -2,7 +2,7 @@ package com.company.awms.services;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.bson.BsonBinarySubType;
@@ -52,7 +52,7 @@ public class DocumentService {
     
     public boolean uploadDocument(MultipartFile file, String uploaderID) {
     	Employee uploader = null;
-    	LocalDate date = LocalDate.now();
+    	LocalDateTime dateTime = LocalDateTime.now();
     	try {
     		uploader = EmployeeService.getRepository().findById(uploaderID).get();
     		
@@ -68,7 +68,7 @@ public class DocumentService {
 			e.printStackTrace();
 			return false;
 		}
-    	document.setUploadDate(date);
+    	document.setUploadDateTime(dateTime);
     	double size = ((File) file).length();
     	document.setSize(size);
     	documentRepo.save(document);

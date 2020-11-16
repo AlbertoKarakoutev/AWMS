@@ -8,16 +8,18 @@
 		
 		"dailyHours":[9,0,18,0],
 		
-		"shiftLength":8
+		"shiftLength":8,
+		
+		"dailyBreakDurationTotal":1
 	},
 	"b":{ 
 		"name":"Storage",
 		
 		"universalSchedule":false,
 		
-		"levels":{
+		"levels":[{ 
 		
-			"1":{ 
+			"0":{ 
 			
 				"scheduleType":"Irregular",
 			
@@ -29,9 +31,11 @@
 			
 				"breakBetweenDays":12,
 		
-				"workloadRequirement":50
-			},
-			"2":{ 
+				"workloadRequirement":50,
+		
+				"dailyBreakDurationTotal":2
+			}},{ 
+			"1":{ 
 			
 				"scheduleType":"Regular",
 				
@@ -43,10 +47,11 @@
 			
 				"breakBetweenDays":12,
 		
-				"workloadRequirement":16
-			}
-		}
+				"workloadRequirement":16,
 		
+				"dailyBreakDurationTotal":1
+			}}
+		]
 	},
 	"c":{ 
 		"name":"Security",
@@ -63,6 +68,8 @@
 		
 		"breakBetweenDays":14,
 		
-		"workloadRequirement":12
+		"workloadRequirement":12,
+		
+		"dailyBreakDurationTotal":3
 	}
 } 

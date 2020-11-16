@@ -1,6 +1,5 @@
 package com.company.awms.data.employees;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Dictionary;
 
@@ -24,7 +23,7 @@ public class Employee {
 	private String phoneNumber;
 	private double salary;
 	private int[] workWeek = new int[2];
-	//Shoult be in the form ("Start":Date, "End":Date, "Paid":boolean)
+	//Should be in the form ("Start":Date, "End":Date, "Paid":boolean)
 	private ArrayList<Dictionary<String, Object>> leaves = new ArrayList<>();
 
 	public Employee() {}

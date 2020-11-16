@@ -1,10 +1,11 @@
 package com.company.awms.controllers;
 
+import java.io.FileReader;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,82 +24,57 @@ public class ScheduleController {
 	EmployeeService employeeService;
 
 	@Autowired
-	public ScheduleController(ScheduleService scheduleService) {
+	public ScheduleController(ScheduleService scheduleService, EmployeeService employeeService) {
 		this.scheduleService = scheduleService;
+		this.employeeService = employeeService;
 	}
 
-	// @TestMethod
-	// Populate DB with this month's dates
-	@GetMapping("/schedule/days")
-	public String addDays() {
-		LocalDate now = LocalDate.now();
-		// Certain 1-28 days
-		for (int i = 1; i < 29; i++) {
+	// Populate DB with a month's dates
+	@GetMapping("/schedule/month/{month}")
+	public String addDays(@PathVariable int month) {
+		LocalDate now = LocalDate.now().withMonth(month);
+		YearMonth yearMonthObject = YearMonth.of(now.getYear(), now.getMonthValue());
+		for (int i = 1; i <= yearMonthObject.lengthOfMonth(); i++) {
 			LocalDate correctDate = now.withDayOfMonth(i);
-			Day testDay = new Day(correctDate);
+			Day day = new Day(correctDate);
 			System.out.println(correctDate);
-			ScheduleService.getRepository().save(testDay);
-		}
-		// Leap year
-		if (now.getYear() % 4 == 0) {
-			// Add day 29 if leap
-			LocalDate correctDate29 = now.withDayOfMonth(29);
-			Day day29 = new Day(correctDate29);
-			System.out.println(correctDate29);
-			ScheduleService.getRepository().save(day29);
-			if (now.getMonthValue() != 2) {
-				// Add day 30 if not February
-				LocalDate correctDate30 = now.withDayOfMonth(30);
-				Day day30 = new Day(correctDate30);
-				System.out.println(correctDate30);
-				ScheduleService.getRepository().save(day30);
-			}
-		} else {
-			// Not leap - add day29 and day 30 if not February
-			if (now.getMonthValue() != 2) {
-				LocalDate correctDate29 = now.withDayOfMonth(29);
-				Day day29 = new Day(correctDate29);
-				System.out.println(correctDate29);
-				ScheduleService.getRepository().save(day29);
-				LocalDate correctDate30 = now.withDayOfMonth(30);
-				Day day30 = new Day(correctDate30);
-				System.out.println(correctDate30);
-				ScheduleService.getRepository().save(day30);
-			}
-		}
-		// Add day 31 if the length of month value is 31
-		if (now.getMonthValue() != 2) {
-			YearMonth yearMonthObject = YearMonth.of(now.getYear(), now.getMonthValue());
-			if (yearMonthObject.lengthOfMonth() == 31) {
-				LocalDate correctDate31 = now.withDayOfMonth(31);
-				Day day31 = new Day(correctDate31.plus(1, ChronoUnit.DAYS));
-				System.out.println(correctDate31);
-				ScheduleService.getRepository().save(day31);
-			}
+			ScheduleService.getRepository().save(day);
 		}
 		return "Done";
 	}
 
-	// @TestMethod
-	// Populate schedule with a test employee with default working hours 09:00-17:00
-	public String addWorkHours() {
-		LocalDate now = LocalDate.now();
-		// Certain 1-28 days
-		for (int i = 1; i < 31; i++) {
-			LocalDate correctDate = now.withDayOfMonth(i);
-			int[] workTime = { 9, 0, 17, 0 };
-			boolean success = scheduleService.addWorkDay("1234567890", correctDate, workTime);
-			if(!success) {
-				return "Error adding work hours!";
-			}
+	//Test Method
+	//@GetMapping("/schedule/add/{day}")
+	public ResponseEntity<String> addWorkDay(@PathVariable int day) {
+		LocalDate date = LocalDate.now().withMonth(10).withDayOfMonth(day);
+		JSONObject departments = null;
+		try {
+			departments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		return "Done!";
+		JSONObject thisDepartment = (JSONObject) departments.get("b");  
+		boolean success = scheduleService.addWorkDay("5fa80775cb0e9c6301e92d3a", date, thisDepartment, 0);
+		if(success) {
+			return new ResponseEntity<String>("Successfully applied schedule!", HttpStatus.OK);
+		}else {
+			return new ResponseEntity<String>("Error applying scheduole!", HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	@GetMapping("/schedule/apply")
 	public ResponseEntity<String> applyRegularSchedule() {
-		boolean success = scheduleService.applyRegularSchedule("a", 2);
+		boolean success = scheduleService.applyRegularSchedule("b", 0);
+		if(success) {
+			return new ResponseEntity<String>("Successfully applied schedule!", HttpStatus.OK);
+		}else {
+			return new ResponseEntity<String>("Error applying scheduole!", HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/schedule/applyIrregular")
+	public ResponseEntity<String> applyIrregularSchedule() {
+		boolean success = scheduleService.applyIrregularSchedule("b", 0);
 		if(success) {
 			return new ResponseEntity<String>("Successfully applied schedule!", HttpStatus.OK);
 		}else {
@@ -115,20 +91,6 @@ public class ScheduleController {
 		}else {
 			return new ResponseEntity<String>("Error swapping " + requestorNationalID + " and " + receiverNationalID, HttpStatus.BAD_REQUEST);
 		}
-	}
-
-	@GetMapping("day/{DOM}")
-	public ResponseEntity<String> dayID(@PathVariable String DOM) {
-		LocalDate date = LocalDate.now();
-		LocalDate dateQuery = date.withDayOfMonth(Integer.parseInt(DOM));
-		Day day = null;
-		try {
-			day = ScheduleService.getRepository().findByDate(dateQuery);
-		} catch (Exception e) {
-			System.err.println("Invalid date!");
-			return new ResponseEntity<>("Date not found!", HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(day.getID(), HttpStatus.OK);
 	}
 
 	@GetMapping("/schedule/task/{taskDay}/{receiverNationalID}")

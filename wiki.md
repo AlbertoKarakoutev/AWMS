@@ -30,7 +30,7 @@
        		- Binary _data_
         	- String _accessLevel_
         	- String _uploaderID_
-        	- LocalDate _uploadDate_
+        	- LocalDateTime _uploadDateTime_
         	- ArrayList _downloaderIDs_
         	- double _size_
     - ### **com.company.awms.data.documents.DocumentRepo**  
@@ -66,7 +66,7 @@
       	**Reference object, child of Employee, containing all of its information. It is used in the schedule, and is intended to be instantiated each day, which that employee is at work. It contains work time and tasks for the specific day, ass well as all getters and setters for it's _variables_**
         - **Variables:**
 			- @Autowired EmployeeRepo _employeeRepo_
-			- int[] _workTime_ - _In the form **[startHour, startMinutes, endHour, endMinutes]**_
+			- LocalTime[] _workTime_
 			- String _refFirstName_
 			- String _refLastName_
 			- String _refNationalID_
@@ -215,15 +215,18 @@ _forumService.addNewThread()_ and sends appropriate response
 		***(Class)***  
       	**Schedule controller, responsible for the requests' getting and posting and their appropriate _methods_**
         - **Methods:**
+			- ***@GetMapping*** String _addDays(int month)_  
+			Populates the database with all the days for a specific month  
+  
 			- ***@GetMapping*** ResponseEntity _swapEmployees(String requestorNationalID, String receiverNationalID, String requestorDate, String receiverDate)_  
 			Handles requests for swapping employee shifts in the schedule through _scheduleService.swapEmployees()_ and responds appropriately  
-			
-			- ***@GetMapping*** ResponseEntity _dayID(String DOM)_  
-			Handles requests for an ID for a specific DOM (Day Of Month)through the repository and responds appropriately
-		
+  
 			- ***@GetMapping*** ResponseEntity _applyRegularSchedule()_  
-			Calls scheduleService.applyRegularSchedule() and responds appropriately
-			 
+			Calls scheduleService.applyRegularSchedule() and responds appropriately  
+  
+			- ***@GetMapping*** ResponseEntity _applyIrregularSchedule()_  
+			Calls scheduleService.applyIrregularSchedule() and responds appropriately  
+  
 			- ***@GetMapping*** ResponseEntity _addTask(String taskDay, String receiverNationalID)_  
 			Handles requests for a new task on an employee on a specific day by calling _scheduleService.addTask()_ and responds appropriately
 		
@@ -247,7 +250,7 @@ _forumService.addNewThread()_ and sends appropriate response
 		***(Class)***  
       	**Main employee actions backend logic, responsible for the executing the neccessary algorithms and running in the system with their appropriate _methods_.**
         - **Methods:**
-			- EmployeeDailyReference _createEmployeeDailyReference(Employee employee, LocalDate date, int[] workTime)_  
+			- EmployeeDailyReference _createEmployeeDailyReference(Employee employee, LocalDate date, LocalTime[] workTime)_  
 			Creates new _EDR_ object from the employee. Feeds it the date and work hours. Returns that _EDR_ object  
 
 			- void _addLeave(String employeeID, LocalDate start, LocalDate end, boolean paid)_  
@@ -294,7 +297,7 @@ _forumService.addNewThread()_ and sends appropriate response
 		***(Class)***  
       	**Main schedule module backend logic, responsible for the executing the neccessary algorithms and actions, running in the system with their appropriate _methods_.**
         - **Methods:**
-			- double _addWorkDay(String nationalID, LocalDate date, int[] workTime)_  
+			- double _addWorkDay(String employeeID, LocalDate date, JSONObject thisDepartment, int level)_  
 			Tries to get the employee from the DB. If successfull, makes a new _EDR_ object from it. Tries to find the _Day_ from the DB. Adds the new _EDR_ to the _Day.employees_ list and updates the _Day_ in the DB
 			
 			- boolean _swapEmployees(String requestorNationalID, String receiverNationalID, String requestorDate, String receiverDate)  
@@ -305,7 +308,13 @@ _forumService.addNewThread()_ and sends appropriate response
 			
 			- Task _createTask(String receiverNationalID, Day date, String taskBody, String taskTitle)_  
 			Creates a bew _Task_ objects and returns it  
-
+  
+			- boolean _isLeaveDay(Employee employee, Day day)_  
+			Checks if a day is marked as a paid/unpaid leave day for en employee
+  
+			- boolean _applyIrregularSchedule(String department, int level)_  
+			Loads all employees from the specified accessLevel. Parses the _departments.json_ configuration file and finds the current department. Applies the second scheduling algorithm to that department, if it is specified in the file. 
+  
 			- boolean _applyRegularSchedule(String department, int level)_  
 			Loads all employees from the specified accessLevel. Parses the _departments.json_ configuration file and finds the current department. Applies the first scheduling algorithm to that department, if it is specified in the file. 
 			
