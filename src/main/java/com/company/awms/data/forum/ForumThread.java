@@ -15,14 +15,16 @@ public class ForumThread {
 	private String body;
 	private String issuerID;
 	private LocalDateTime time;
+	private boolean isAnswered;
 	
 	public ForumThread() {}
 	
-	public ForumThread(String issuerID, String body, String title, LocalDateTime time) {
+	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered) {
 		this.issuerID = issuerID;
 		this.title = title;
 		this.body = body;
 		this.time = time;
+		this.isAnswered = isAnswered;
 	}
 
 	public String getID() {
@@ -40,6 +42,9 @@ public class ForumThread {
 	public String getBody() {
 		return this.body;
 	}
+	public boolean getAnswered() {
+		return isAnswered;
+	}
 	public void setIssuerID(String issuerID) {
 		this.issuerID = issuerID;
 	}
@@ -51,5 +56,8 @@ public class ForumThread {
 	}
 	public void setBody(String body) {
 		this.body = body;
+	}
+	public void setAnswered(boolean answered) {
+		isAnswered = answered;
 	}
 }

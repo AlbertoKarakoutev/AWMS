@@ -107,6 +107,7 @@
 			- String _issuerID_
 			- String _body_
 			- LocalDateTime _time_
+			- boolean _isAnswered_
 	
 	- ### **com.company.awms.data.forum.ThreadReplyDTO**  
 		***(Class)***  
@@ -201,6 +202,12 @@ _forumService.addNewThread()_ and sends appropriate response
 			- ***@PostMapping*** ResponseEntity _addReply(ForumReply forumReply, String threadID)_  
 			Handles reply addition requests by calling _forumService.addNewReply()_ and responds appropriately
 			
+			- ***@PutMapping*** ResponseEntity<String> _setThreadAnswered(@PathVariable String threadID)_
+			Marks thread as answered by calling _forumService.markAsAnswered()_ and responds approprately
+			
+			- ***@PutMapping*** ResponseEntity<String> _editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID)_
+			Handles edit thead requests by calling _forumService.editThread()_ and responds appropriately
+			
 	- ### com.company.awms.controllers.SalaryController
 		***(Class)***  
       	**Salary controller, responsible for the requests' getting and posting and their appropriate _methods_**
@@ -262,10 +269,16 @@ _forumService.addNewThread()_ and sends appropriate response
 			- ThreadReplyDTO _getThreadWithRepliesByID(String threadID)_  
 			Tries to find the specified thread with all its replies through the id, and returns a _DTO_ with them
 			
+			- ForumThread _getThread(String threadID)
+			Returns thread with _threadID_ from the database
+			
+			- ThreadReplyDTO getThreadWithRepliesByID(String threadID)
+			Returns a ThreadReplyDTO object containing the thread with _threadID_ and all of it's replies 
+			
 			- List _getAllThreads()  
 			Finds all the threads from the database
 			
-			- List _getAllThreadsFrom Employee()  
+			- List _getAllThreadsFromEmployee()  
 			Finds all the threads from a specific employee from the database 
 			
 			- List _getAlRepliesFromEmployee()  
@@ -276,6 +289,12 @@ _forumService.addNewThread()_ and sends appropriate response
 			
 			- void addNewReply(ForumThread newThread, String threadId)  
 			Adds the _newReply_ object with the thread id to the database
+			
+			- void markAsAnswered(String threadID)
+			Marks thread with _threadID_ as answered
+			
+			- void editThreadForumThread newForumThread, String oldThreadID)
+            Updates the thread with _oldThreadID_ with the new information from  _newForumThread_
 			
 	- ### com.company.awms.services.SalaryService
 		***(Class)***  

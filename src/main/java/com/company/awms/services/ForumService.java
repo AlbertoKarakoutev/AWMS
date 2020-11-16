@@ -18,17 +18,23 @@ public class ForumService {
         this.forumThreadRepo = forumThreadRepo;
         this.forumReplyRepo = forumReplyRepo;
     }
-    
-    public ThreadReplyDTO getThreadWithRepliesByID(String threadID) throws IOException {
+
+    public ForumThread getThread(String threadID) throws IOException{
         Optional<ForumThread> thread = this.forumThreadRepo.findById(threadID);
 
         if(thread.isEmpty()){
             throw new IOException("Thread not found!");
         }
 
+        return thread.get();
+    }
+    
+    public ThreadReplyDTO getThreadWithRepliesByID(String threadID) throws IOException {
+        ForumThread thread = getThread(threadID);
+
         List<ForumReply> replies = this.forumReplyRepo.findByThreadID(threadID);
 
-        return new ThreadReplyDTO(thread.get(), replies);
+        return new ThreadReplyDTO(thread, replies);
     }
 
     public List<ForumThread> getAllThreads() {
@@ -53,5 +59,21 @@ public class ForumService {
         this.forumReplyRepo.save(newReply);
     }
 
+    public void markAsAnswered(String threadID) throws IOException{
+        ForumThread forumThread = getThread(threadID);
 
+        forumThread.setAnswered(true);
+
+        this.forumThreadRepo.save(forumThread);
+    }
+
+    public void editThread(ForumThread newForumThread, String oldThreadID) throws IOException{
+        ForumThread oldThread = getThread(oldThreadID);
+        //Validation? from Validator Class
+        //We don't update the issuerID, time and isAnswered because they are presumed to be the same.
+        oldThread.setBody(newForumThread.getBody());
+        oldThread.setTitle(newForumThread.getTitle());
+
+        this.forumThreadRepo.save(oldThread);
+    }
 }

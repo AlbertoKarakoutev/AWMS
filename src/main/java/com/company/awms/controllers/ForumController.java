@@ -34,7 +34,20 @@ public class ForumController {
     }
 
     @GetMapping(value = "forum/thread/{threadID}")
-    public ResponseEntity<ThreadReplyDTO> getThread(@PathVariable String threadID){
+    public ResponseEntity<ForumThread> getThread(@PathVariable String threadID){
+        try {
+            ForumThread forumThread = this.forumService.getThread(threadID);
+
+            return new ResponseEntity<>(forumThread, HttpStatus.OK);
+        } catch(IOException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value = "forum/thread/{threadID}/replies")
+    public ResponseEntity<ThreadReplyDTO> getThreadWithReplies(@PathVariable String threadID){
         try {
             ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
 
@@ -73,7 +86,7 @@ public class ForumController {
     @PostMapping(value = "forum/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addThread(@RequestBody ForumThread forumThread){
 
-        //Authenticate that current user is the same as the issuerId from forumReply. If not return 401 Not Authorized
+        //Authenticate that current user is the same as the issuerId from forumThread. If not return 401 Not Authorized
         try {
             this.forumService.addNewThread(forumThread);
 
@@ -91,6 +104,36 @@ public class ForumController {
             this.forumService.addNewReply(forumReply);
 
             return new ResponseEntity<>("Added new Reply", HttpStatus.OK);
+        } catch(Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping(value = "forum/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> setThreadAnswered(@PathVariable String threadID){
+
+        //Authenticate that current user is the same as the issuerId from forumThread. If not return 401 Not Authorized
+        try {
+            this.forumService.markAsAnswered(threadID);
+
+            return new ResponseEntity<>("Added new Reply", HttpStatus.OK);
+        } catch(IOException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch(Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping(value = "forum/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID){
+
+        //Authenticate that current user is the same as the issuerId from forumThread. If not return 401 Not Authorized
+        try {
+            this.forumService.editThread(newForumThread, oldThreadID);
+
+            return new ResponseEntity<>("Added new Reply", HttpStatus.OK);
+        } catch(IOException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch(Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
