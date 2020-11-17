@@ -31,8 +31,6 @@
 			
 				"breakBetweenDays":12,
 		
-				"workloadRequirement":50,
-		
 				"dailyBreakDurationTotal":2
 			}},{ 
 			"1":{ 
@@ -46,8 +44,6 @@
 				"workOnWeekends":false,
 			
 				"breakBetweenDays":12,
-		
-				"workloadRequirement":16,
 		
 				"dailyBreakDurationTotal":1
 			}}
@@ -66,7 +62,7 @@
 		
 		"workOnWeekends":true,
 		
-		"breakBetweenDays":14,
+		"breakBetweenDays":12,
 		
 		"workloadRequirement":12,
 		

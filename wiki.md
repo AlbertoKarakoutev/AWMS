@@ -82,11 +82,11 @@
 			
 			- Employee _findByEmail(String email)_
 			
-			- List _findByFirstName(String firstName)_
+			- ArrayList _findByFirstName(String firstName)_
 			
-			- List _findByLastName(String lastName)_
+			- ArrayList _findByLastName(String lastName)_
 			
-			- List _findByAccessLevel(String accessLevel)_ 
+			- ArrayList _findByAccessLevel(String accessLevel)_ 
 			
 	- ### **com.company.awms.data.forum.ForumReply**  
 		***(Class)***  
@@ -234,6 +234,9 @@ _forumService.addNewThread()_ and sends appropriate response
 			- ***@GetMapping*** ResponseEntity _applyIrregularSchedule()_  
 			Calls scheduleService.applyIrregularSchedule() and responds appropriately  
   
+			- ***@GetMapping*** ResponseEntity _applyOnCallSchedule()_  
+			Calls scheduleService.applyOnCallSchedule() and responds appropriately  
+  
 			- ***@GetMapping*** ResponseEntity _addTask(String taskDay, String receiverNationalID)_  
 			Handles requests for a new task on an employee on a specific day by calling _scheduleService.addTask()_ and responds appropriately
 		
@@ -329,7 +332,13 @@ _forumService.addNewThread()_ and sends appropriate response
 			Creates a bew _Task_ objects and returns it  
   
 			- boolean _isLeaveDay(Employee employee, Day day)_  
-			Checks if a day is marked as a paid/unpaid leave day for en employee
+			Checks if a day is marked as a paid/unpaid leave day for en employee  
+  
+			- JSONObject _setDepartment(String department, int level, String type)_  
+			Finds the appropriate department for the key values from _departments.json_  
+  
+			- boolean _applyOnCallSchedule(String department, int level)_  
+			Gets all employees from the specified accessLevel. Parses the _departments.json_ configuration file and finds the current department. Distributes shifts according to number of employees and shifts needed. Applies the third scheduling algorithm to that department, if it is specified in the file.  
   
 			- boolean _applyIrregularSchedule(String department, int level)_  
 			Loads all employees from the specified accessLevel. Parses the _departments.json_ configuration file and finds the current department. Applies the second scheduling algorithm to that department, if it is specified in the file. 

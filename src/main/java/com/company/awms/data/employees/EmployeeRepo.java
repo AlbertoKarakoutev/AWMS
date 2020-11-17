@@ -1,6 +1,7 @@
 package com.company.awms.data.employees;
 
-import java.util.List;
+import java.util.ArrayList;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface EmployeeRepo extends MongoRepository<Employee, String> {
@@ -9,10 +10,10 @@ public interface EmployeeRepo extends MongoRepository<Employee, String> {
 
 	public Employee findByEmail(String email);
 
-	public List<Employee> findByFirstName(String firstName);
+	public ArrayList<Employee> findByFirstName(String firstName);
 
-	public List<Employee> findByLastName(String lastName);
+	public ArrayList<Employee> findByLastName(String lastName);
 
-	public List<Employee> findByAccessLevel(String accessLevel);
+	public ArrayList<Employee> findByAccessLevel(String accessLevel);
 
 }

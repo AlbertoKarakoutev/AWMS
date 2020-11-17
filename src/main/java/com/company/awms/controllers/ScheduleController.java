@@ -66,9 +66,9 @@ public class ScheduleController {
 	public ResponseEntity<String> applyRegularSchedule() {
 		boolean success = scheduleService.applyRegularSchedule("b", 0);
 		if(success) {
-			return new ResponseEntity<String>("Successfully applied schedule!", HttpStatus.OK);
+			return new ResponseEntity<String>("Successfully applied regular schedule!", HttpStatus.OK);
 		}else {
-			return new ResponseEntity<String>("Error applying scheduole!", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>("Error applying schedule!", HttpStatus.BAD_REQUEST);
 		}
 	}
 	
@@ -76,12 +76,22 @@ public class ScheduleController {
 	public ResponseEntity<String> applyIrregularSchedule() {
 		boolean success = scheduleService.applyIrregularSchedule("b", 0);
 		if(success) {
-			return new ResponseEntity<String>("Successfully applied schedule!", HttpStatus.OK);
+			return new ResponseEntity<String>("Successfully applied irregular schedule!", HttpStatus.OK);
 		}else {
-			return new ResponseEntity<String>("Error applying scheduole!", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>("Error applying schedule!", HttpStatus.BAD_REQUEST);
 		}
 	}
 
+	@GetMapping("/schedule/applyOncall")
+	public ResponseEntity<String> applyOnCallSchedule() {
+		boolean success = scheduleService.applyOnCallSchedule("c", 0);
+		if(success) {
+			return new ResponseEntity<String>("Successfully applied on-call schedule!", HttpStatus.OK);
+		}else {
+			return new ResponseEntity<String>("Error applying schedule!", HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@GetMapping("/schedule/swap/{requestorNationalID}/{receiverNationalID}/{requestorDate}/{receiverDate}")
 	public ResponseEntity<String> swapEmployees(@PathVariable String requestorNationalID, @PathVariable String receiverNationalID,
 			@PathVariable String requestorDate, @PathVariable String receiverDate) {
