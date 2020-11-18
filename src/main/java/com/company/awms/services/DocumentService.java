@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.company.awms.data.employees.EmployeeRepo;
 import org.bson.BsonBinarySubType;
@@ -26,72 +27,69 @@ public class DocumentService {
     @Autowired
     public DocumentService(DocumentRepo documentRepo, EmployeeRepo employeeRepo) {
         this.documentRepo = documentRepo;
+        this.employeeRepo = employeeRepo;
     }
     
     //Access to all documents form the same dpt. and same or lower level
     public List<String> getAccessableDocumentIDs(String accessLevel) {
-		List<String> accessableDocumentIDs = new ArrayList<>();
+		List<String> accessibleDocumentIDs = new ArrayList<>();
 		int level = 0;
-		@SuppressWarnings("null")
-		char department = (Character) null;
+		char department;
 		try {
 			department = accessLevel.charAt(0);
-			level = Integer.parseInt(String.valueOf(accessLevel.charAt(1)));		
+			level = accessLevel.charAt(1);
 		}catch(Exception e) {
 			System.out.println("Error retrieving access level!");
 			return null;
 		}
+		//This sends the same amount of request to the database as the level. If we have level 9 that is too slow
+		//TODO: optimize
 		for(int i = 0; i <= level; i++) {
 			List<Doc> thisLevelDocuments = documentRepo.findByAccessLevel(Character.toString(department) + Integer.toString(i));
 			for(Doc document : thisLevelDocuments) {
-				accessableDocumentIDs.add(document.getID());
+				accessibleDocumentIDs.add(document.getID());
 			}
 		}
-		if(accessableDocumentIDs.isEmpty()) {
+		if(accessibleDocumentIDs.isEmpty()) {
 			System.out.println("You do not have access to this module!");
 		}
-		return accessableDocumentIDs;
+		return accessibleDocumentIDs;
 	}
     
-    public boolean uploadDocument(MultipartFile file, String uploaderID) {
-    	Employee uploader = null;
+    public void uploadDocument(MultipartFile file, String uploaderID) throws IOException {
     	LocalDateTime dateTime = LocalDateTime.now();
-    	try {
-    		uploader = this.employeeRepo.findById(uploaderID).get();
-    		
-    	}catch(Exception e) {
-    		System.out.println("User not found!");
-    		return false;
-    	}
-    	Doc document = new Doc(uploader.getAccessLevel());
-    	document.setUploaderID(uploaderID);
-    	try {
-			document.setData(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
+    	Optional<Employee> uploader = this.employeeRepo.findById(uploaderID);
+
+    	if(uploader.isEmpty()) {
+			throw new IllegalArgumentException("Employee with id " + uploaderID + " doesn't exist");
 		}
+
+    	Doc document = new Doc(uploader.get().getAccessLevel());
+
+    	document.setUploaderID(uploaderID);
+    	document.setData(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
     	document.setUploadDateTime(dateTime);
-    	double size = ((File) file).length();
+    	double size = file.getSize();
     	document.setSize(size);
+
     	documentRepo.save(document);
-    	return true;
     }
 
-    // Check if documentRepo.findById(documentID) is present before calling .get().
-	// If not throw an IOException and catch it in the controller and return 404 Not Found
-    public Doc downloadDocument(String documentID, String downloaderID) {
-    	Doc documentToDownload;
-    	try {
-    		documentToDownload = documentRepo.findById(documentID).get();
-    	}catch(Exception e) {
-    		System.out.println("Document not found!");
-    		return null;
+    public Doc downloadDocument(String documentID, String downloaderID) throws IOException {
+    	Optional<Doc> documentToDownload = documentRepo.findById(documentID);
+
+    	if(documentToDownload.isEmpty()){
+    		throw new IOException("Document not found!");
+		}
+
+    	if(!documentToDownload.get().getDownloaders().contains(downloaderID)) {
+    		documentToDownload.get().getDownloaders().add(downloaderID);
     	}
-    	if(!documentToDownload.getDownloaders().contains(downloaderID)) {
-    		documentToDownload.getDownloaders().add(downloaderID);
-    	}
-    	documentRepo.save(documentToDownload);
-    	return documentToDownload;
+
+    	documentRepo.save(documentToDownload.get());
+    	return documentToDownload.get();
     }
+
+	//TODO:
+	//The rest of the CRUD methods related to the controller methods
 }

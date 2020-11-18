@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,16 +26,46 @@ public class DocumentsController {
         this.documentService = documentService;
     }
     
-    @PostMapping("upload")
-    public ResponseEntity<String> uploadDocument(@RequestParam("file") MultipartFile file, Model model)throws IOException{
-        documentService.uploadDocument(file, "1234567890");
-        return new ResponseEntity<>("redirect:/photos/", HttpStatus.OK);
+    @PostMapping(value = "document/public/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadPublicDocument(@RequestParam MultipartFile file){
+        try{
+            //TODO:
+            //get uploaderId from current user
+            documentService.uploadDocument(file, "5fa80775cb0e9c6301e92d3a");
+
+            return new ResponseEntity<>("Successfully uploaded file!", HttpStatus.OK);
+        } catch (IOException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (Exception e){
+            System.out.println(e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     
-    @GetMapping("download/{id}")
-    public ResponseEntity<Doc> downloadDocument(@PathVariable String id, Model model){
-        Doc downloaded = documentService.downloadDocument(id, "1234567890");
-        //model.addAttribute("data", downloaded.getData());
-        return new ResponseEntity<>(downloaded, HttpStatus.OK);
+    @GetMapping(value = "document/public/download/{documentId}")
+    public ResponseEntity<Doc> downloadDocument(@PathVariable String documentId){
+        try {
+            //TODO:
+            //replace downloaderId with current user Id
+            //check if user has access to download document
+            Doc document = documentService.downloadDocument(documentId, "5fa80775cb0e9c6301e92d3a");
+
+            return new ResponseEntity<>(document, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+    //TODO:
+    //getAllDocuments in department
+    //get personal document
+    //add personal document
+    //delete personal document
+    //delete public document
+    //edit personal document
+    //edit public document
 }

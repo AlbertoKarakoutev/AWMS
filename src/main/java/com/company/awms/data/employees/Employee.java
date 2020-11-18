@@ -25,7 +25,7 @@ public class Employee {
 	private double salary;
 	private int[] workWeek = new int[2];
 	//Should be in the form ("Start":Date, "End":Date, "Paid":boolean)
-	private List<Map<String, Object>> leaves;
+	private List<Map<String, Object>> leaves = new ArrayList<>();
 
 	public Employee() {}
 
@@ -50,7 +50,6 @@ public class Employee {
 		this.phoneNumber = phoneNumber;
 		this.salary = salary;
 		this.workWeek = workWeek;
-		this.leaves = new ArrayList<>();
 	}
 
 	// Get employee information

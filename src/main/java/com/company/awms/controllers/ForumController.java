@@ -85,7 +85,7 @@ public class ForumController {
 
     @PostMapping(value = "forum/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addThread(@RequestBody ForumThread forumThread){
-
+        //TODO:
         //Authenticate that current user is the same as the issuerId from forumThread. If not return 401 Not Authorized
         try {
             this.forumService.addNewThread(forumThread);
@@ -98,7 +98,7 @@ public class ForumController {
 
     @PostMapping(value = "forum/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID){
-
+        //TODO:
         //Authenticate that current user is the same as the issuerId from forumReply. If not return 401 Not Authorized
         try {
             this.forumService.addNewReply(forumReply);
@@ -110,8 +110,8 @@ public class ForumController {
     }
 
     @PutMapping(value = "forum/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setThreadAnswered(@PathVariable String threadID){
-
+    public ResponseEntity<String> markThreadAsAnswered(@PathVariable String threadID){
+        //TODO:
         //Authenticate that current user is the same as the issuerId from forumThread. If not return 401 Not Authorized
         try {
             this.forumService.markAsAnswered(threadID);
@@ -126,7 +126,7 @@ public class ForumController {
 
     @PutMapping(value = "forum/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID){
-
+        //TODO:
         //Authenticate that current user is the same as the issuerId from forumThread. If not return 401 Not Authorized
         try {
             this.forumService.editThread(newForumThread, oldThreadID);

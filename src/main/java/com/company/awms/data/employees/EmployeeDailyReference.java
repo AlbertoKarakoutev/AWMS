@@ -23,7 +23,7 @@ public class EmployeeDailyReference extends Employee {
 	private String refFirstName;
 	private String refLastName;
 	private String refNationalID;
-	private List<Task> tasks;
+	private List<Task> tasks = new ArrayList<>();
 	private LocalDate date;
 
 	/*public EmployeeDailyReference() {}
@@ -46,7 +46,6 @@ public class EmployeeDailyReference extends Employee {
 			this.refFirstName = employee.get().getFirstName();
 			this.refLastName = employee.get().getLastName();
 			this.workTime = new LocalTime[2];
-			this.tasks = new ArrayList<>();
 		}
 	}
 	

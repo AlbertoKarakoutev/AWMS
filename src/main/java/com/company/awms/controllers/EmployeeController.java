@@ -20,7 +20,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @GetMapping(value = "employee/{employeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "employee/{employeeId}")
     public ResponseEntity<Employee> getEmployee(@PathVariable String employeeId){
         try {
             Employee employee = this.employeeService.getEmployee(employeeId);
@@ -37,6 +37,7 @@ public class EmployeeController {
     @PostMapping(value = "employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registerEmployee(@RequestBody Employee newEmployee){
         try {
+            //TODO:
             //Validate that the current user trying to register a new employee is the Admin
             this.employeeService.registerEmployee(newEmployee);
 
@@ -49,6 +50,7 @@ public class EmployeeController {
     @PutMapping(value = "employee/{employeeId}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> editEmployeeInfo(@RequestBody Employee newEmployee, @PathVariable String employeeId){
         try {
+            //TODO:
             //Validate that the current user trying to register a new employee is the Admin
             this.employeeService.editEmployeeInfo(newEmployee, employeeId);
 

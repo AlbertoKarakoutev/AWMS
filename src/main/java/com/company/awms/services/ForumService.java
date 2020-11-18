@@ -50,11 +50,13 @@ public class ForumService {
     }
 
     public void addNewThread(ForumThread newThread) {
+        //TODO:
         //Validation? from Validator Class
         this.forumThreadRepo.save(newThread);
     }
 
     public void addNewReply(ForumReply newReply) {
+        //TODO:
         //Validation? from Validator Class
         this.forumReplyRepo.save(newReply);
     }
@@ -69,6 +71,7 @@ public class ForumService {
 
     public void editThread(ForumThread newForumThread, String oldThreadID) throws IOException{
         ForumThread oldThread = getThread(oldThreadID);
+        //TODO:
         //Validation? from Validator Class
         //We don't update the issuerID, time and isAnswered because they are presumed to be the same.
         oldThread.setBody(newForumThread.getBody());

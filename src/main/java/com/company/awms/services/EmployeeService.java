@@ -32,6 +32,7 @@ public class EmployeeService {
     }
 
     public void registerEmployee(Employee newEmployee){
+        //TODO:
         //Validation? from Validator Class
         this.employeeRepo.save(newEmployee);
     }
@@ -39,6 +40,7 @@ public class EmployeeService {
     //can be accessed by any employee who wants to edit their info
     public void editEmployeeInfo(Employee newEmployee, String oldEmployeeId) throws IOException{
         Employee oldEmployee = getEmployee(oldEmployeeId);
+        //TODO:
         //Validation? from Validator Class
         oldEmployee.setEmail(newEmployee.getEmail());
         oldEmployee.setFirstName(newEmployee.getFirstName());
@@ -58,6 +60,7 @@ public class EmployeeService {
         return empDayRef;
     }
 
+    //TODO:
     //delete this method if swapping of employees is in the ScheduleService
     public void requestSwap(String requestorID, String date, String message) {
         /*Employee will be prompted and he will decide whether he wants to swap
