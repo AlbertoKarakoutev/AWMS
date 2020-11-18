@@ -20,8 +20,8 @@ import com.company.awms.services.ScheduleService;
 @RestController
 public class ScheduleController {
 
-	ScheduleService scheduleService;
-	EmployeeService employeeService;
+	private ScheduleService scheduleService;
+	private EmployeeService employeeService;
 
 	@Autowired
 	public ScheduleController(ScheduleService scheduleService, EmployeeService employeeService) {
@@ -30,7 +30,7 @@ public class ScheduleController {
 	}
 
 	// Populate DB with a month's dates
-	@GetMapping("/schedule/month/{month}")
+	/*@GetMapping("/schedule/month/{month}")
 	public String addDays(@PathVariable int month) {
 		LocalDate now = LocalDate.now().withMonth(month);
 		YearMonth yearMonthObject = YearMonth.of(now.getYear(), now.getMonthValue());
@@ -41,7 +41,7 @@ public class ScheduleController {
 			ScheduleService.getRepository().save(day);
 		}
 		return "Done";
-	}
+	}*/
 
 	//Test Method
 	//@GetMapping("/schedule/add/{day}")

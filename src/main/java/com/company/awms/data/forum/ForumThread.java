@@ -31,33 +31,43 @@ public class ForumThread {
 	public String getID() {
 		return this.id;
 	}
+
 	public String getIssuerID() {
 		return this.issuerID;
 	}
+
 	public LocalDateTime getDateTime() {
 		return this.dateTime;
 	}
+
 	public String getTitle() {
 		return this.title;
 	}
+
 	public String getBody() {
 		return this.body;
 	}
+
 	public boolean getAnswered() {
 		return isAnswered;
 	}
+
 	public void setIssuerID(String issuerID) {
 		this.issuerID = issuerID;
 	}
+
 	public void setDateTime(LocalDateTime dateTime) {
 		this.dateTime = dateTime;
 	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
 	public void setBody(String body) {
 		this.body = body;
 	}
+
 	public void setAnswered(boolean answered) {
 		isAnswered = answered;
 	}

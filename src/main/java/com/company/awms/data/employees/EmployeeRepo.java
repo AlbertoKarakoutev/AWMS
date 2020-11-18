@@ -1,19 +1,20 @@
 package com.company.awms.data.employees;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface EmployeeRepo extends MongoRepository<Employee, String> {
 
-	public Employee findByNationalID(String nationalID);
+	Optional<Employee> findByNationalID(String nationalID);
 
-	public Employee findByEmail(String email);
+	Optional<Employee> findByEmail(String email);
 
-	public ArrayList<Employee> findByFirstName(String firstName);
+	List<Employee> findByFirstName(String firstName);
 
-	public ArrayList<Employee> findByLastName(String lastName);
+	List<Employee> findByLastName(String lastName);
 
-	public ArrayList<Employee> findByAccessLevel(String accessLevel);
+	List<Employee> findByAccessLevel(String accessLevel);
 
 }

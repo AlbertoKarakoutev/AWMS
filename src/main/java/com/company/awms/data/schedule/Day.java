@@ -2,6 +2,7 @@ package com.company.awms.data.schedule;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,7 +16,7 @@ public class Day {
 	private String id;
 
 	private LocalDate date;
-	private ArrayList<EmployeeDailyReference> employees = new ArrayList<>();
+	private List<EmployeeDailyReference> employees = new ArrayList<>();
 
 	public Day(LocalDate date) {
 		this.date = date;
@@ -25,7 +26,7 @@ public class Day {
 		return date;
 	}
 
-	public ArrayList<EmployeeDailyReference> getEmployees() {
+	public List<EmployeeDailyReference> getEmployees() {
 		return employees;
 	}
 
@@ -33,7 +34,7 @@ public class Day {
 		this.date = date;
 	}
 
-	public void setEmployees(ArrayList<EmployeeDailyReference> employees) {
+	public void setEmployees(List<EmployeeDailyReference> employees) {
 		this.employees = employees;
 	}
 	

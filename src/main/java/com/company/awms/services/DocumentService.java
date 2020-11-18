@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
+import com.company.awms.data.employees.EmployeeRepo;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +20,17 @@ import com.company.awms.data.employees.Employee;
 @Service
 public class DocumentService {
 
-    private static DocumentRepo documentRepo;
+    private DocumentRepo documentRepo;
+    private EmployeeRepo employeeRepo;
 
     @Autowired
-    public DocumentService(DocumentRepo documentRepo) {
-        DocumentService.documentRepo = documentRepo;
+    public DocumentService(DocumentRepo documentRepo, EmployeeRepo employeeRepo) {
+        this.documentRepo = documentRepo;
     }
     
     //Access to all documents form the same dpt. and same or lower level
-    public ArrayList<String> getAccessableDocumentIDs(String accessLevel) {
-		ArrayList<String> accessableDocumentIDs = new ArrayList<>();
+    public List<String> getAccessableDocumentIDs(String accessLevel) {
+		List<String> accessableDocumentIDs = new ArrayList<>();
 		int level = 0;
 		@SuppressWarnings("null")
 		char department = (Character) null;
@@ -39,7 +42,7 @@ public class DocumentService {
 			return null;
 		}
 		for(int i = 0; i <= level; i++) {
-			ArrayList<Doc> thisLevelDocuments = documentRepo.findByAccessLevel(Character.toString(department) + Integer.toString(i));
+			List<Doc> thisLevelDocuments = documentRepo.findByAccessLevel(Character.toString(department) + Integer.toString(i));
 			for(Doc document : thisLevelDocuments) {
 				accessableDocumentIDs.add(document.getID());
 			}
@@ -54,7 +57,7 @@ public class DocumentService {
     	Employee uploader = null;
     	LocalDateTime dateTime = LocalDateTime.now();
     	try {
-    		uploader = EmployeeService.getRepository().findById(uploaderID).get();
+    		uploader = this.employeeRepo.findById(uploaderID).get();
     		
     	}catch(Exception e) {
     		System.out.println("User not found!");
@@ -90,9 +93,5 @@ public class DocumentService {
     	}
     	documentRepo.save(documentToDownload);
     	return documentToDownload;
-    }
-    
-    public static DocumentRepo getRepository() {
-    	return documentRepo;
     }
 }

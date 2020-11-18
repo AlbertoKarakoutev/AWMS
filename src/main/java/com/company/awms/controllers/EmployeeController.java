@@ -4,14 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.company.awms.data.employees.Employee;
 import com.company.awms.services.EmployeeService;
+
+import java.io.IOException;
 
 @RestController
 public class EmployeeController {
@@ -22,49 +20,43 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping(value = "register", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> register(@RequestBody Employee newEmployee){
+    @GetMapping(value = "employee/{employeeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Employee> getEmployee(@PathVariable String employeeId){
         try {
-            //this.employeeService.Register(newEmployee);
+            Employee employee = this.employeeService.getEmployee(employeeId);
 
-        	//return employeeRepo.findByFirstName(firstName).get(0).info();
-        } catch(Exception e) {
-        	System.out.println("No such user!");
-        	return new ResponseEntity<>("User Not Found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(employee, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return new ResponseEntity<>("Registered Successfully", HttpStatus.OK);
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    //To be used after implementing EmployeeService
-    /*@GetMapping(value = "employee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Employee getEmployee(@PathVariable String username){
-
-
+    @PostMapping(value = "employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> registerEmployee(@RequestBody Employee newEmployee){
         try {
-            this.employeeService.findByUsername(username);
+            //Validate that the current user trying to register a new employee is the Admin
+            this.employeeService.registerEmployee(newEmployee);
 
-            Employee employee = employeeService.findByUsername(username);
-            System.out.println(employee.info());
+            return new ResponseEntity<>("Registered Successfully", HttpStatus.OK);
         } catch(Exception e) {
-            System.out.println("No such user!");
-            return  new ResponseEntity<>("User Not Found", HttpStatus.NOT_FOUND);
+        	return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
 
-        return employee;
-    }*/
-
-    //Testing connection to MongoDB cloud database
-    @GetMapping("/employee/{firstName}")
-    public ResponseEntity<Employee> getByFirstName(@PathVariable String firstName){
-        //addSampleData();
+    @PutMapping(value = "employee/{employeeId}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> editEmployeeInfo(@RequestBody Employee newEmployee, @PathVariable String employeeId){
         try {
-            Employee employee = EmployeeService.getRepository().findByFirstName(firstName).get(0);
-            System.out.println(employee.info());
-            return new ResponseEntity<>(employee, HttpStatus.OK);
+            //Validate that the current user trying to register a new employee is the Admin
+            this.employeeService.editEmployeeInfo(newEmployee, employeeId);
+
+            return new ResponseEntity<>("Edited Employee", HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch(Exception e) {
-            System.out.println("No such user!");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

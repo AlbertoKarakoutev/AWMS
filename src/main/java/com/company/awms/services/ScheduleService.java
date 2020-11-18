@@ -1,15 +1,16 @@
 package com.company.awms.services;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Dictionary;
+import java.util.*;
 
+import com.company.awms.data.employees.EmployeeRepo;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -25,18 +26,17 @@ import com.company.awms.data.schedule.Task;
 @Service
 public class ScheduleService {
 
-	private static ScheduleRepo scheduleRepo;
-
-	@Autowired
-	EmployeeService employeeService;
+	private ScheduleRepo scheduleRepo;
+	private EmployeeRepo employeeRepo;
 
 	private JSONObject departments;
       
 	@Autowired
-	public ScheduleService(ScheduleRepo scheduleRepo) {
+	public ScheduleService(ScheduleRepo scheduleRepo, EmployeeRepo employeeRepo) {
 
-		ScheduleService.scheduleRepo = scheduleRepo;
-		
+		this.scheduleRepo = scheduleRepo;
+		this.employeeRepo = employeeRepo;
+
 		try {
 			departments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
 		} catch (Exception e) {
@@ -80,25 +80,29 @@ public class ScheduleService {
 			return false;
 		}
 
-		try {
-			employee = EmployeeService.getRepository().findById(employeeID).get();
-		} catch (Exception e) {
-			System.err.println("Error finding user!");
+		Optional<Employee> employeeOptional = this.employeeRepo.findById(employeeID);
+		if(employeeOptional.isEmpty()){
+			System.err.println("EmployeeNotFound!");
 			return false;
 		}
-		
-		EmployeeDailyReference edr = new EmployeeDailyReference(EmployeeService.getRepository(), employee.getNationalID());
-		edr.setRefFirstName(employee.getFirstName());
-        edr.setRefLastName(employee.getLastName());
-        edr.setDate(date);
-        edr.setWorkTime(workTime);
+		employee = employeeOptional.get();
 
+		EmployeeDailyReference edr;
 		try {
-			currentDay = scheduleRepo.findByDate(date);
-		} catch (Exception e) {
-			System.err.println("Date not found!");
+			edr = new EmployeeDailyReference(this.employeeRepo, employee.getNationalID());
+			edr.setDate(date);
+			edr.setWorkTime(workTime);
+		} catch (IOException e){
 			return false;
 		}
+
+		Optional<Day> dayOptional = scheduleRepo.findByDate(date);
+		if(dayOptional.isEmpty()){
+			System.err.println("Invalid date!");
+			return false;
+		}
+		currentDay = dayOptional.get();
+
 		if (currentDay.getEmployees() != null) {
 			currentDay.addEmployee(edr);
 		} else {
@@ -116,8 +120,23 @@ public class ScheduleService {
 		EmployeeDailyReference receiver = null;
 		LocalDate thisRequestorDate = LocalDate.parse(requestorDate);
 		LocalDate thisReceiverDate = LocalDate.parse(receiverDate);
-		Day requestorDay = scheduleRepo.findByDate(thisRequestorDate.withDayOfMonth(thisRequestorDate.getDayOfMonth() + 1));
-		Day receiverDay = scheduleRepo.findByDate(thisReceiverDate.withDayOfMonth(thisReceiverDate.getDayOfMonth() + 1));
+		Optional<Day> requestorDayOptional = scheduleRepo.findByDate(thisRequestorDate.withDayOfMonth(thisRequestorDate.getDayOfMonth() + 1));
+		Optional<Day> receiverDayOptional = scheduleRepo.findByDate(thisReceiverDate.withDayOfMonth(thisReceiverDate.getDayOfMonth() + 1));
+
+		Day requestorDay;
+		Day receiverDay;
+
+		if(requestorDayOptional.isEmpty()){
+			System.err.println("Invalid date!");
+			return false;
+		}
+		requestorDay = requestorDayOptional.get();
+
+		if(receiverDayOptional.isEmpty()){
+			System.err.println("Invalid date!");
+			return false;
+		}
+		receiverDay = receiverDayOptional.get();
 
 		for (EmployeeDailyReference edr : requestorDay.getEmployees()) {
 			if (edr.getNationalID().equals(requestorNationalID)) {
@@ -151,27 +170,28 @@ public class ScheduleService {
 
 	public boolean addTask(String taskDay, String receiverNationalID) {
 		Day currentDay;
-		try {
-			LocalDate taskDate = LocalDate.parse(taskDay);
-			currentDay = getRepository().findByDate(taskDate.withDayOfMonth(taskDate.getDayOfMonth() + 1));
-		} catch (Exception e) {
+		LocalDate taskDate = LocalDate.parse(taskDay);
+		Optional<Day> currentDayOptional = this.scheduleRepo.findByDate(taskDate.withDayOfMonth(taskDate.getDayOfMonth() + 1));
+
+		if(currentDayOptional.isEmpty()){
 			System.err.println("Invalid date!");
-			e.printStackTrace();
 			return false;
 		}
+		currentDay = currentDayOptional.get();
+
 		Task task;
 		for (EmployeeDailyReference edr : currentDay.getEmployees()) {
 			if (edr.getNationalID().equals(receiverNationalID)) {
 				task = createTask(receiverNationalID, currentDay, "Test task title", "Test task body");
 				if (edr.getTasks() != null) {
 					edr.getTasks().add(task);
-					getRepository().save(currentDay);
+					this.scheduleRepo.save(currentDay);
 					return true;
 				} else {
 					ArrayList<Task> taskList = new ArrayList<>();
 					taskList.add(task);
 					edr.setTasks(taskList);
-					getRepository().save(currentDay);
+					this.scheduleRepo.save(currentDay);
 					return true;
 				}
 			}
@@ -185,12 +205,21 @@ public class ScheduleService {
 
 	// Get all equivalent access level employees with their schedules, by iterating
 	// over dates up to a month ahead  
-	public ArrayList<EmployeeDailyReference> viewSchedule(String accessLevel) {
+	public List<EmployeeDailyReference> viewSchedule(String accessLevel) throws IOException {
 		ArrayList<EmployeeDailyReference> sameLevelEmployees = new ArrayList<>();
 		for (LocalDate startDate = LocalDate.now(); startDate.isBefore(LocalDate.now().plusMonths(1)); startDate = startDate.plusDays(1)) {
-			Day thisDay = scheduleRepo.findByDate(startDate);
+			Day thisDay;
+			Optional<Day> thisDayOptional = scheduleRepo.findByDate(startDate);
+			if(thisDayOptional.isEmpty()){
+				throw new IOException("Invalid date!");
+			}
+			thisDay = thisDayOptional.get();
+
 			for (int i = 0; i < thisDay.getEmployees().size(); i++) {
-				if (EmployeeService.getRepository().findByNationalID(thisDay.getEmployees().get(i).getNationalID()).getAccessLevel().equals(accessLevel)) {
+				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(i).getNationalID());
+				if(employeeOptional.isEmpty()){
+					throw new IOException("Invalid nationalID");
+				} else if(employeeOptional.get().getAccessLevel().equals(accessLevel)){
 					sameLevelEmployees.add(thisDay.getEmployees().get(i));
 				}
 			}
@@ -204,7 +233,7 @@ public class ScheduleService {
 		if(thisDepartment == null) return false;
 		
 		
-		ArrayList<Employee> employees = EmployeeService.getRepository().findByAccessLevel(department+Integer.toString(level));
+		List<Employee> employees = this.employeeRepo.findByAccessLevel(department+Integer.toString(level));
 		if(employees.isEmpty()) {
 			System.out.println("No employees in this department!");
 			return false;
@@ -234,7 +263,6 @@ public class ScheduleService {
 			return false;
 		}
 		
-		
 		ArrayList<Day> month = new ArrayList<>();
 		for (Day day : scheduleRepo.findAll()) {
 			if (day.getDate().getMonthValue() == LocalDate.now().getMonthValue()) {
@@ -247,8 +275,10 @@ public class ScheduleService {
 			LocalDateTime shiftTracker = LocalDateTime.of(now.getYear(),now.getMonthValue(),1,0,0,0,0).plus((employees.indexOf(employee))*shiftLength, ChronoUnit.HOURS);
 			dayLoop:
 			for(int i = 0; i < monthlyShifts; i+=employees.size()) {
-				Day day = getRepository().findByDate(shiftTracker.toLocalDate());
-				if(isLeaveDay(employee, day)) {
+				Optional<Day> dayOptional = this.scheduleRepo.findByDate(shiftTracker.toLocalDate());
+				if(dayOptional.isEmpty()){
+					return false;
+				} else if(isLeaveDay(employee, dayOptional.get())) {
 					continue dayLoop;
 				}else {
 					//addWorkDay(employee.getID(), day.getDate(), thisDepartment, level);
@@ -272,7 +302,7 @@ public class ScheduleService {
 				month.add(day);
 			}
 		}
-		for (Employee employee : EmployeeService.getRepository().findByAccessLevel(department + Integer.toString(level))) {
+		for (Employee employee : this.employeeRepo.findByAccessLevel(department + Integer.toString(level))) {
 			boolean[] lastSevenDays = new boolean[7];
 			LocalDate lastMonth = LocalDate.now().withMonth(LocalDate.now().getMonthValue() - 1);
 			int lengthOfPreviousMonth = YearMonth.of(LocalDate.now().getYear(), lastMonth.getMonth()).lengthOfMonth();
@@ -280,8 +310,11 @@ public class ScheduleService {
 			//Getting the last 7 days of the previous month to properly continue the work schedule
 			for(LocalDate date = lastMonth.withDayOfMonth(lengthOfPreviousMonth); date.isAfter(lastMonth.withDayOfMonth(lengthOfPreviousMonth - 7)); date = date.plus(-1, ChronoUnit.DAYS)){
 				System.out.println(date);
-				Day thisDay = scheduleRepo.findByDate(date);
-				for (EmployeeDailyReference edrl : thisDay.getEmployees()) {
+				Optional<Day> thisDay = scheduleRepo.findByDate(date);
+				if(thisDay.isEmpty()){
+					return false;
+				}
+				for (EmployeeDailyReference edrl : thisDay.get().getEmployees()) {
 					if (edrl.getRefNationalID().equals(employee.getNationalID())) {
 						lastSevenDays[(date.getDayOfMonth() - (lengthOfPreviousMonth - 7)) - 1] = true;
 						continue workWeekLoop;
@@ -367,7 +400,7 @@ public class ScheduleService {
 			}
 		}
 
-		for (Employee employee : EmployeeService.getRepository().findByAccessLevel(department + Integer.toString(level))) {
+		for (Employee employee : this.employeeRepo.findByAccessLevel(department + Integer.toString(level))) {
 			dayLoop: for (Day day : month) {
 				if (day.getDate().getDayOfWeek() != DayOfWeek.SUNDAY && day.getDate().getDayOfWeek() != DayOfWeek.SATURDAY) {
 					if (isLeaveDay(employee, day)) {
@@ -415,16 +448,12 @@ public class ScheduleService {
 	
 	private boolean isLeaveDay(Employee employee, Day day) {
 		if (!employee.getLeaves().isEmpty()) {
-			for (Dictionary<String, Object> leave : employee.getLeaves()) {
+			for (Map<String, Object> leave : employee.getLeaves()) {
 				if (day.getDate().isAfter((LocalDate) leave.get("Start")) && day.getDate().isBefore((LocalDate) leave.get("End"))) {
 					return true;
 				}
 			}
 		}
 		return false;
-	}
-
-	public static ScheduleRepo getRepository() {
-		return scheduleRepo;
 	}
 }

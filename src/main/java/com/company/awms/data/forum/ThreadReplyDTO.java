@@ -15,12 +15,15 @@ public class ThreadReplyDTO {
     public ForumThread getForumThread() {
         return forumThread;
     }
+
     public List<ForumReply> getForumReply() {
         return forumReply;
     }
+
     public void setForumThread(ForumThread forumThread) {
         this.forumThread = forumThread;
     }
+
     public void setForumReply(List<ForumReply> forumReply) {
         this.forumReply = forumReply;
     }

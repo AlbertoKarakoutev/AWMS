@@ -116,7 +116,7 @@ public class ForumController {
         try {
             this.forumService.markAsAnswered(threadID);
 
-            return new ResponseEntity<>("Added new Reply", HttpStatus.OK);
+            return new ResponseEntity<>("Thread set to answered", HttpStatus.OK);
         } catch(IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch(Exception e) {
@@ -131,7 +131,7 @@ public class ForumController {
         try {
             this.forumService.editThread(newForumThread, oldThreadID);
 
-            return new ResponseEntity<>("Added new Reply", HttpStatus.OK);
+            return new ResponseEntity<>("Edited Thread", HttpStatus.OK);
         } catch(IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch(Exception e) {

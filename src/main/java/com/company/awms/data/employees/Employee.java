@@ -1,7 +1,8 @@
 package com.company.awms.data.employees;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,7 +25,7 @@ public class Employee {
 	private double salary;
 	private int[] workWeek = new int[2];
 	//Should be in the form ("Start":Date, "End":Date, "Paid":boolean)
-	private ArrayList<Dictionary<String, Object>> leaves = new ArrayList<>();
+	private List<Map<String, Object>> leaves;
 
 	public Employee() {}
 
@@ -38,10 +39,69 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 
+	public Employee(String nationalID, String firstName, String lastName, String email, String iban, String accessLevel,
+					String phoneNumber, double salary, int[] workWeek) {
+		this.nationalID = nationalID;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.iban = iban;
+		this.accessLevel = accessLevel;
+		this.phoneNumber = phoneNumber;
+		this.salary = salary;
+		this.workWeek = workWeek;
+		this.leaves = new ArrayList<>();
+	}
+
 	// Get employee information
-	public String info() {
-		return String.format("Employee ID: %s \nName: %s %s \nNational ID: %s \nE-mail: %s \nAccess Level: %s \nIBAN: %s\nPhone number: %s", id, firstName,
+	@Override
+	public String toString() {
+		return String.format("Employee ID: %s %nName: %s %s %nNational ID: %s %nE-mail: %s %nAccess Level: %s %nIBAN: %s%nPhone number: %s", id, firstName,
 				lastName, nationalID, email, accessLevel, iban, phoneNumber);
+	}
+
+	public String getID() {
+		return this.id;
+	}
+
+	public String getFirstName() {
+		return this.firstName;
+	}
+
+	public String getLastName() {
+		return this.lastName;
+	}
+
+	public String getEmail() {
+		return this.email;
+	}
+
+	public String getIBAN() {
+		return this.iban;
+	}
+
+	public String getAccessLevel() {
+		return this.accessLevel;
+	}
+
+	public String getPhoneNumber() {
+		return this.phoneNumber;
+	}
+
+	public String getNationalID() {
+		return this.nationalID;
+	}
+
+	public double getSalary() {
+		return this.salary;
+	}
+
+	public int[] getWorkWeek() {
+		return this.workWeek;
+	}
+
+	public List<Map<String, Object>> getLeaves(){
+		return this.leaves;
 	}
 
 	public void setFirstName(String firstName) {
@@ -80,51 +140,7 @@ public class Employee {
 		this.workWeek = workWeek;
 	}
 	
-	public void setLeaves(ArrayList<Dictionary<String, Object>> leaves) {
+	public void setLeaves(List<Map<String, Object>> leaves) {
 		this.leaves = leaves;
-	}
-
-	public String getID() {
-		return this.id;
-	}
-	
-	public String getFirstName() {
-		return this.firstName;
-	}
-
-	public String getLastName() {
-		return this.lastName;
-	}
-
-	public String getEmail() {
-		return this.email;
-	}
-
-	public String getIBAN() {
-		return this.iban;
-	}
-
-	public String getAccessLevel() {
-		return this.accessLevel;
-	}
-
-	public String getPhoneNumber() {
-		return this.phoneNumber;
-	}
-
-	public String getNationalID() {
-		return this.nationalID;
-	}
-
-	public double getSalary() {
-		return this.salary;
-	}
-	
-	public int[] getWorkWeek() {
-		return this.workWeek;
-	}
-	
-	public ArrayList<Dictionary<String, Object>> getLeaves(){
-		return this.leaves;
 	}
 }
