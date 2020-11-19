@@ -1,6 +1,7 @@
 package com.company.awms.services;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -36,13 +37,8 @@ public class ScheduleService {
 
 		this.scheduleRepo = scheduleRepo;
 		this.employeeRepo = employeeRepo;
+		setDepartmentField("a", "name", "acccounting");
 
-		try {
-			departments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
-		} catch (Exception e) {
-			System.out.println("Could not parse JSON file!");
-			e.printStackTrace();
-		}
 	}
 
 	// Call employeeService.createEmployeeDailyReference(...) in the   
@@ -227,13 +223,14 @@ public class ScheduleService {
 		return sameLevelEmployees;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean applyOnCallSchedule(String department, int level) {
-	
+		
 		JSONObject thisDepartment = setDepartment(department, level, "OnCall");
 		if(thisDepartment == null) return false;
 		
 		
-		List<Employee> employees = this.employeeRepo.findByAccessLevel(department+Integer.toString(level));
+		List<Employee> employees = employeeRepo.findByAccessLevel(department+Integer.toString(level));
 		if(employees.isEmpty()) {
 			System.out.println("No employees in this department!");
 			return false;
@@ -241,27 +238,49 @@ public class ScheduleService {
 		
 
 		int lengthOfMonth = YearMonth.of(LocalDate.now().getYear(), LocalDate.now().getMonth()).lengthOfMonth();
+		
 		long shiftLength;
-		long breakBetweenDays;
+		long breakBetweenShiftsMin;
+		long employeesPerShift;
 		double lengthOfWorkDay;
+		ArrayList<Long> dailyHours;
 		try {
+			dailyHours = (ArrayList<Long>)thisDepartment.get("dailyHours");
 			shiftLength = (long)thisDepartment.get("shiftLength");
-			breakBetweenDays = (long)thisDepartment.get("breakBetweenDays");
-			JSONArray dailyHours = (JSONArray)thisDepartment.get("dailyHours");
-			lengthOfWorkDay = ((double)(long)dailyHours.get(2)+((double)(long)dailyHours.get(3)/60))-((double)(long)dailyHours.get(0)+((double)(long)dailyHours.get(1)/60));
+			breakBetweenShiftsMin = (long)thisDepartment.get("breakBetweenShifts");
+			lengthOfWorkDay = ((double)dailyHours.get(2)+((double)dailyHours.get(3)/60))-((double)dailyHours.get(0)+((double)dailyHours.get(1)/60));
 			if(lengthOfWorkDay>23.9){
 				lengthOfWorkDay = 24;
 			}
+			employeesPerShift = (long) thisDepartment.get("employeesPerShift");
+			
 		}catch(Exception e) {
 			System.out.println("JSON Error");
 			e.printStackTrace();
 			return false;
 		}
-		long monthlyShifts = (long)Math.ceil(lengthOfMonth*(24.0/shiftLength));
-		if((employees.size()-1)*shiftLength < breakBetweenDays) {
-			System.out.println("Not enough employees to do the amount of work " + (employees.size()-1)*shiftLength );
+		if(lengthOfWorkDay%shiftLength!=0) {
+			System.out.println("Impossible to distribute shifts correctly");
 			return false;
 		}
+		
+		long shiftsPerDay = (long) (lengthOfWorkDay/shiftLength);
+		long employeesPerDay = employeesPerShift*shiftsPerDay;
+		long employeesPerDayMax =  employees.size();
+		long breakBetweenShifts =  (long) (((employees.size()-1)*shiftLength)/employeesPerShift + ((employees.size()/employeesPerShift)/shiftsPerDay)*(24-lengthOfWorkDay));
+		long monthlyShifts = (long)Math.ceil(lengthOfMonth*shiftsPerDay);
+		long monthlyShiftsPerEmployee = (monthlyShifts/employees.size())*employeesPerShift;
+		if(employeesPerDay>employeesPerDayMax) {
+			System.out.println("Employees per day required are "+ employeesPerDay + ", but only " + employeesPerDayMax + " can be distributed");
+			return false;
+		}else {
+			if(breakBetweenShifts < breakBetweenShiftsMin) {
+				System.out.println("Break between shifts should be " + breakBetweenShiftsMin + ", but is " + breakBetweenShifts);
+				return false;
+			}
+		}
+		
+		
 		
 		ArrayList<Day> month = new ArrayList<>();
 		for (Day day : scheduleRepo.findAll()) {
@@ -270,22 +289,44 @@ public class ScheduleService {
 			}
 		}
 		
+		System.out.println("Employees: " + employees.size());
+		System.out.println("Monthly shifts: " + monthlyShifts);
+		System.out.println("Employees per shift: " + employeesPerShift);
+		System.out.println("Employees per day: " + employeesPerDay);
+		//%(employees.size()*employeesPerShift)
 		for(Employee employee : employees) {
+			double initialShiftOffset = (employees.indexOf(employee)%(employees.size()/employeesPerShift))*shiftLength ;
+			System.out.println(employee.getFirstName() + " " + initialShiftOffset + " shift-off");
+			double multiplier = initialShiftOffset/shiftLength;
+			System.out.println("ratio: "+(multiplier/employeesPerDay));
+			double initialIntermediaryOffset =  Math.floor((multiplier/shiftsPerDay))*((int)24-lengthOfWorkDay);
+			//double initialIntermediaryOffset =  ((employees.indexOf(employee))%(employees.size()/employeesPerDay))*((int)24-lengthOfWorkDay);
+			System.out.println(employee.getFirstName() + " " + initialIntermediaryOffset + " inter.-off");
+			
+			double initialOffset = initialShiftOffset + initialIntermediaryOffset;
 			LocalDateTime now = LocalDateTime.now();
-			LocalDateTime shiftTracker = LocalDateTime.of(now.getYear(),now.getMonthValue(),1,0,0,0,0).plus((employees.indexOf(employee))*shiftLength, ChronoUnit.HOURS);
+			LocalDateTime shiftTracker = LocalDateTime.of(now.getYear(),now.getMonthValue(),1,dailyHours.get(0).intValue(),dailyHours.get(1).intValue(),0,0).plus((int)initialOffset, ChronoUnit.HOURS);
+			System.out.println(initialOffset + " hour offset");
 			dayLoop:
-			for(int i = 0; i < monthlyShifts; i+=employees.size()) {
-				Optional<Day> dayOptional = this.scheduleRepo.findByDate(shiftTracker.toLocalDate());
-				if(dayOptional.isEmpty()){
-					return false;
-				} else if(isLeaveDay(employee, dayOptional.get())) {
+			for(int i = 0; i < month.size(); i++) {
+				Day day;
+				try {
+					day = scheduleRepo.findByDate(shiftTracker.toLocalDate()).get();
+				}catch(Exception e) {
+					break dayLoop;
+				}
+				if(isLeaveDay(employee, day)) {
 					continue dayLoop;
 				}else {
 					//addWorkDay(employee.getID(), day.getDate(), thisDepartment, level);
-					System.out.println(shiftTracker + " " + "is a work shift for " + employee.getFirstName());
-					shiftTracker = shiftTracker.plus(employees.size()*shiftLength, ChronoUnit.HOURS);
+			
+					System.out.println(shiftTracker.toLocalDate() + "  " + shiftTracker.toLocalTime() + "-" + shiftTracker.plus(shiftLength, ChronoUnit.HOURS).toLocalTime() + " " + "is a work shift for " + employee.getFirstName());
+					shiftTracker = shiftTracker.plus((long) ((employees.size()/employeesPerShift)*shiftLength + ((int)24-lengthOfWorkDay)*(month.size()/monthlyShiftsPerEmployee)), ChronoUnit.HOURS);
+					
+		
 				}
 			}
+			System.out.println(" ");
 		}
 		
 		return true;
@@ -421,16 +462,10 @@ public class ScheduleService {
 
 	private JSONObject setDepartment(String department,int level, String type) {
 		
-		JSONObject thisDepartment;
-		try {
-			thisDepartment = (JSONObject) departments.get(department);
-		} catch (Exception e) {
-			System.out.println("Could not parse JSON file!");
-			e.printStackTrace();
-			return null;
-		}
+		JSONObject thisDepartment = getDepartment(department);
+
 		if((boolean)thisDepartment.get("universalSchedule")) {
-			if (!((String)thisDepartment.get("scheduleType")).equals(type)) {
+			if (!thisDepartment.get("scheduleType").equals(type)) {
 				System.out.println("Incorrect schedule type!");
 				return null;
 			}
@@ -444,6 +479,35 @@ public class ScheduleService {
 			}
 		}
 		return thisDepartment;
+	}
+	
+	private JSONObject getDepartment(String department) {
+		
+		JSONObject thisDepartment;
+		try {
+			departments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
+			thisDepartment = (JSONObject) departments.get(department);
+		} catch (Exception e) {
+			System.out.println("Could not parse JSON file!");
+			e.printStackTrace();
+			return null;
+		}
+		return thisDepartment;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void setDepartmentField(String department, String field, String value) {
+		
+		JSONObject thisDepartment = getDepartment(department);
+
+		thisDepartment.put(field, value);
+		departments.put(department, thisDepartment);
+		
+		 try (FileWriter file = new FileWriter("src/main/resources/departments.json")) {
+	            file.write(departments.toJSONString());
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
 	}
 	
 	private boolean isLeaveDay(Employee employee, Day day) {

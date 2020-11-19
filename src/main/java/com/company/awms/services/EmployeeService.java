@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
 import com.company.awms.data.employees.EmployeeRepo;
+import com.company.awms.data.employees.Notification;
 
 @Service
 public class EmployeeService {
@@ -21,11 +22,11 @@ public class EmployeeService {
         this.employeeRepo = employeeRepo;
     }
 
-    public Employee getEmployee(String employeeId) throws IOException{
-        Optional<Employee> employee = this.employeeRepo.findById(employeeId);
+    public Employee getEmployee(String employeeID) throws IOException{
+        Optional<Employee> employee = this.employeeRepo.findById(employeeID);
 
         if(employee.isEmpty()){
-            throw new IOException("Thread not found!");
+            throw new IOException("Employee not found!");
         }
 
         return employee.get();
@@ -38,8 +39,8 @@ public class EmployeeService {
     }
 
     //can be accessed by any employee who wants to edit their info
-    public void editEmployeeInfo(Employee newEmployee, String oldEmployeeId) throws IOException{
-        Employee oldEmployee = getEmployee(oldEmployeeId);
+    public void editEmployeeInfo(Employee newEmployee, String oldEmployeeID) throws IOException{
+        Employee oldEmployee = getEmployee(oldEmployeeID);
         //TODO:
         //Validation? from Validator Class
         oldEmployee.setEmail(newEmployee.getEmail());
@@ -58,6 +59,23 @@ public class EmployeeService {
         empDayRef.setDate(date);
         empDayRef.setWorkTime(workTime);
         return empDayRef;
+    }
+    
+    public void addNotification(String employeeID, Notification notification) throws IOException {
+    	Employee employee = getEmployee(employeeID);
+    	employee.getNotifications().add(notification);
+    	this.employeeRepo.save(employee);
+    }
+    
+    public void removeNotification(String employeeID, Notification notification) throws IOException {
+    	Employee employee = getEmployee(employeeID);
+    	try {
+    		employee.getNotifications().remove(notification);
+    	}catch(Exception e) {
+    		System.out.println("Notification not found");
+    		return;
+    	}
+    	this.employeeRepo.save(employee);
     }
 
     //TODO:

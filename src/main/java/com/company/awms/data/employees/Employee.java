@@ -26,6 +26,7 @@ public class Employee {
 	private int[] workWeek = new int[2];
 	//Should be in the form ("Start":Date, "End":Date, "Paid":boolean)
 	private List<Map<String, Object>> leaves = new ArrayList<>();
+	private List<Notification> notifications = new ArrayList<>();
 
 	public Employee() {}
 
@@ -102,7 +103,11 @@ public class Employee {
 	public List<Map<String, Object>> getLeaves(){
 		return this.leaves;
 	}
-
+	
+	public List<Notification> getNotifications(){
+		return this.notifications;
+	}
+	
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
@@ -141,5 +146,9 @@ public class Employee {
 	
 	public void setLeaves(List<Map<String, Object>> leaves) {
 		this.leaves = leaves;
+	}
+	
+	public void setNotifications(List<Notification> notifications) {
+		this.notifications = notifications;
 	}
 }
