@@ -27,11 +27,9 @@ public class DocumentsController {
     }
     
     @PostMapping(value = "document/public/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadPublicDocument(@RequestParam MultipartFile file){
+    public ResponseEntity<String> uploadPublicDocument(@RequestParam MultipartFile file, @RequestParam String uploaderID){
         try{
-            //TODO:
-            //get uploaderId from current user
-            documentService.uploadDocument(file, "5fa80775cb0e9c6301e92d3a");
+            documentService.uploadDocument(file, uploaderID);
 
             return new ResponseEntity<>("Successfully uploaded file!", HttpStatus.OK);
         } catch (IOException e){
@@ -45,12 +43,9 @@ public class DocumentsController {
     }
     
     @GetMapping(value = "document/public/download/{documentId}")
-    public ResponseEntity<Doc> downloadDocument(@PathVariable String documentId){
+    public ResponseEntity<Doc> downloadDocument(@PathVariable String documentID, @RequestParam String downloaderID){
         try {
-            //TODO:
-            //replace downloaderId with current user Id
-            //check if user has access to download document
-            Doc document = documentService.downloadDocument(documentId, "5fa80775cb0e9c6301e92d3a");
+            Doc document = documentService.downloadDocument(documentID, downloaderID);
 
             return new ResponseEntity<>(document, HttpStatus.OK);
         } catch (IOException e) {

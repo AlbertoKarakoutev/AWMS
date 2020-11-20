@@ -1,13 +1,11 @@
 package com.company.awms.services;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.company.awms.data.employees.EmployeeRepo;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.company.awms.data.documents.Doc;
 import com.company.awms.data.documents.DocumentRepo;
 import com.company.awms.data.employees.Employee;
+import com.company.awms.data.employees.EmployeeRepo;
 
 @Service
 public class DocumentService {
@@ -34,10 +33,10 @@ public class DocumentService {
     public List<String> getAccessableDocumentIDs(String accessLevel) {
 		List<String> accessibleDocumentIDs = new ArrayList<>();
 		int level = 0;
-		char department;
+		String department;
 		try {
-			department = accessLevel.charAt(0);
-			level = accessLevel.charAt(1);
+			department = accessLevel.substring(0,1);
+			level = Integer.parseInt(accessLevel.substring(1, accessLevel.length()));
 		}catch(Exception e) {
 			System.out.println("Error retrieving access level!");
 			return null;
@@ -45,7 +44,7 @@ public class DocumentService {
 		//This sends the same amount of request to the database as the level. If we have level 9 that is too slow
 		//TODO: optimize
 		for(int i = 0; i <= level; i++) {
-			List<Doc> thisLevelDocuments = documentRepo.findByAccessLevel(Character.toString(department) + Integer.toString(i));
+			List<Doc> thisLevelDocuments = documentRepo.findByAccessLevel(department + Integer.toString(i));
 			for(Doc document : thisLevelDocuments) {
 				accessibleDocumentIDs.add(document.getID());
 			}
@@ -81,6 +80,8 @@ public class DocumentService {
     	if(documentToDownload.isEmpty()){
     		throw new IOException("Document not found!");
 		}
+    	
+    	if(!isAccessible(documentToDownload.get().getAccessLevel(), downloaderID))return null;
 
     	if(!documentToDownload.get().getDownloaders().contains(downloaderID)) {
     		documentToDownload.get().getDownloaders().add(downloaderID);
@@ -88,6 +89,26 @@ public class DocumentService {
 
     	documentRepo.save(documentToDownload.get());
     	return documentToDownload.get();
+    }
+    
+    private boolean isAccessible(String accessLevel, String employeeID) {
+    	Employee employee;
+    	try {
+    		employee = employeeRepo.findById(employeeID).get();
+    	}catch(Exception e) {
+    		System.out.println("Employee not found");
+    		return false;
+    	}
+    	if(!accessLevel.substring(0,1).equals(employee.getAccessLevel().substring(0,1))){
+    		return false;
+    	}else {
+    		int documentAccessLevel = Integer.parseInt(accessLevel.substring(1, accessLevel.length()));
+    		int employeeAccessLevel = Integer.parseInt(employee.getAccessLevel().substring(1, employee.getAccessLevel().length()));
+    		if(documentAccessLevel > employeeAccessLevel) {
+    			return false;
+    		}
+    	}
+    	return true;
     }
 
 	//TODO:
