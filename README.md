@@ -43,6 +43,8 @@ Software, intended for a functional and utilised company worflow. It incomporate
   
 *   **int** _dailyBreakDurationTotal_ - Specifies the accumulated break time per one day for that department/level  
   
+*   **int** _monthlyWorkDays_ - Specifies the total work days for the month, so the OnCall schedule can distribute accordingly  
+  
 .  
 .  
 .  

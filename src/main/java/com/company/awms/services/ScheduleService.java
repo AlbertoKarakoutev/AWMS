@@ -37,7 +37,6 @@ public class ScheduleService {
 
 		this.scheduleRepo = scheduleRepo;
 		this.employeeRepo = employeeRepo;
-		setDepartmentField("a", "name", "acccounting");
 
 	}
 
@@ -242,6 +241,7 @@ public class ScheduleService {
 		long shiftLength;
 		long breakBetweenShiftsMin;
 		long employeesPerShift;
+		long monthlyWorkDays;
 		double lengthOfWorkDay;
 		ArrayList<Long> dailyHours;
 		try {
@@ -253,25 +253,64 @@ public class ScheduleService {
 				lengthOfWorkDay = 24;
 			}
 			employeesPerShift = (long) thisDepartment.get("employeesPerShift");
+			monthlyWorkDays = (long) thisDepartment.get("monthlyWorkDays");
 			
 		}catch(Exception e) {
 			System.out.println("JSON Error");
 			e.printStackTrace();
 			return false;
 		}
-		if(lengthOfWorkDay%shiftLength!=0) {
-			System.out.println("Impossible to distribute shifts correctly");
-			return false;
+		
+		
+		class Shift{
+			LocalDateTime beginning;
+			LocalDateTime end;
+			public Shift(LocalDateTime beginning, LocalDateTime end) {
+				this.beginning = beginning;
+				this.end = end;
+			}
+			public LocalDate getDate() {
+				return this.beginning.toLocalDate();
+			}
+		}
+		if(lengthOfMonth/monthlyWorkDays<2)System.out.println("Shifts required are over 15, adding shifts each day");
+		ArrayList<Day> workDays = new ArrayList<>();
+		for (Day day : scheduleRepo.findAll()) {
+			if (day.getDate().getMonthValue() == LocalDate.now().getMonthValue()) {
+				
+				if(day.getDate().getDayOfMonth()%(lengthOfMonth/monthlyWorkDays) == 0) {
+					workDays.add(day);
+				}
+			}
+		}
+		ArrayList<Shift> shifts = new ArrayList<>();
+		for(Day day : workDays) {
+			LocalDateTime dayHour = LocalDateTime.of(day.getDate(), LocalTime.of(dailyHours.get(0).intValue(), dailyHours.get(1).intValue(), 0, 0));
+			LocalDateTime dayEnd = LocalDateTime.of(day.getDate(), LocalTime.of(dailyHours.get(2).intValue(), dailyHours.get(3).intValue(), 1, 0));
+			do{
+				shifts.add(new Shift(LocalDateTime.of(day.getDate(), dayHour.toLocalTime()), LocalDateTime.of(day.getDate(), dayHour.plusHours(shiftLength).toLocalTime())));
+				dayHour = dayHour.plusHours(shiftLength);
+			}while(dayHour.plusHours(shiftLength).isBefore(dayEnd));
 		}
 		
 		long shiftsPerDay = (long) (lengthOfWorkDay/shiftLength);
 		long employeesPerDay = employeesPerShift*shiftsPerDay;
-		long employeesPerDayMax =  employees.size();
 		long breakBetweenShifts =  (long) (((employees.size()-1)*shiftLength)/employeesPerShift + ((employees.size()/employeesPerShift)/shiftsPerDay)*(24-lengthOfWorkDay));
-		long monthlyShifts = (long)Math.ceil(lengthOfMonth*shiftsPerDay);
-		long monthlyShiftsPerEmployee = (monthlyShifts/employees.size())*employeesPerShift;
-		if(employeesPerDay>employeesPerDayMax) {
-			System.out.println("Employees per day required are "+ employeesPerDay + ", but only " + employeesPerDayMax + " can be distributed");
+		
+		if(monthlyWorkDays > lengthOfMonth) {
+			System.out.println("Too many work days per month!");
+			return false;
+		}
+		if(lengthOfWorkDay%shiftLength!=0) {
+			System.out.println("Impossible to distribute shifts correctly");
+			return false;
+		}
+		if(shifts.size()/(double)employees.size()<2.0) {
+			System.out.println("Unnccessary amount of employees in this department");
+			return false;
+		}
+		if(employeesPerDay>employees.size()) {
+			System.out.println("Employees per day required are "+ employeesPerDay + ", but only " + employees.size() + " can be distributed");
 			return false;
 		}else {
 			if(breakBetweenShifts < breakBetweenShiftsMin) {
@@ -280,50 +319,30 @@ public class ScheduleService {
 			}
 		}
 		
-		
-		
-		ArrayList<Day> month = new ArrayList<>();
-		for (Day day : scheduleRepo.findAll()) {
-			if (day.getDate().getMonthValue() == LocalDate.now().getMonthValue()) {
-				month.add(day);
-			}
-		}
-		
 		System.out.println("Employees: " + employees.size());
-		System.out.println("Monthly shifts: " + monthlyShifts);
+		System.out.println("Monthly shifts: " + shifts.size());
 		System.out.println("Employees per shift: " + employeesPerShift);
-		System.out.println("Employees per day: " + employeesPerDay);
-		//%(employees.size()*employeesPerShift)
+		System.out.println("Shifts per day: " + shiftsPerDay);
+		System.out.println(" ");
+		
 		for(Employee employee : employees) {
-			double initialShiftOffset = (employees.indexOf(employee)%(employees.size()/employeesPerShift))*shiftLength ;
-			System.out.println(employee.getFirstName() + " " + initialShiftOffset + " shift-off");
-			double multiplier = initialShiftOffset/shiftLength;
-			System.out.println("ratio: "+(multiplier/employeesPerDay));
-			double initialIntermediaryOffset =  Math.floor((multiplier/shiftsPerDay))*((int)24-lengthOfWorkDay);
-			//double initialIntermediaryOffset =  ((employees.indexOf(employee))%(employees.size()/employeesPerDay))*((int)24-lengthOfWorkDay);
-			System.out.println(employee.getFirstName() + " " + initialIntermediaryOffset + " inter.-off");
-			
-			double initialOffset = initialShiftOffset + initialIntermediaryOffset;
-			LocalDateTime now = LocalDateTime.now();
-			LocalDateTime shiftTracker = LocalDateTime.of(now.getYear(),now.getMonthValue(),1,dailyHours.get(0).intValue(),dailyHours.get(1).intValue(),0,0).plus((int)initialOffset, ChronoUnit.HOURS);
-			System.out.println(initialOffset + " hour offset");
-			dayLoop:
-			for(int i = 0; i < month.size(); i++) {
+			int initialOffset = employees.indexOf(employee)%employees.size();
+			System.out.println(initialOffset + " shifts offset");
+			shiftLoop:
+			for(int i = initialOffset; i < shifts.size(); i+=employees.size()/employeesPerShift) {
 				Day day;
 				try {
-					day = scheduleRepo.findByDate(shiftTracker.toLocalDate()).get();
+					day = scheduleRepo.findByDate(shifts.get(i).getDate()).get();
 				}catch(Exception e) {
-					break dayLoop;
+					break shiftLoop;
 				}
 				if(isLeaveDay(employee, day)) {
-					continue dayLoop;
+					continue shiftLoop;
 				}else {
 					//addWorkDay(employee.getID(), day.getDate(), thisDepartment, level);
 			
-					System.out.println(shiftTracker.toLocalDate() + "  " + shiftTracker.toLocalTime() + "-" + shiftTracker.plus(shiftLength, ChronoUnit.HOURS).toLocalTime() + " " + "is a work shift for " + employee.getFirstName());
-					shiftTracker = shiftTracker.plus((long) ((employees.size()/employeesPerShift)*shiftLength + ((int)24-lengthOfWorkDay)*(month.size()/monthlyShiftsPerEmployee)), ChronoUnit.HOURS);
-					
-		
+					System.out.println(shifts.get(i).getDate() + "  " + shifts.get(i).beginning.toLocalTime() + " - " + shifts.get(i).end.toLocalTime() + " " + "is a work shift for " + employee.getFirstName());
+
 				}
 			}
 			System.out.println(" ");
