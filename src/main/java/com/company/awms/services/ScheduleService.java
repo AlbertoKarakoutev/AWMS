@@ -201,7 +201,7 @@ public class ScheduleService {
 
 	// Get all equivalent access level employees with their schedules, by iterating
 	// over dates up to a month ahead  
-	public List<EmployeeDailyReference> viewSchedule(String accessLevel) throws IOException {
+	public List<EmployeeDailyReference> viewSchedule(String department, int accessLevel) throws IOException {
 		ArrayList<EmployeeDailyReference> sameLevelEmployees = new ArrayList<>();
 		for (LocalDate startDate = LocalDate.now(); startDate.isBefore(LocalDate.now().plusMonths(1)); startDate = startDate.plusDays(1)) {
 			Day thisDay;
@@ -215,7 +215,8 @@ public class ScheduleService {
 				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(i).getNationalID());
 				if(employeeOptional.isEmpty()){
 					throw new IOException("Invalid nationalID");
-				} else if(employeeOptional.get().getAccessLevel().equals(accessLevel)){
+				}
+				if(employeeOptional.get().getDepartment().equals(department) && employeeOptional.get().getAccessLevel() == accessLevel){
 					sameLevelEmployees.add(thisDay.getEmployees().get(i));
 				}
 			}

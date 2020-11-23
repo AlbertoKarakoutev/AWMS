@@ -127,7 +127,7 @@ public class ForumController {
     @PutMapping(value = "forum/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID){
         //TODO:
-        //Authenticate that current user is the same as the issuerId from forumThread. If not return 401 Not Authorized
+        //Authenticate that current user is the same as the issuerId from newForumThread. If not return 401 Not Authorized
         try {
             this.forumService.editThread(newForumThread, oldThreadID);
 

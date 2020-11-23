@@ -19,8 +19,8 @@ public class Employee {
 	private String lastName;
 	private String email;
 	private String iban;
-	//Should be in the form %c%d, where %c is a department of the company, and %d is vertical access level in that department
-	private String accessLevel;
+	private int accessLevel;
+	private String department;
 	private String phoneNumber;
 	private double salary;
 	private int[] workWeek = new int[2];
@@ -40,14 +40,15 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 
-	public Employee(String nationalID, String firstName, String lastName, String email, String iban, String accessLevel,
-					String phoneNumber, double salary, int[] workWeek) {
+	public Employee(String nationalID, String firstName, String lastName, String email, String iban, int accessLevel,
+					String department, String phoneNumber, double salary, int[] workWeek) {
 		this.nationalID = nationalID;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.iban = iban;
 		this.accessLevel = accessLevel;
+		this.department = department;
 		this.phoneNumber = phoneNumber;
 		this.salary = salary;
 		this.workWeek = workWeek;
@@ -80,8 +81,12 @@ public class Employee {
 		return this.iban;
 	}
 
-	public String getAccessLevel() {
+	public int getAccessLevel() {
 		return this.accessLevel;
+	}
+
+	public String getDepartment() {
+		return department;
 	}
 
 	public String getPhoneNumber() {
@@ -124,8 +129,12 @@ public class Employee {
 		this.iban = iban;
 	}
 
-	public void setAccessLevel(String accessLevel) {
+	public void setAccessLevel(int accessLevel) {
 		this.accessLevel = accessLevel;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
 	}
 
 	public void setSalary(double salary) {

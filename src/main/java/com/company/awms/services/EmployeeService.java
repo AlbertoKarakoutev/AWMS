@@ -77,14 +77,6 @@ public class EmployeeService {
     	}
     	this.employeeRepo.save(employee);
     }
-
-    //TODO:
-    //delete this method if swapping of employees is in the ScheduleService
-    public void requestSwap(String requestorID, String date, String message) {
-        /*Employee will be prompted and he will decide whether he wants to swap
-         * with that person on that date. If he agrees, Day.swapEmployees(requesterID, this.id) will be called
-         */
-    }
     
     public void addLeave(String employeeID, LocalDate start, LocalDate end, boolean paid) throws IOException {
 		Map<String, Object> leave = new HashMap<>();
