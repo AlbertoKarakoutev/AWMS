@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.company.awms.data.documents.Doc;
+
 //Main employee class
 @Document
 public class Employee {
@@ -27,6 +29,7 @@ public class Employee {
 	//Should be in the form ("Start":Date, "End":Date, "Paid":boolean)
 	private List<Map<String, Object>> leaves = new ArrayList<>();
 	private List<Notification> notifications = new ArrayList<>();
+	private List<Doc> privateDocuments = new ArrayList<>();
 
 	public Employee() {}
 
@@ -108,6 +111,10 @@ public class Employee {
 		return this.notifications;
 	}
 	
+	public List<Doc> getPrivateDocuments() {
+		return this.privateDocuments;
+	}
+	
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
@@ -150,5 +157,9 @@ public class Employee {
 	
 	public void setNotifications(List<Notification> notifications) {
 		this.notifications = notifications;
+	}
+	
+	public void setPrivateDocuments(List<Doc> privateDocuments) {
+		this.privateDocuments = privateDocuments;
 	}
 }
