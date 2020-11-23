@@ -4,12 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.company.awms.data.employees.Employee;
 import com.company.awms.services.EmployeeService;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @RestController
 public class EmployeeController {
@@ -18,6 +22,15 @@ public class EmployeeController {
     @Autowired
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
+    }
+
+    @RequestMapping("/")
+    public String index(Model model) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d yyyy : HH:mm:ss:SSS z");
+        Date now = new Date();
+        String dateStr = dateFormat.format( now );
+        model.addAttribute("time", dateStr);
+        return "index";
     }
 
     @GetMapping(value = "employee/{employeeId}")
