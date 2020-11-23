@@ -24,15 +24,6 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @RequestMapping("/")
-    public String index(Model model) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d yyyy : HH:mm:ss:SSS z");
-        Date now = new Date();
-        String dateStr = dateFormat.format( now );
-        model.addAttribute("time", dateStr);
-        return "index";
-    }
-
     @GetMapping(value = "employee/{employeeId}")
     public ResponseEntity<Employee> getEmployee(@PathVariable String employeeId){
         try {
