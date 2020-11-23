@@ -57,7 +57,7 @@ public class DocumentService {
 	//Access to all private documents info
 	public List<DocInfoDTO> getPrivateDocumentsInfo(String employeeID) {
 		List<DocInfoDTO> privateDocumentsInfo = new ArrayList<>();
-		List<EmployeeDoc> privateDocuments = this.employeeDocRepo.findByEmployeeID(employeeID);
+		List<EmployeeDoc> privateDocuments = this.employeeDocRepo.findByUploaderID(employeeID);
 
 		for (EmployeeDoc document : privateDocuments) {
 			DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType());
@@ -135,7 +135,7 @@ public class DocumentService {
 			throw new IOException("Document not found!");
 		}
 
-		if(!downloaderID.equals(ADMIN_ID) && !documentID.equals(documentToDownload.get().getEmployeeID())){
+		if(!downloaderID.equals(ADMIN_ID) && !downloaderID.equals(documentToDownload.get().getUploaderID())){
 			throw new IllegalAccessException("Document not accessible!");
 		}
 

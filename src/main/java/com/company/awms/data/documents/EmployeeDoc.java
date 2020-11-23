@@ -19,8 +19,6 @@ public class EmployeeDoc {
     private LocalDateTime uploadDateTime;
     private double size;
 
-    private String employeeID;
-
     public EmployeeDoc() {
     }
 
@@ -62,10 +60,6 @@ public class EmployeeDoc {
         return size;
     }
 
-    public String getEmployeeID() {
-        return employeeID;
-    }
-
     public void setData(Binary data) {
         this.data = data;
     }
@@ -84,9 +78,5 @@ public class EmployeeDoc {
 
     public void setSize(double size) {
         this.size = size;
-    }
-
-    public void setEmployeeID(String employeeID) {
-        this.employeeID = employeeID;
     }
 }
