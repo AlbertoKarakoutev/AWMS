@@ -97,7 +97,7 @@ public class EmployeeDailyReference extends Employee {
 		this.date = date;
 	}
 
-	public void setTasks(ArrayList<Task> tasks) {
+	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 	}
 }

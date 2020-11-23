@@ -21,15 +21,15 @@ public class Employee {
 	private String lastName;
 	private String email;
 	private String iban;
-	//Should be in the form %c%d, where %c is a department of the company, and %d is vertical access level in that department
-	private String accessLevel;
+	private int accessLevel;
+	private String department;
 	private String phoneNumber;
 	private double salary;
 	private int[] workWeek = new int[2];
 	//Should be in the form ("Start":Date, "End":Date, "Paid":boolean)
 	private List<Map<String, Object>> leaves = new ArrayList<>();
 	private List<Notification> notifications = new ArrayList<>();
-	private List<Doc> privateDocuments = new ArrayList<>();
+	private List<Doc> personalDocuments = new ArrayList<>();
 
 	public Employee() {}
 
@@ -43,14 +43,15 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 
-	public Employee(String nationalID, String firstName, String lastName, String email, String iban, String accessLevel,
-					String phoneNumber, double salary, int[] workWeek) {
+	public Employee(String nationalID, String firstName, String lastName, String email, String iban, int accessLevel,
+					String department, String phoneNumber, double salary, int[] workWeek) {
 		this.nationalID = nationalID;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.iban = iban;
 		this.accessLevel = accessLevel;
+		this.department = department;
 		this.phoneNumber = phoneNumber;
 		this.salary = salary;
 		this.workWeek = workWeek;
@@ -83,8 +84,12 @@ public class Employee {
 		return this.iban;
 	}
 
-	public String getAccessLevel() {
+	public int getAccessLevel() {
 		return this.accessLevel;
+	}
+
+	public String getDepartment() {
+		return department;
 	}
 
 	public String getPhoneNumber() {
@@ -111,8 +116,8 @@ public class Employee {
 		return this.notifications;
 	}
 	
-	public List<Doc> getPrivateDocuments() {
-		return this.privateDocuments;
+	public List<Doc> getPersonalDocuments() {
+		return this.personalDocuments;
 	}
 	
 	public void setFirstName(String firstName) {
@@ -131,8 +136,12 @@ public class Employee {
 		this.iban = iban;
 	}
 
-	public void setAccessLevel(String accessLevel) {
+	public void setAccessLevel(int accessLevel) {
 		this.accessLevel = accessLevel;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
 	}
 
 	public void setSalary(double salary) {
@@ -159,7 +168,7 @@ public class Employee {
 		this.notifications = notifications;
 	}
 	
-	public void setPrivateDocuments(List<Doc> privateDocuments) {
-		this.privateDocuments = privateDocuments;
+	public void setPersonalDocuments(List<Doc> privateDocuments) {
+		this.personalDocuments = privateDocuments;
 	}
 }

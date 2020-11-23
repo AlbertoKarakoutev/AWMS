@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.company.awms.data.documents.DocInfoDTO;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.company.awms.data.documents.Doc;
@@ -24,6 +21,8 @@ import com.company.awms.data.employees.EmployeeRepo;
 @Service
 public class DocumentService {
 
+	private static final String ADMIN_ID = "adminID";
+
 	private DocumentRepo documentRepo;
 	private EmployeeRepo employeeRepo;
 
@@ -33,133 +32,179 @@ public class DocumentService {
 		this.employeeRepo = employeeRepo;
 	}
 
-	// Access to all documents form the same dpt. and same or lower level
-	public List<String> getAccessableDocumentIDs(String accessLevel) {
-		List<String> accessibleDocumentIDs = new ArrayList<>();
-		int level = 0;
-		String department;
-		try {
-			department = accessLevel.substring(0, 1);
-			level = Integer.parseInt(accessLevel.substring(1, accessLevel.length()));
-		} catch (Exception e) {
-			System.out.println("Error retrieving access level!");
-			return null;
+	//Access to all public documents info form the same dpt. and same or lower level
+	public List<DocInfoDTO> getAllAccessibleDocumentsInfo(String employeeID) throws IOException {
+		List<DocInfoDTO> accessibleDocumentsInfo = new ArrayList<>();
+
+		Optional<Employee> employee = this.employeeRepo.findById(employeeID);
+
+		if(employee.isEmpty()){
+			throw new IOException("Employee with id " + employeeID + " doesn't exist");
 		}
-		// This sends the same amount of request to the database as the level. If we
-		// have level 9 that is too slow
-		// TODO: optimize
-		for (int i = 0; i <= level; i++) {
-			List<Doc> thisLevelDocuments = documentRepo.findByAccessLevel(department + Integer.toString(i));
-			for (Doc document : thisLevelDocuments) {
-				accessibleDocumentIDs.add(document.getID());
+
+		List<Doc> departmentDocuments = this.documentRepo.findByDepartment(employee.get().getDepartment());
+
+		for (Doc document : departmentDocuments) {
+			if (employee.get().getAccessLevel() >= document.getAccessLevel()) {
+				DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType());
+				accessibleDocumentsInfo.add(documentInfo);
 			}
 		}
-		if (accessibleDocumentIDs.isEmpty()) {
-			System.out.println("You do not have access to this module!");
-		}
-		return accessibleDocumentIDs;
+
+		return accessibleDocumentsInfo;
 	}
 
-	public void uploadDocument(MultipartFile file, String uploaderID) throws IOException {
-		LocalDateTime dateTime = LocalDateTime.now();
+	//Access to all private documents info
+	public List<DocInfoDTO> getPersonalDocumentsInfo(String employeeID) {
+		List<DocInfoDTO> privateDocumentsInfo = new ArrayList<>();
+		Optional<Employee> employee = this.employeeRepo.findById(employeeID);
+
+		if(employee.isEmpty()) {
+			throw new IllegalArgumentException("Employee with id " + employeeID + " doesn't exist");
+		}
+
+		for (Doc document : employee.get().getPersonalDocuments()) {
+			DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType());
+			privateDocumentsInfo.add(documentInfo);
+		}
+
+		return privateDocumentsInfo;
+	}
+
+	public void uploadPublicDocument(MultipartFile file, String uploaderID) throws IOException {
 		Optional<Employee> uploader = this.employeeRepo.findById(uploaderID);
 
-		if (uploader.isEmpty()) {
+		if(uploader.isEmpty()) {
 			throw new IllegalArgumentException("Employee with id " + uploaderID + " doesn't exist");
 		}
 
-		Doc document = new Doc(uploader.get().getAccessLevel());
+		Binary data = new Binary(BsonBinarySubType.BINARY, file.getBytes());
+		String fileName = file.getOriginalFilename();
+		String fileType = file.getContentType();
+		String department = uploader.get().getDepartment();
+		int accessLevel = uploader.get().getAccessLevel();
+		LocalDateTime dateTime = LocalDateTime.now();
 
-		document.setUploaderID(uploaderID);
-		document.setData(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
-		document.setUploadDateTime(dateTime);
-		double size = file.getSize();
-		document.setSize(size);
+		Doc document = new Doc(data, accessLevel, department, fileName, fileType, uploaderID, dateTime, file.getSize());
 
-		documentRepo.save(document);
+		this.documentRepo.save(document);
 	}
 
-	public Doc downloadDocument(String documentID, String downloaderID) throws IOException {
-		Optional<Doc> documentToDownload = documentRepo.findById(documentID);
+	//only the admin can upload the private Docs
+	public void uploadPersonalDocument(MultipartFile file, String uploaderID, String ownerID) throws IOException, IllegalAccessException {
+		Optional<Employee> owner = this.employeeRepo.findById(ownerID);
 
-		if (documentToDownload.isEmpty()) {
+		if(owner.isEmpty()) {
+			throw new IOException("Employee with id " + ownerID + " doesn't exist");
+		}
+
+		if(uploaderID.equals(ADMIN_ID)){
+			Binary data = new Binary(BsonBinarySubType.BINARY, file.getBytes());
+			String fileName = file.getOriginalFilename();
+			String fileType = file.getContentType();
+			LocalDateTime dateTime = LocalDateTime.now();
+
+			Doc document = new Doc(data, owner.get().getAccessLevel(), owner.get().getDepartment(), fileName, fileType, ownerID, dateTime, file.getSize());
+
+			owner.get().getPersonalDocuments().add(document);
+			this.employeeRepo.save(owner.get());
+		} else {
+			throw new IllegalAccessException("You don't have permission to upload!");
+		}
+	}
+
+	public Doc downloadPublicDocument(String documentID, String downloaderID) throws IOException, IllegalAccessException {
+		Optional<Doc> documentToDownload = this.documentRepo.findById(documentID);
+
+		if(documentToDownload.isEmpty()){
 			throw new IOException("Document not found!");
 		}
 
-		if (!isAccessible(documentToDownload.get().getAccessLevel(), downloaderID))
-			return null;
+		if(!isAccessible(documentToDownload.get().getDepartment(), documentToDownload.get().getAccessLevel(), downloaderID)
+				&& !downloaderID.equals(ADMIN_ID)){
+			throw new IllegalAccessException("Document not accessible!");
+		}
 
-		if (!documentToDownload.get().getDownloaders().contains(downloaderID)) {
+		if(!documentToDownload.get().getDownloaders().contains(downloaderID)) {
 			documentToDownload.get().getDownloaders().add(downloaderID);
 		}
 
-		documentRepo.save(documentToDownload.get());
 		return documentToDownload.get();
 	}
 
-	public void uploadPrivateDocument(MultipartFile file, String uploaderID) throws IOException {
-		LocalDateTime dateTime = LocalDateTime.now();
-		Optional<Employee> uploader = this.employeeRepo.findById(uploaderID);
+	//Both Employee and Admin can download a personal document
+	public Doc downloadPersonalDocument(int documentID, String downloaderID, String ownerID) throws IllegalArgumentException, IllegalAccessException {
+		Optional<Employee> owner = this.employeeRepo.findById(ownerID);
 
-		if (uploader.isEmpty()) {
-			throw new IllegalArgumentException("Employee with id " + uploaderID + " doesn't exist");
+		if(owner.isEmpty()){
+			throw new IllegalArgumentException("Employee with id " + ownerID + " doesn't exist");
 		}
 
-		Doc document = new Doc(uploader.get().getAccessLevel());
+		List<Doc> personalDocuments = owner.get().getPersonalDocuments();
 
-		document.setUploaderID(uploaderID);
-		document.setData(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
-		document.setUploadDateTime(dateTime);
-		double size = file.getSize();
-		document.setSize(size);
+		if(personalDocuments.size() <= documentID){
+			throw new IllegalArgumentException("Document with id " + documentID + " doesn't exists");
+		}
 
-		uploader.get().getPrivateDocuments().add(document);
-		employeeRepo.save(uploader.get());
+		Doc document = personalDocuments.get(documentID);
+
+		if(!downloaderID.equals(ADMIN_ID) && !downloaderID.equals(document.getUploaderID())){
+			throw new IllegalAccessException("Document not accessible!");
+		}
+
+		return document;
 	}
 
-	public Doc downloadPrivateDocument(String documentID, String downloaderID, String employeeID) throws IOException {
-		Optional<Employee> downloader = employeeRepo.findById(employeeID);
-		if (downloader.isEmpty()) {
-			throw new IllegalArgumentException("Employee with id " + downloaderID + " doesn't exist");
-		}
-		Doc document = null;
-		for (Doc doc : downloader.get().getPrivateDocuments()) {
-			if (doc.getID().equals(documentID)) {
-				document = doc;
-				break;
-			}
-		}
-		if (downloader.get().getID().equals(downloaderID) || adminCheck(downloaderID)) {
-			return document;
-		}
-		return null;
-	}
+	public void deletePublicDocument(String documentID, String employeeID) throws IllegalArgumentException, IllegalAccessException{
+		Optional<Doc> documentToDelete = this.documentRepo.findById(documentID);
 
-	private boolean adminCheck(String employeeID) {
-
-		return false;
-	}
-
-	private boolean isAccessible(String accessLevel, String employeeID) {
-		Employee employee;
-		try {
-			employee = employeeRepo.findById(employeeID).get();
-		} catch (Exception e) {
-			System.out.println("Employee not found");
-			return false;
+		if(documentToDelete.isEmpty()){
+			throw new IllegalArgumentException("Document not found!");
 		}
-		if (!accessLevel.substring(0, 1).equals(employee.getAccessLevel().substring(0, 1))) {
-			return false;
+
+		if(employeeID.equals(ADMIN_ID) || documentToDelete.get().getUploaderID().equals(employeeID)){
+			this.documentRepo.deleteById(documentID);
 		} else {
-			int documentAccessLevel = Integer.parseInt(accessLevel.substring(1, accessLevel.length()));
-			int employeeAccessLevel = Integer.parseInt(employee.getAccessLevel().substring(1, employee.getAccessLevel().length()));
-			if (documentAccessLevel > employeeAccessLevel) {
-				return false;
-			}
+			throw new IllegalAccessException("You don't have permission to delete document");
 		}
-		return true;
 	}
 
-	// TODO:
-	// The rest of the CRUD methods related to the controller methods
+	//only admin can delete private documents
+	public void deletePersonalDocument(int documentID, String employeeID, String ownerID) throws IllegalArgumentException, IllegalAccessException{
+		Optional<Employee> owner = this.employeeRepo.findById(ownerID);
+
+		if(owner.isEmpty()){
+			throw new IllegalArgumentException("Owner not found!");
+		}
+
+		if(employeeID.equals(ADMIN_ID)){
+			List<Doc> personalDocuments = owner.get().getPersonalDocuments();
+
+			if(personalDocuments.size() <= documentID){
+				throw new IllegalArgumentException("Document with id " + documentID + " doesn't exists");
+			}
+
+			personalDocuments.remove(documentID);
+
+			this.employeeRepo.save(owner.get());
+		} else {
+			throw new IllegalAccessException("You don't have permission to delete document");
+		}
+	}
+
+
+	private boolean isAccessible(String department, int accessLevel, String employeeID) {
+		Optional<Employee> employee = this.employeeRepo.findById(employeeID);
+
+		if(employee.isEmpty()){
+			return false;
+		}
+
+		//The Admin always has access
+		if(employeeID.equals(ADMIN_ID)){
+			return true;
+		} else {
+			return department.equals(employee.get().getDepartment()) && accessLevel <= employee.get().getAccessLevel();
+		}
+	}
 }

@@ -51,7 +51,7 @@ public class EmployeeController {
     public ResponseEntity<String> editEmployeeInfo(@RequestBody Employee newEmployee, @PathVariable String employeeId){
         try {
             //TODO:
-            //Validate that the current user trying to register a new employee is the Admin
+            //Validate that the current user trying to edit employee info is the actual employee
             this.employeeService.editEmployeeInfo(newEmployee, employeeId);
 
             return new ResponseEntity<>("Edited Employee", HttpStatus.OK);
