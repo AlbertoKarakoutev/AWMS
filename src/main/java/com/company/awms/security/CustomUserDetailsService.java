@@ -20,11 +20,11 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        Optional<Employee> employee = this.employeeRepo.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) {
+        Optional<Employee> employee = this.employeeRepo.findByEmail(email);
 
         if(employee.isEmpty()){
-            throw new UsernameNotFoundException("Employee with username " + username + " doesn't exist");
+            throw new UsernameNotFoundException("Employee with email " + email + " doesn't exist");
         }
 
         return new CustomUserDetails(employee.get());

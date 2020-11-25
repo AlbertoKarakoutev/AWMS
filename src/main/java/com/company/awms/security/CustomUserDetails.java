@@ -16,9 +16,9 @@ public class CustomUserDetails implements UserDetails {
     private String ID;
 
     CustomUserDetails(Employee employee) {
-        this.username = employee.getUsername();
+        this.username = employee.getEmail();
         this.password = employee.getPassword();
-        this.role = employee.getAccessLevel();
+        this.role = employee.getRole();
         this.ID = employee.getID();
     }
 

@@ -26,8 +26,8 @@ public class ForumController {
 
     @GetMapping(value = "forum")
     public ResponseEntity<List<ForumThread>> getAllThreads(@AuthenticationPrincipal CustomUserDetails userDetails){
-        //Get the userDetails of the currentlyLoggedInUser
-        System.out.println(userDetails.getID());
+        //Get the userDetails of the currentlyLoggedInUser. Just testing
+        System.out.println(userDetails.getAuthorities().toArray()[0]);
 
         try {
             List<ForumThread> threads = this.forumService.getAllThreads();

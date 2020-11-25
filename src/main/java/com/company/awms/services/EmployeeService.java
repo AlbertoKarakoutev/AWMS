@@ -41,6 +41,7 @@ public class EmployeeService {
         //Add salt to password
         String encodedPassword = this.passwordEncoder.encode(newEmployee.getPassword());
         newEmployee.setPassword(encodedPassword);
+        newEmployee.setRole("EMPLOYEE");
 
         this.employeeRepo.save(newEmployee);
     }

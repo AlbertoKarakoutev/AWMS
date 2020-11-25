@@ -20,7 +20,7 @@ public class Employee {
 	private String firstName;
 	private String lastName;
 	private String password;
-	private String username;
+	private String role;
 	private String email;
 	private String iban;
 	private int level;
@@ -46,13 +46,12 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 
-	public Employee(String nationalID, String firstName, String lastName, String password, String username, String email,
+	public Employee(String nationalID, String firstName, String lastName, String password, String email,
 					String iban, String accessLevel, String department, int level, String phoneNumber, double salary, int[] workWeek) {
 		this.nationalID = nationalID;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.password = password;
-		this.username = username;
 		this.email = email;
 		this.iban = iban;
 		this.accessLevel = accessLevel;
@@ -86,8 +85,8 @@ public class Employee {
 		return password;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getRole() {
+		return role;
 	}
 
 	public String getEmail() {
@@ -150,8 +149,8 @@ public class Employee {
 		this.password = password;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public void setEmail(String email) {
