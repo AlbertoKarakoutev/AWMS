@@ -2,7 +2,6 @@ package com.company.awms.controllers;
 
 import java.io.FileReader;
 import java.time.LocalDate;
-import java.time.YearMonth;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.company.awms.data.schedule.Day;
 import com.company.awms.services.EmployeeService;
 import com.company.awms.services.ScheduleService;
 
@@ -21,12 +19,9 @@ import com.company.awms.services.ScheduleService;
 public class ScheduleController {
 
 	private ScheduleService scheduleService;
-	private EmployeeService employeeService;
-
 	@Autowired
 	public ScheduleController(ScheduleService scheduleService, EmployeeService employeeService) {
 		this.scheduleService = scheduleService;
-		this.employeeService = employeeService;
 	}
 
 	// Populate DB with a month's dates

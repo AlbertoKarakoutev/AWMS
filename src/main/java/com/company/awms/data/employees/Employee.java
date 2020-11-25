@@ -21,8 +21,9 @@ public class Employee {
 	private String lastName;
 	private String email;
 	private String iban;
-	private int accessLevel;
+	private int level;
 	private String department;
+	private String accessLevel;
 	private String phoneNumber;
 	private double salary;
 	private int[] workWeek = new int[2];
@@ -43,8 +44,8 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 
-	public Employee(String nationalID, String firstName, String lastName, String email, String iban, int accessLevel,
-					String department, String phoneNumber, double salary, int[] workWeek) {
+	public Employee(String nationalID, String firstName, String lastName, String email, String iban, String accessLevel,
+					String department, int level, String phoneNumber, double salary, int[] workWeek) {
 		this.nationalID = nationalID;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -84,10 +85,14 @@ public class Employee {
 		return this.iban;
 	}
 
-	public int getAccessLevel() {
+	public String getAccessLevel() {
 		return this.accessLevel;
 	}
 
+	public int getLevel() {
+		return this.level;
+	}
+	
 	public String getDepartment() {
 		return department;
 	}
@@ -136,12 +141,18 @@ public class Employee {
 		this.iban = iban;
 	}
 
-	public void setAccessLevel(int accessLevel) {
+	public void setAccessLevel(String accessLevel) {
 		this.accessLevel = accessLevel;
 	}
 
+	public void setLevel(int level) {
+		this.level = level;
+		setAccessLevel(department + Integer.toString(level));
+	}
+	
 	public void setDepartment(String department) {
 		this.department = department;
+		setAccessLevel(department + Integer.toString(level));
 	}
 
 	public void setSalary(double salary) {

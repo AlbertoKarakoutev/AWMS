@@ -16,5 +16,7 @@ public interface EmployeeRepo extends MongoRepository<Employee, String> {
 	List<Employee> findByLastName(String lastName);
 
 	List<Employee> findByAccessLevel(String accessLevel);
+	
+	List<Employee> findByLevel(String level);
 
 }

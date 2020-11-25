@@ -3,29 +3,30 @@ package com.company.awms.controllers;
 import java.io.IOException;
 import java.util.List;
 
-import com.company.awms.data.documents.DocInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.company.awms.data.documents.Doc;
-import com.company.awms.data.employees.Employee;
+import com.company.awms.data.documents.DocInfoDTO;
 import com.company.awms.services.DocumentService;
-import com.company.awms.services.EmployeeService;
 
 @RestController
 public class DocumentController {
 
     private DocumentService documentService;
-	private EmployeeService employeeService;
 	
     @Autowired
-    public DocumentController(DocumentService documentService, EmployeeService employeeService) {
+    public DocumentController(DocumentService documentService) {
         this.documentService = documentService;
-        this.employeeService = employeeService;
     }
     
     @PostMapping(value = "document/public/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

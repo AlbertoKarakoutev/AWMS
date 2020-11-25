@@ -45,7 +45,7 @@ public class DocumentService {
 		List<Doc> departmentDocuments = this.documentRepo.findByDepartment(employee.get().getDepartment());
 
 		for (Doc document : departmentDocuments) {
-			if (employee.get().getAccessLevel() >= document.getAccessLevel()) {
+			if (employee.get().getLevel() >= document.getLevel()) {
 				DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType());
 				accessibleDocumentsInfo.add(documentInfo);
 			}
@@ -82,10 +82,10 @@ public class DocumentService {
 		String fileName = file.getOriginalFilename();
 		String fileType = file.getContentType();
 		String department = uploader.get().getDepartment();
-		int accessLevel = uploader.get().getAccessLevel();
+		int level = uploader.get().getLevel();
 		LocalDateTime dateTime = LocalDateTime.now();
 
-		Doc document = new Doc(data, accessLevel, department, fileName, fileType, uploaderID, dateTime, file.getSize());
+		Doc document = new Doc(data, level, department, fileName, fileType, uploaderID, dateTime, file.getSize());
 
 		this.documentRepo.save(document);
 	}
@@ -104,7 +104,7 @@ public class DocumentService {
 			String fileType = file.getContentType();
 			LocalDateTime dateTime = LocalDateTime.now();
 
-			Doc document = new Doc(data, owner.get().getAccessLevel(), owner.get().getDepartment(), fileName, fileType, ownerID, dateTime, file.getSize());
+			Doc document = new Doc(data, owner.get().getLevel(), owner.get().getDepartment(), fileName, fileType, ownerID, dateTime, file.getSize());
 
 			owner.get().getPersonalDocuments().add(document);
 			this.employeeRepo.save(owner.get());
@@ -120,7 +120,7 @@ public class DocumentService {
 			throw new IOException("Document not found!");
 		}
 
-		if(!isAccessible(documentToDownload.get().getDepartment(), documentToDownload.get().getAccessLevel(), downloaderID)
+		if(!isAccessible(documentToDownload.get().getDepartment(), documentToDownload.get().getLevel(), downloaderID)
 				&& !downloaderID.equals(ADMIN_ID)){
 			throw new IllegalAccessException("Document not accessible!");
 		}
@@ -193,7 +193,7 @@ public class DocumentService {
 	}
 
 
-	private boolean isAccessible(String department, int accessLevel, String employeeID) {
+	private boolean isAccessible(String department, int level, String employeeID) {
 		Optional<Employee> employee = this.employeeRepo.findById(employeeID);
 
 		if(employee.isEmpty()){
@@ -204,7 +204,7 @@ public class DocumentService {
 		if(employeeID.equals(ADMIN_ID)){
 			return true;
 		} else {
-			return department.equals(employee.get().getDepartment()) && accessLevel <= employee.get().getAccessLevel();
+			return department.equals(employee.get().getDepartment()) && level <= employee.get().getLevel();
 		}
 	}
 }
