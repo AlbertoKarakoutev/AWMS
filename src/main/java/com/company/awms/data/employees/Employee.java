@@ -19,6 +19,8 @@ public class Employee {
 	private String nationalID;
 	private String firstName;
 	private String lastName;
+	private String password;
+	private String username;
 	private String email;
 	private String iban;
 	private int level;
@@ -44,15 +46,18 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 
-	public Employee(String nationalID, String firstName, String lastName, String email, String iban, String accessLevel,
-					String department, int level, String phoneNumber, double salary, int[] workWeek) {
+	public Employee(String nationalID, String firstName, String lastName, String password, String username, String email,
+					String iban, String accessLevel, String department, int level, String phoneNumber, double salary, int[] workWeek) {
 		this.nationalID = nationalID;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.password = password;
+		this.username = username;
 		this.email = email;
 		this.iban = iban;
 		this.accessLevel = accessLevel;
 		this.department = department;
+		this.level = level;
 		this.phoneNumber = phoneNumber;
 		this.salary = salary;
 		this.workWeek = workWeek;
@@ -75,6 +80,14 @@ public class Employee {
 
 	public String getLastName() {
 		return this.lastName;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getUsername() {
+		return username;
 	}
 
 	public String getEmail() {
@@ -131,6 +144,14 @@ public class Employee {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public void setEmail(String email) {

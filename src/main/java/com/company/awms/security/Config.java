@@ -1,4 +1,4 @@
-package com.company.awms;
+package com.company.awms.security;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;

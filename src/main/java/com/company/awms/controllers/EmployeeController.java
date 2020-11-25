@@ -39,11 +39,10 @@ public class EmployeeController {
         }
     }
 
+    //only the admin can register new employee accounts
     @PostMapping(value = "employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registerEmployee(@RequestBody Employee newEmployee){
         try {
-            //TODO:
-            //Validate that the current user trying to register a new employee is the Admin
             this.employeeService.registerEmployee(newEmployee);
 
             return new ResponseEntity<>("Registered Successfully", HttpStatus.OK);

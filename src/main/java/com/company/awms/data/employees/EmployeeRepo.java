@@ -9,6 +9,8 @@ public interface EmployeeRepo extends MongoRepository<Employee, String> {
 
 	Optional<Employee> findByNationalID(String nationalID);
 
+	Optional<Employee> findByUsername(String username);
+
 	Optional<Employee> findByEmail(String email);
 
 	List<Employee> findByFirstName(String firstName);
