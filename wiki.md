@@ -28,7 +28,8 @@
       	- **Variables:**
 		- String _id_
        		- Binary _data_
-        	- String _accessLevel_
+        	- int _level_
+		- String _department_
         	- String _uploaderID_
         	- LocalDateTime _uploadDateTime_
         	- ArrayList _downloaderIDs_
@@ -56,6 +57,8 @@
 			- String _lastName_
 			- String _iban_
 			- String _accessLevel_  -  _In the form **char-int**, char being a department code, and int being the employee level in that department_
+			- String _department_
+			- int _level_
 			- String _phoneNumber_
 			- double _salary_
 			- int[] _workWeek
@@ -82,12 +85,14 @@
 			
 			- Employee _findByEmail(String email)_
 			
-			- ArrayList _findByFirstName(String firstName)_
+			- List _findByFirstName(String firstName)_
 			
-			- ArrayList _findByLastName(String lastName)_
+			- List _findByLastName(String lastName)_
 			
-			- ArrayList _findByAccessLevel(String accessLevel)_ 
+			- List _findByAccessLevel(String accessLevel)_ 
 			
+			- List _findByLevel(int level)_  
+  
 	- ### **com.company.awms.data.forum.ForumReply**  
 		***(Class)***  
       	**Main forum reply object, containing _variables_, as well as their appropriate getters and setters**

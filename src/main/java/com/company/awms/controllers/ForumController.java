@@ -3,11 +3,13 @@ package com.company.awms.controllers;
 import com.company.awms.data.forum.ForumReply;
 import com.company.awms.data.forum.ForumThread;
 import com.company.awms.data.forum.ThreadReplyDTO;
+import com.company.awms.security.CustomUserDetails;
 import com.company.awms.services.ForumService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -23,7 +25,10 @@ public class ForumController {
     }
 
     @GetMapping(value = "forum")
-    public ResponseEntity<List<ForumThread>> getAllThreads(){
+    public ResponseEntity<List<ForumThread>> getAllThreads(@AuthenticationPrincipal CustomUserDetails userDetails){
+        //Get the userDetails of the currentlyLoggedInUser. Just testing
+        System.out.println(userDetails.getAuthorities().toArray()[0]);
+
         try {
             List<ForumThread> threads = this.forumService.getAllThreads();
 

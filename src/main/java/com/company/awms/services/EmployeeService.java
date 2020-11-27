@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.company.awms.data.employees.Employee;
@@ -16,10 +17,12 @@ import com.company.awms.data.employees.Notification;
 @Service
 public class EmployeeService {
     private EmployeeRepo employeeRepo;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EmployeeService(EmployeeRepo employeeRepo) {
+    public EmployeeService(EmployeeRepo employeeRepo, PasswordEncoder passwordEncoder) {
         this.employeeRepo = employeeRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Employee getEmployee(String employeeID) throws IOException{
@@ -35,6 +38,11 @@ public class EmployeeService {
     public void registerEmployee(Employee newEmployee){
         //TODO:
         //Validation? from Validator Class
+        //Add salt to password
+        String encodedPassword = this.passwordEncoder.encode(newEmployee.getPassword());
+        newEmployee.setPassword(encodedPassword);
+        newEmployee.setRole("EMPLOYEE");
+
         this.employeeRepo.save(newEmployee);
     }
 

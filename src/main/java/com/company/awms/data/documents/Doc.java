@@ -15,7 +15,7 @@ public class Doc {
 	private String id;
 	
 	private Binary data;
-	private int accessLevel;
+	private int level;
 	private String department;
 	private String name;
 	private String type;
@@ -27,10 +27,10 @@ public class Doc {
 	public Doc() {
 	}
 
-	public Doc(Binary data, int accessLevel, String department, String name, String type, String uploaderID,
+	public Doc(Binary data, int level, String department, String name, String type, String uploaderID,
 			   LocalDateTime uploadDateTime, double size) {
 		this.data = data;
-		this.accessLevel = accessLevel;
+		this.level = level;
 		this.department = department;
 		this.name = name;
 		this.type = type;
@@ -40,7 +40,7 @@ public class Doc {
 	}
 
 	public Doc(int accessLevel) {
-		this.accessLevel = accessLevel;
+		this.level = accessLevel;
 	}
 	
 	public Binary getData() {
@@ -51,8 +51,8 @@ public class Doc {
 		return id;
 	}
 
-	public int getAccessLevel() {
-		return accessLevel;
+	public int getLevel() {
+		return level;
 	}
 
 	public double getSize() {
@@ -91,8 +91,8 @@ public class Doc {
 		this.data = data;
 	}
 
-	public void setAccessLevel(int accessLevel) {
-		this.accessLevel = accessLevel;
+	public void setLevel(int level) {
+		this.level = level;
 	}
 
 	public void setDepartment(String department) {

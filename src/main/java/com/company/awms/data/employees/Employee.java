@@ -19,10 +19,13 @@ public class Employee {
 	private String nationalID;
 	private String firstName;
 	private String lastName;
+	private String password;
+	private String role;
 	private String email;
 	private String iban;
-	private int accessLevel;
+	private int level;
 	private String department;
+	private String accessLevel;
 	private String phoneNumber;
 	private double salary;
 	private int[] workWeek = new int[2];
@@ -43,15 +46,17 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 
-	public Employee(String nationalID, String firstName, String lastName, String email, String iban, int accessLevel,
-					String department, String phoneNumber, double salary, int[] workWeek) {
+	public Employee(String nationalID, String firstName, String lastName, String password, String email,
+					String iban, String accessLevel, String department, int level, String phoneNumber, double salary, int[] workWeek) {
 		this.nationalID = nationalID;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.password = password;
 		this.email = email;
 		this.iban = iban;
 		this.accessLevel = accessLevel;
 		this.department = department;
+		this.level = level;
 		this.phoneNumber = phoneNumber;
 		this.salary = salary;
 		this.workWeek = workWeek;
@@ -76,6 +81,14 @@ public class Employee {
 		return this.lastName;
 	}
 
+	public String getPassword() {
+		return password;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
 	public String getEmail() {
 		return this.email;
 	}
@@ -84,10 +97,14 @@ public class Employee {
 		return this.iban;
 	}
 
-	public int getAccessLevel() {
+	public String getAccessLevel() {
 		return this.accessLevel;
 	}
 
+	public int getLevel() {
+		return this.level;
+	}
+	
 	public String getDepartment() {
 		return department;
 	}
@@ -128,6 +145,14 @@ public class Employee {
 		this.lastName = lastName;
 	}
 
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -136,12 +161,18 @@ public class Employee {
 		this.iban = iban;
 	}
 
-	public void setAccessLevel(int accessLevel) {
+	public void setAccessLevel(String accessLevel) {
 		this.accessLevel = accessLevel;
 	}
 
+	public void setLevel(int level) {
+		this.level = level;
+		setAccessLevel(department + Integer.toString(level));
+	}
+	
 	public void setDepartment(String department) {
 		this.department = department;
+		setAccessLevel(department + Integer.toString(level));
 	}
 
 	public void setSalary(double salary) {
