@@ -46,12 +46,23 @@ public class ScheduleService {
 
 	// Create a employee reference with appropriate information and add to the
 	// current day employees array
-	public boolean addWorkDay(String employeeID, LocalDate date, JSONObject thisDepartment, int level) {
+	public boolean addWorkDay(String employeeID, LocalDate date, boolean onCall, LocalTime startShift, LocalTime endShift) {
 		Employee employee;
 		Day currentDay;
 		LocalTime[] workTime = new LocalTime[2];
+		
 		JSONArray workTimeJSON;
 		JSONObject employeeLevel = null;
+		
+		Optional<Employee> employeeOptional = this.employeeRepo.findById(employeeID);
+		if(employeeOptional.isEmpty()){
+			System.err.println("Employee Not Found!");
+			return false;
+		}
+		employee = employeeOptional.get();
+		
+		JSONObject thisDepartment = getDepartment(employee.getDepartment());
+		int level = employee.getLevel();
 		if ((boolean) thisDepartment.get("universalSchedule")) {
 			workTimeJSON = (JSONArray) thisDepartment.get("dailyHours");
 			employeeLevel = thisDepartment;
@@ -63,11 +74,15 @@ public class ScheduleService {
 		}
 
 		try {
-
-			LocalTime start = LocalTime.of(Integer.parseInt(workTimeJSON.get(0).toString()), Integer.parseInt(workTimeJSON.get(1).toString()));
-			workTime[0] = start;
-			LocalTime end = start.plus(Integer.parseInt(employeeLevel.get("shiftLength").toString()) + Integer.parseInt(employeeLevel.get("dailyBreakDurationTotal").toString()), ChronoUnit.HOURS);
-			workTime[1] = end;
+			if(!onCall) {
+				LocalTime start = LocalTime.of(Integer.parseInt(workTimeJSON.get(0).toString()), Integer.parseInt(workTimeJSON.get(1).toString()));
+				workTime[0] = start;
+				LocalTime end = start.plus(Integer.parseInt(employeeLevel.get("shiftLength").toString()) + Integer.parseInt(employeeLevel.get("dailyBreakDurationTotal").toString()), ChronoUnit.HOURS);
+				workTime[1] = end;
+			}else {
+				workTime[0] = startShift;
+				workTime[1] = endShift;
+			}
 
 		} catch (Exception e) {
 			System.out.println("DateTime error!");
@@ -75,12 +90,7 @@ public class ScheduleService {
 			return false;
 		}
 
-		Optional<Employee> employeeOptional = this.employeeRepo.findById(employeeID);
-		if(employeeOptional.isEmpty()){
-			System.err.println("EmployeeNotFound!");
-			return false;
-		}
-		employee = employeeOptional.get();
+		
 
 		EmployeeDailyReference edr;
 		try {
@@ -339,7 +349,7 @@ public class ScheduleService {
 				if(isLeaveDay(employee, day)) {
 					continue shiftLoop;
 				}else {
-					//addWorkDay(employee.getID(), day.getDate(), thisDepartment, level);
+					//addWorkDay(employee.getID(), day.getDate(), true, shifts.get(i).beginning.toLocalTime(),shifts.get(i).end.toLocalTime());
 			
 					System.out.println(shifts.get(i).getDate() + "  " + shifts.get(i).beginning.toLocalTime() + " - " + shifts.get(i).end.toLocalTime() + " " + "is a work shift for " + employee.getFirstName());
 
@@ -352,10 +362,6 @@ public class ScheduleService {
 	}
 	
 	public boolean applyIrregularSchedule(String department, int level) {
-
-		JSONObject thisDepartment = setDepartment(department, level, "Irregular");
-		if(thisDepartment == null) return false;
-
 		ArrayList<Day> month = new ArrayList<>();
 		for (Day day : scheduleRepo.findAll()) {
 			if (day.getDate().getMonthValue() == LocalDate.now().getMonthValue()) {
@@ -419,7 +425,7 @@ public class ScheduleService {
 				} else {
 					if (consecutiveWorkDays < employee.getWorkWeek()[0]) {
 						if(!isLeaveDay(employee, day)) {
-							//addWorkDay(employee.getID(), day.getDate(), thisDepartment, level);
+							//addWorkDay(employee.getID(), day.getDate(), false, null, null);
 							System.out.println(day.getDate() + " " + "is a work day");
 						}
 					}
@@ -431,7 +437,7 @@ public class ScheduleService {
 				} else {
 					if(employeeWorkWeek[workWeekCounter]) {
 						System.out.println(day.getDate() + " is a work day");
-						//addWorkDay(employee.getID(), day.getDate(), thisDepartment, level);
+						//addWorkDay(employee.getID(), day.getDate(), false, null, null);
 					}else {
 						System.out.println(day.getDate() + " " + "is a break day");
 					}
@@ -448,11 +454,7 @@ public class ScheduleService {
 		return true;
 	}
 
-	public boolean applyRegularSchedule(String department, int level) {
-
-		JSONObject thisDepartment = setDepartment(department, level, "Regular");
-		if(thisDepartment == null) return false;
-		
+	public boolean applyRegularSchedule(String department, int level) {	
 		ArrayList<Day> month = new ArrayList<>();
 		for (Day day : scheduleRepo.findAll()) {
 			if (day.getDate().getMonthValue() == LocalDate.now().getMonthValue()) {
@@ -467,7 +469,7 @@ public class ScheduleService {
 						System.out.println(day.getDate() + " is a break day");
 						continue dayLoop;
 					} else {
-						//addWorkDay(employee.getID(), day.getDate(), thisDepartment, level);
+						//addWorkDay(employee.getID(), day.getDate(), false, null, null);
 						System.out.println(day.getDate() + " is a work day");
 					}
 				} else {
@@ -530,6 +532,7 @@ public class ScheduleService {
 	}
 	
 	private boolean isLeaveDay(Employee employee, Day day) {
+
 		if (!employee.getLeaves().isEmpty()) {
 			for (Map<String, Object> leave : employee.getLeaves()) {
 				if (day.getDate().isAfter((LocalDate) leave.get("Start")) && day.getDate().isBefore((LocalDate) leave.get("End"))) {
@@ -538,5 +541,16 @@ public class ScheduleService {
 			}
 		}
 		return false;
+	}
+	
+	public void addMonthlyDays(int month) {
+		LocalDate now = LocalDate.now().withMonth(month);
+		YearMonth yearMonthObject = YearMonth.of(now.getYear(), now.getMonthValue());
+		for (int i = 1; i <= yearMonthObject.lengthOfMonth(); i++) {
+			LocalDate correctDate = now.withDayOfMonth(i);
+			Day day = new Day(correctDate);
+			System.out.println(correctDate);
+			scheduleRepo.save(day);
+		}
 	}
 }

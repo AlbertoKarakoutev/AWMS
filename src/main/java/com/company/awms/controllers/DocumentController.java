@@ -22,6 +22,8 @@ import com.company.awms.services.DocumentService;
 @RestController
 public class DocumentController {
 
+	private static final boolean active = true;
+	
     private DocumentService documentService;
 	
     @Autowired
@@ -41,24 +43,6 @@ public class DocumentController {
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } catch (Exception e){
-            System.out.println(e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping(value = "document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID, @RequestParam String uploaderID){
-        try{
-            //uploaderID can be taken from the authentication - only admin can upload to employeeID's private documents
-            this.documentService.uploadPersonalDocument(file, uploaderID, employeeID);
-
-            return new ResponseEntity<>("Successfully uploaded document!", HttpStatus.OK);
-        } catch (IOException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (IllegalAccessException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        catch (Exception e){
             System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -114,24 +98,6 @@ public class DocumentController {
         }
     }
 
-    @DeleteMapping(value = "document/personal/delete/{documentID}")
-    public ResponseEntity<String> deletePrivateDocument(@PathVariable int documentID, @RequestParam String employeeID, @RequestParam String ownerID){
-        try{
-            //employeeID can be taken from the authentication
-
-            this.documentService.deletePersonalDocument(documentID, employeeID, ownerID);
-
-            return new ResponseEntity<>("Successfully deleted document!", HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (IllegalAccessException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } catch (Exception e) {
-            System.out.println(e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @GetMapping(value = "document/public/accessible")
     public ResponseEntity<List<DocInfoDTO>> getAccessibleDocuments(@RequestParam String employeeID){
         try {
@@ -159,4 +125,8 @@ public class DocumentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+	public static boolean getActive() {
+		return active;
+	}
 }

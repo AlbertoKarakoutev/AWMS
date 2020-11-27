@@ -12,6 +12,8 @@ import com.company.awms.services.SalaryService;
 @RestController
 public class SalaryController {
 
+	private static boolean active = true;
+
 	private SalaryService salaryService;
 
 	@Autowired
@@ -19,13 +21,39 @@ public class SalaryController {
 		this.salaryService = salaryService;
 	}
 
-	@GetMapping("/workHours/{nationalID}")
+	@GetMapping("salary/workHours/{nationalID}")
 	public ResponseEntity<String> getByName(@PathVariable String nationalID) {
-		return new ResponseEntity<>(String.format("%3.2f hours of work this month", salaryService.calculateWorkHours(nationalID)), HttpStatus.OK);
+		if (active) {
+			try {
+				double workHours = salaryService.calculateWorkHours(nationalID);
+				return new ResponseEntity<>(String.format("%3.2f hours of work this month", workHours), HttpStatus.OK);
+			} catch (Exception e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@GetMapping("/salary/{nationalID}")
+	public ResponseEntity<String> getSalary(@PathVariable String nationalID) {
+		if (active) {
+			try {
+				double salary = salaryService.estimateSalary(nationalID, 1.0);
+				return new ResponseEntity<>(String.format("Approximately %3.2f leva for this month", salary), HttpStatus.OK);
+			} catch (Exception e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	public static boolean getActive() {
+		return active;
 	}
 	
-	@GetMapping("/salary/{nationalID}")
-	public ResponseEntity<String> getSalary(@PathVariable String nationalID){
-		return new ResponseEntity<>(String.format("Approximately %3.2f leva for this month", salaryService.estimateSalary(nationalID, 1.0)), HttpStatus.OK);
+	public void setActive(boolean newActive) {
+		active = newActive;
 	}
 }
