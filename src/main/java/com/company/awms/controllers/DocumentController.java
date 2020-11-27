@@ -20,8 +20,12 @@ import com.company.awms.services.EmployeeService;
 public class DocumentController {
 
     private DocumentService documentService;
+<<<<<<< Updated upstream
 	private EmployeeService employeeService;
 	
+=======
+	private final boolean active = true;
+>>>>>>> Stashed changes
     @Autowired
     public DocumentController(DocumentService documentService, EmployeeService employeeService) {
         this.documentService = documentService;
