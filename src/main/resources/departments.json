@@ -29,15 +29,15 @@
     } ]
   },
   "c" : {
-    "monthlyWorkDays" : 7,
+    "monthlyWorkDays" : 15,
     "universalSchedule" : true,
     "scheduleType" : "OnCall",
     "dailyBreakDurationTotal" : 3,
     "name" : "Security",
     "workOnWeekends" : true,
     "dailyHours" : [ 8, 0, 16, 0 ],
-    "shiftLength" : 4,
-    "employeesPerShift" : 2,
+    "shiftLength" : 8,
+    "employeesPerShift" : 1,
     "breakBetweenShifts" : 2
   }
 }

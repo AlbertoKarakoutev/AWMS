@@ -31,7 +31,7 @@ public class DocumentController {
         this.documentService = documentService;
     }
     
-    @PostMapping(value = "document/public/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/document/public/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadPublicDocument(@RequestParam MultipartFile file, @RequestParam String uploaderID){
         try{
             //uploaderID can be taken from the authentication
@@ -48,7 +48,7 @@ public class DocumentController {
         }
     }
 
-    @GetMapping(value = "document/public/download/{documentID}")
+    @GetMapping(value = "/document/public/download/{documentID}")
     public ResponseEntity<Doc> downloadPublicDocument(@PathVariable String documentID, @RequestParam String downloaderID){
         try {
             //downloaderID can be taken from the authentication
@@ -65,7 +65,7 @@ public class DocumentController {
         }
     }
     
-    @GetMapping(value = "document/personal/download/{documentID}")
+    @GetMapping(value = "/document/personal/download/{documentID}")
     public ResponseEntity<Doc> downloadPersonalDocument(@PathVariable int documentID, @RequestParam String downloaderID, @RequestParam String ownerID){
         try {
         	Doc document = documentService.downloadPersonalDocument(documentID, downloaderID, ownerID);
@@ -80,7 +80,7 @@ public class DocumentController {
         }
     }
 
-    @DeleteMapping(value = "document/public/delete/{documentID}")
+    @DeleteMapping(value = "/document/public/delete/{documentID}")
     public ResponseEntity<String> deletePublicDocument(@PathVariable String documentID, @RequestParam String employeeID){
         try{
             //employeeID can be taken from the authentication
@@ -98,7 +98,7 @@ public class DocumentController {
         }
     }
 
-    @GetMapping(value = "document/public/accessible")
+    @GetMapping(value = "/document/public/accessible")
     public ResponseEntity<List<DocInfoDTO>> getAccessibleDocuments(@RequestParam String employeeID){
         try {
             //employeeID can be taken from the authentication
@@ -113,7 +113,7 @@ public class DocumentController {
         }
     }
 
-    @GetMapping(value = "document/personal/all")
+    @GetMapping(value = "/document/personal/all")
     public ResponseEntity<List<DocInfoDTO>> getAllPrivateDocuments(@RequestParam String employeeID){
         try {
             //employeeID can be taken from the authentication

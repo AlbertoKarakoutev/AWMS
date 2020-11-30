@@ -27,7 +27,7 @@ public class ForumController {
 		this.forumService = forumService;
 	}
 
-	@GetMapping(value = "forum")
+	@GetMapping(value = "/forum")
 	public ResponseEntity<List<ForumThread>> getAllThreads(@AuthenticationPrincipal CustomUserDetails userDetails) {
 		// Get the userDetails of the currentlyLoggedInUser. Just testing
 		System.out.println(userDetails.getAuthorities().toArray()[0]);
@@ -41,7 +41,7 @@ public class ForumController {
 		}
 	}
 
-	@GetMapping(value = "forum/thread/{threadID}")
+	@GetMapping(value = "/forum/thread/{threadID}")
 	public ResponseEntity<ForumThread> getThread(@PathVariable String threadID) {
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
@@ -54,7 +54,7 @@ public class ForumController {
 		}
 	}
 
-	@GetMapping(value = "forum/thread/{threadID}/replies")
+	@GetMapping(value = "/forum/thread/{threadID}/replies")
 	public ResponseEntity<ThreadReplyDTO> getThreadWithReplies(@PathVariable String threadID) {
 		try {
 			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
@@ -91,7 +91,7 @@ public class ForumController {
 		}
 	}
 
-	@PostMapping(value = "forum/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/forum/add", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> addThread(@RequestBody ForumThread forumThread) {
 		// TODO:
 		// Authenticate that current user is the same as the issuerId from forumThread.
@@ -105,7 +105,7 @@ public class ForumController {
 		}
 	}
 
-	@PostMapping(value = "forum/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/forum/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID) {
 		// TODO:
 		// Authenticate that current user is the same as the issuerId from forumReply.
@@ -119,7 +119,7 @@ public class ForumController {
 		}
 	}
 
-	@PutMapping(value = "forum/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/forum/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> markThreadAsAnswered(@PathVariable String threadID) {
 		// TODO:
 		// Authenticate that current user is the same as the issuerId from forumThread.
@@ -135,7 +135,7 @@ public class ForumController {
 		}
 	}
 
-	@PutMapping(value = "forum/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/forum/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID) {
 		// TODO:
 		// Authenticate that current user is the same as the issuerId from

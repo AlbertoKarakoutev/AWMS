@@ -7,10 +7,18 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 
+@EnableWebMvc
+@ComponentScan
 @Configuration
-public class Config {
+public class Config implements WebMvcConfigurer {
 
 	@Bean
 	public ServletWebServerFactory servletContainer() {
@@ -36,6 +44,16 @@ public class Config {
 		connector.setSecure(false);
 		connector.setRedirectPort(8443);
 		return connector;
+	}
+
+	@Override
+	public void configureViewResolvers(ViewResolverRegistry registry) {
+		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+		resolver.setPrefix("/WEB-INF/view/");
+		resolver.setSuffix(".jsp");
+		resolver.setViewClass(JstlView.class);
+		System.out.println(resolver);
+		registry.viewResolver(resolver);
 	}
 
 }

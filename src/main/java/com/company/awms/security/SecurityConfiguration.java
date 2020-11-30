@@ -28,8 +28,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				.antMatchers("/login").permitAll()
 				.antMatchers("/").permitAll()
-				.antMatchers("/employee/register").hasAuthority("ADMIN")
-				.antMatchers("/forum").authenticated()
+				.antMatchers("/document/**").authenticated()
+				.antMatchers("/schedule/**").authenticated()
+				.antMatchers("/forum/**").authenticated()
+				.antMatchers("/salary/**").authenticated()
+				.antMatchers("/admin/**").hasAuthority("ADMIN")
 				.and().csrf().disable().formLogin().defaultSuccessUrl("/")
 				.and().logout().logoutSuccessUrl("/")
 				.and().requiresChannel().anyRequest().requiresSecure();

@@ -44,8 +44,8 @@ public class AdminController {
     }
 
     //Employee methods
-    @GetMapping(value = "employee/{employeeId}")
-    public ResponseEntity<Employee> getEmployee(@PathVariable String employeeId){
+    @GetMapping("/admin/employee")
+    public ResponseEntity<Employee> getEmployee(@RequestParam String employeeId){
         try {
             Employee employee = this.employeeService.getEmployee(employeeId);
 
@@ -57,7 +57,7 @@ public class AdminController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping(value = "employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/admin/employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registerEmployee(@RequestBody Employee newEmployee){
         try {
             this.employeeService.registerEmployee(newEmployee);
@@ -67,7 +67,7 @@ public class AdminController {
         	return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    @PutMapping(value = "employee/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/admin/employee/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> editEmployeeInfo(@RequestBody Employee newEmployee, @RequestParam String employeeId){
         try {
             //TODO:
@@ -83,7 +83,7 @@ public class AdminController {
     }
     
     //Schedule methods
-	@PostMapping(value = "/schedule/add")
+	@PostMapping(value = "/admin/schedule/add")
 	public ResponseEntity<String> addWorkDay(@RequestParam String employeeID, @RequestParam LocalDate date, @RequestParam LocalTime startShift, @RequestParam LocalTime endShift) {
 		boolean success = scheduleService.addWorkDay(employeeID, date, true, startShift, endShift);
 		if(success) {
@@ -92,9 +92,19 @@ public class AdminController {
 			return new ResponseEntity<String>("Error applying scheduole!", HttpStatus.BAD_REQUEST);
 		}
 	}
+	@GetMapping("/admin/schedule/apply")
+	public ResponseEntity<String> applySchedule() {
+		try{
+			this.scheduleService.applySchedule();
+			
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+	}
     
     //Document methods
-    @PostMapping(value = "document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/admin/document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID, @RequestParam String uploaderID){
         try{
             //uploaderID can be taken from the authentication - only admin can upload to employeeID's private documents
@@ -111,7 +121,7 @@ public class AdminController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @DeleteMapping(value = "document/personal/delete/{documentID}")
+    @DeleteMapping(value = "/admin/document/personal/delete/{documentID}")
     public ResponseEntity<String> deletePrivateDocument(@PathVariable int documentID, @RequestParam String employeeID, @RequestParam String ownerID){
         try{
             //employeeID can be taken from the authentication
@@ -124,7 +134,6 @@ public class AdminController {
         } catch (IllegalAccessException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         } catch (Exception e) {
-            System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -149,7 +158,7 @@ public class AdminController {
     	return new ResponseEntity<Map<String, Boolean>>(controllerConditions, HttpStatus.OK);	
     }
     
-    @PostMapping(value = "/admin/modules/set")
+    @PostMapping("/admin/modules/set")
     public ResponseEntity<String> setActives(@RequestParam Map<String, Boolean> actives){
     	for(String key : actives.keySet()) { 		
     		try {

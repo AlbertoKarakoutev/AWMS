@@ -9,17 +9,23 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import com.company.awms.data.employees.EmployeeRepo;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
+import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.data.schedule.Day;
 import com.company.awms.data.schedule.ScheduleRepo;
 import com.company.awms.data.schedule.Task;
@@ -232,10 +238,69 @@ public class ScheduleService {
 		return sameLevelEmployees;
 	}
 
+	@Scheduled(cron = "1 0 0 1 * *")
+	public void applySchedule() {
+		
+		//Clear next month's dates
+		for(int date = 1; date < LocalDate.now().plus(1, ChronoUnit.MONTHS).lengthOfMonth(); date++) {
+			Optional<Day> day = scheduleRepo.findByDate(LocalDate.now().plus(1, ChronoUnit.MONTHS).withDayOfMonth(date));
+			if(!day.isEmpty()) {
+				scheduleRepo.deleteById(day.get().getID());
+			}
+		}
+		
+		//Add next month days
+		addMonthlyDays(LocalDate.now().plus(1, ChronoUnit.MONTHS).withDayOfMonth(1));
+		
+		//Add the employee shifts
+		for(int i = 97; i < 123; i++) {
+			String departmentCode = Character.toString((char)i);
+			JSONObject department = getDepartment(departmentCode);
+			if(department == null) {
+				continue;
+			}
+			if((boolean)department.get("universalSchedule")) {
+				switch((String)department.get("scheduleType")) {
+				case "Regular":
+					applyRegularSchedule(departmentCode, 0);
+					break;
+				case "Irregular":
+					applyIrregularSchedule(departmentCode, 0);
+					break;
+				case "OnCall":
+					applyOnCallSchedule(departmentCode, 0);
+					break;
+				default:
+					System.out.println("Type not found!");
+					continue;
+				}
+			}else {
+				for(int j = 0; j < ((JSONArray)department.get("levels")).size(); j++) {
+					JSONObject employeeLevel = getDepartmentAtLevel(departmentCode, j);
+					System.out.println((String)employeeLevel.get("scheduleType"));
+					switch((String)employeeLevel.get("scheduleType")) {
+					case "Regular":
+						applyRegularSchedule(departmentCode, j);
+						break;
+					case "Irregular":
+						applyIrregularSchedule(departmentCode, j);
+						break;
+					case "OnCall":
+						applyOnCallSchedule(departmentCode, j);
+						break;
+					default:
+						System.out.println("Type not found!");
+						continue;
+					}
+				}
+			}
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public boolean applyOnCallSchedule(String department, int level) {
-		
-		JSONObject thisDepartment = setDepartment(department, level, "OnCall");
+		System.out.println(" ");
+		JSONObject thisDepartment = getDepartmentAtLevel(department, level);
 		if(thisDepartment == null) return false;
 		
 		
@@ -245,8 +310,8 @@ public class ScheduleService {
 			return false;
 		}
 		
-
-		int lengthOfMonth = YearMonth.of(LocalDate.now().getYear(), LocalDate.now().getMonth()).lengthOfMonth();
+		LocalDate now = LocalDate.now().plus(1, ChronoUnit.MONTHS);
+		int lengthOfMonth = YearMonth.of(now.getYear(), now.getMonth()).lengthOfMonth();
 		
 		long shiftLength;
 		long breakBetweenShiftsMin;
@@ -286,7 +351,7 @@ public class ScheduleService {
 		if(lengthOfMonth/monthlyWorkDays<2)System.out.println("Shifts required are over 15, adding shifts each day");
 		ArrayList<Day> workDays = new ArrayList<>();
 		for (Day day : scheduleRepo.findAll()) {
-			if (day.getDate().getMonthValue() == LocalDate.now().getMonthValue()) {
+			if (day.getDate().getMonthValue() == now.getMonthValue()) {
 				
 				if(day.getDate().getDayOfMonth()%(lengthOfMonth/monthlyWorkDays) == 0) {
 					workDays.add(day);
@@ -337,7 +402,6 @@ public class ScheduleService {
 		
 		for(Employee employee : employees) {
 			int initialOffset = employees.indexOf(employee)%employees.size();
-			System.out.println(initialOffset + " shifts offset");
 			shiftLoop:
 			for(int i = initialOffset; i < shifts.size(); i+=employees.size()/employeesPerShift) {
 				Day day;
@@ -363,19 +427,19 @@ public class ScheduleService {
 	
 	public boolean applyIrregularSchedule(String department, int level) {
 		ArrayList<Day> month = new ArrayList<>();
+		LocalDate now = LocalDate.now().plus(1, ChronoUnit.MONTHS);
 		for (Day day : scheduleRepo.findAll()) {
-			if (day.getDate().getMonthValue() == LocalDate.now().getMonthValue()) {
+			if (day.getDate().getMonthValue() == now.getMonthValue()) {
 				month.add(day);
 			}
 		}
 		for (Employee employee : this.employeeRepo.findByAccessLevel(department + Integer.toString(level))) {
 			boolean[] lastSevenDays = new boolean[7];
-			LocalDate lastMonth = LocalDate.now().withMonth(LocalDate.now().getMonthValue() - 1);
-			int lengthOfPreviousMonth = YearMonth.of(LocalDate.now().getYear(), lastMonth.getMonth()).lengthOfMonth();
+			LocalDate lastMonth = now.withMonth(now.getMonthValue() - 1);
+			int lengthOfPreviousMonth = YearMonth.of(now.getYear(), lastMonth.getMonth()).lengthOfMonth();
 			workWeekLoop: 
 			//Getting the last 7 days of the previous month to properly continue the work schedule
 			for(LocalDate date = lastMonth.withDayOfMonth(lengthOfPreviousMonth); date.isAfter(lastMonth.withDayOfMonth(lengthOfPreviousMonth - 7)); date = date.plus(-1, ChronoUnit.DAYS)){
-				System.out.println(date);
 				Optional<Day> thisDay = scheduleRepo.findByDate(date);
 				if(thisDay.isEmpty()){
 					return false;
@@ -413,33 +477,32 @@ public class ScheduleService {
 			for(int i = 0; i < employee.getWorkWeek()[0]; i++){
 				employeeWorkWeek[i] = true;
 			}
-			System.out.println(lastSevenDays[6]);
 			dayLoop:
 			for (Day day : month) {
 				if (!lookingAtWorkDays) {
 					if (consecutiveBreakDays < employee.getWorkWeek()[1]) {
 						consecutiveBreakDays++;
-						System.out.println(day.getDate() + " " + "is a break day");
+						System.out.println(day.getDate() + " " + "is a break day for " + employee.getFirstName());
 						continue dayLoop;
 					}
 				} else {
 					if (consecutiveWorkDays < employee.getWorkWeek()[0]) {
 						if(!isLeaveDay(employee, day)) {
 							//addWorkDay(employee.getID(), day.getDate(), false, null, null);
-							System.out.println(day.getDate() + " " + "is a work day");
+							System.out.println(day.getDate() + " " + "is a work day for " + employee.getFirstName());
 						}
 					}
 				}
 
 				if (isLeaveDay(employee, day)) {
-					System.out.println(day.getDate() + " is a leave day");
+					System.out.println(day.getDate() + " is a leave day for " + employee.getFirstName());
 					continue dayLoop;
 				} else {
 					if(employeeWorkWeek[workWeekCounter]) {
-						System.out.println(day.getDate() + " is a work day");
+						System.out.println(day.getDate() + " is a work day for " + employee.getFirstName());
 						//addWorkDay(employee.getID(), day.getDate(), false, null, null);
 					}else {
-						System.out.println(day.getDate() + " " + "is a break day");
+						System.out.println(day.getDate() + " " + "is a break day for " + employee.getFirstName());
 					}
 					if(workWeekCounter+1 >= employeeWorkWeek.length) {
 						workWeekCounter=0;
@@ -456,8 +519,9 @@ public class ScheduleService {
 
 	public boolean applyRegularSchedule(String department, int level) {	
 		ArrayList<Day> month = new ArrayList<>();
+		LocalDate now = LocalDate.now().plus(1, ChronoUnit.MONTHS);
 		for (Day day : scheduleRepo.findAll()) {
-			if (day.getDate().getMonthValue() == LocalDate.now().getMonthValue()) {
+			if (day.getDate().getMonthValue() == now.getMonthValue()) {
 				month.add(day);
 			}
 		}
@@ -466,14 +530,14 @@ public class ScheduleService {
 			dayLoop: for (Day day : month) {
 				if (day.getDate().getDayOfWeek() != DayOfWeek.SUNDAY && day.getDate().getDayOfWeek() != DayOfWeek.SATURDAY) {
 					if (isLeaveDay(employee, day)) {
-						System.out.println(day.getDate() + " is a break day");
+						System.out.println(day.getDate() + " is a break day for " + employee.getFirstName());
 						continue dayLoop;
 					} else {
 						//addWorkDay(employee.getID(), day.getDate(), false, null, null);
-						System.out.println(day.getDate() + " is a work day");
+						System.out.println(day.getDate() + " is a work day for " + employee.getFirstName());
 					}
 				} else {
-					System.out.println(day.getDate() + " is a break day");
+					System.out.println(day.getDate() + " is a break day for " + employee.getFirstName());
 					continue dayLoop;
 				}
 			}
@@ -481,24 +545,16 @@ public class ScheduleService {
 		return true;
 	}
 
-	private JSONObject setDepartment(String department,int level, String type) {
+	private JSONObject getDepartmentAtLevel(String department,int level) {
 		
 		JSONObject thisDepartment = getDepartment(department);
 
-		if((boolean)thisDepartment.get("universalSchedule")) {
-			if (!thisDepartment.get("scheduleType").equals(type)) {
-				System.out.println("Incorrect schedule type!");
-				return null;
-			}
-		}else {
+		if(!(boolean)thisDepartment.get("universalSchedule")) {
 			JSONArray levels = (JSONArray) thisDepartment.get("levels");
 			JSONObject thisLevel = (JSONObject)levels.get(level);
-			JSONObject employeeLevel = (JSONObject) thisLevel.get(Integer.toString(level));
-			if (!((String)employeeLevel.get("scheduleType")).equals(type)) {
-				System.out.println("Incorrect schedule type!");
-				return null;
-			}
+			thisDepartment = (JSONObject) thisLevel.get(Integer.toString(level));
 		}
+		
 		return thisDepartment;
 	}
 	
@@ -543,13 +599,11 @@ public class ScheduleService {
 		return false;
 	}
 	
-	public void addMonthlyDays(int month) {
-		LocalDate now = LocalDate.now().withMonth(month);
-		YearMonth yearMonthObject = YearMonth.of(now.getYear(), now.getMonthValue());
+	public void addMonthlyDays(LocalDate date) {
+		YearMonth yearMonthObject = YearMonth.of(date.getYear(), date.getMonthValue());
 		for (int i = 1; i <= yearMonthObject.lengthOfMonth(); i++) {
-			LocalDate correctDate = now.withDayOfMonth(i);
+			LocalDate correctDate = date.withDayOfMonth(i);
 			Day day = new Day(correctDate);
-			System.out.println(correctDate);
 			scheduleRepo.save(day);
 		}
 	}
