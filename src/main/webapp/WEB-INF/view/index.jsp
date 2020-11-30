@@ -1,21 +1,13 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+		 pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>das</title>
+	<meta charset="ISO-8859-1">
+	<title>Insert title here</title>
 </head>
 <body>
-	<div class="testPOSTForm">
-		<style>
-			body {
-				text-align:center;
-			}
-		</style>
-		<form id="formm" action="employee" method="GET" >
-			<label for="employeeId">Enter employee ID:</label><br>
-			<input type="text" id="employeeId" name="employeeId"><br>
-			<input type="submit" value="Get employee">
-		</form>
-	</div>
+<h2 align="center"> Hello ${name}!</h2>
+<h2>Current Time: ${time}</h2>
 </body>
 </html>
