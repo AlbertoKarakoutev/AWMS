@@ -3,6 +3,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link href="css/custom.css"
+		  rel="stylesheet">
 	<meta charset="ISO-8859-1">
 	<title>Insert title here</title>
 </head>
