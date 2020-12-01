@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,12 +53,15 @@ public class ForumService {
     public void addNewThread(ForumThread newThread) {
         //TODO:
         //Validation? from Validator Class
+        newThread.setDateTime(LocalDateTime.now());
+        newThread.setAnswered(false);
         this.forumThreadRepo.save(newThread);
     }
 
     public void addNewReply(ForumReply newReply) {
         //TODO:
         //Validation? from Validator Class
+        newReply.setDateTime(LocalDateTime.now());
         this.forumReplyRepo.save(newReply);
     }
 

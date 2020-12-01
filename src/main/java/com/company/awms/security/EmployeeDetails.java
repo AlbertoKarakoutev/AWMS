@@ -8,14 +8,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-public class CustomUserDetails implements UserDetails {
+public class EmployeeDetails implements UserDetails {
 
     private String username;
     private String password;
     private String role;
     private String ID;
 
-    CustomUserDetails(Employee employee) {
+    EmployeeDetails(Employee employee) {
         this.username = employee.getEmail();
         this.password = employee.getPassword();
         this.role = employee.getRole();

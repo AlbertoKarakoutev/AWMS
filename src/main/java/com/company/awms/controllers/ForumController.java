@@ -3,12 +3,10 @@ package com.company.awms.controllers;
 import com.company.awms.data.forum.ForumReply;
 import com.company.awms.data.forum.ForumThread;
 import com.company.awms.data.forum.ThreadReplyDTO;
-import com.company.awms.security.CustomUserDetails;
+import com.company.awms.security.EmployeeDetails;
 import com.company.awms.services.ForumService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -102,10 +100,8 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/forum/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String addThread(@RequestBody ForumThread forumThread, @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-		if(!forumThread.getIssuerID().equals(userDetails.getID())){
-			return "notAuthorized";
-		}
+	public String addThread(@RequestBody ForumThread forumThread, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		forumThread.setIssuerID(employeeDetails.getID());
 
 		try {
 			this.forumService.addNewThread(forumThread);
@@ -120,13 +116,9 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/forum/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID, @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-		if(!forumReply.getIssuerID().equals(userDetails.getID())){
-			return "notAuthorized";
-		}
-		if(!forumReply.getThreadID().equals(threadID)){
-			return "badRequest";
-		}
+	public String addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		forumReply.setIssuerID(employeeDetails.getID());
+		forumReply.setThreadID(threadID);
 		try {
 			this.forumService.addNewReply(forumReply);
 			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID);
@@ -141,11 +133,11 @@ public class ForumController {
 	}
 
 	@PutMapping(value = "/forum/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String markThreadAsAnswered(@PathVariable String threadID, @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+	public String markThreadAsAnswered(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
 
-			if(!userDetails.getID().equals(forumThread.getIssuerID())){
+			if(!employeeDetails.getID().equals(forumThread.getIssuerID())){
 				return "notAuthorized";
 			}
 
@@ -162,14 +154,12 @@ public class ForumController {
 	}
 
 	@PutMapping(value = "/forum/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID, @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-		if(!newForumThread.getIssuerID().equals(userDetails.getID())){
-			return "notAuthorized";
-		}
+	public String editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		newForumThread.setIssuerID(employeeDetails.getID());
 		try {
 			ForumThread oldThread = this.forumService.getThread(oldThreadID);
 
-			if(!oldThread.getIssuerID().equals(userDetails.getID())){
+			if(!oldThread.getIssuerID().equals(employeeDetails.getID())){
 				return "notAuthorized";
 			}
 

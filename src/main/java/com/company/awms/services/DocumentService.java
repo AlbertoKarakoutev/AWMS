@@ -21,7 +21,7 @@ import com.company.awms.data.employees.EmployeeRepo;
 @Service
 public class DocumentService {
 
-	private static final String ADMIN_ID = "adminID";
+	private static final String ADMIN_ID = "5fbe50169283684476c02096";
 
 	private DocumentRepo documentRepo;
 	private EmployeeRepo employeeRepo;
@@ -32,21 +32,27 @@ public class DocumentService {
 		this.employeeRepo = employeeRepo;
 	}
 
-	//Access to all public documents info form the same dpt. and same or lower level
-	public List<DocInfoDTO> getAllAccessibleDocumentsInfo(String employeeID) throws IOException {
-		List<DocInfoDTO> accessibleDocumentsInfo = new ArrayList<>();
-
+	private Employee getEmployee(String employeeID) throws IOException{
 		Optional<Employee> employee = this.employeeRepo.findById(employeeID);
 
-		if(employee.isEmpty()){
+		if(employee.isEmpty()) {
 			throw new IOException("Employee with id " + employeeID + " doesn't exist");
 		}
 
-		List<Doc> departmentDocuments = this.documentRepo.findByDepartment(employee.get().getDepartment());
+		return employee.get();
+	}
+
+	//Access to all public documents info form the same dpt. and same or lower level
+	public List<DocInfoDTO> getAccessibleDocumentsInfo(String employeeID) throws IOException {
+		List<DocInfoDTO> accessibleDocumentsInfo = new ArrayList<>();
+
+		Employee employee = getEmployee(employeeID);
+
+		List<Doc> departmentDocuments = this.documentRepo.findByDepartment(employee.getDepartment());
 
 		for (Doc document : departmentDocuments) {
-			if (employee.get().getLevel() >= document.getLevel()) {
-				DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType());
+			if (employee.getLevel() >= document.getLevel()) {
+				DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType(), document.getUploaderID());
 				accessibleDocumentsInfo.add(documentInfo);
 			}
 		}
@@ -55,16 +61,12 @@ public class DocumentService {
 	}
 
 	//Access to all private documents info
-	public List<DocInfoDTO> getPersonalDocumentsInfo(String employeeID) {
+	public List<DocInfoDTO> getPersonalDocumentsInfo(String employeeID) throws IOException{
 		List<DocInfoDTO> privateDocumentsInfo = new ArrayList<>();
-		Optional<Employee> employee = this.employeeRepo.findById(employeeID);
+		Employee employee = getEmployee(employeeID);
 
-		if(employee.isEmpty()) {
-			throw new IllegalArgumentException("Employee with id " + employeeID + " doesn't exist");
-		}
-
-		for (Doc document : employee.get().getPersonalDocuments()) {
-			DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType());
+		for (Doc document : employee.getPersonalDocuments()) {
+			DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType(), document.getUploaderID());
 			privateDocumentsInfo.add(documentInfo);
 		}
 
@@ -72,31 +74,24 @@ public class DocumentService {
 	}
 
 	public void uploadPublicDocument(MultipartFile file, String uploaderID) throws IOException {
-		Optional<Employee> uploader = this.employeeRepo.findById(uploaderID);
-
-		if(uploader.isEmpty()) {
-			throw new IllegalArgumentException("Employee with id " + uploaderID + " doesn't exist");
-		}
+		Employee uploader = getEmployee(uploaderID);
 
 		Binary data = new Binary(BsonBinarySubType.BINARY, file.getBytes());
 		String fileName = file.getOriginalFilename();
 		String fileType = file.getContentType();
-		String department = uploader.get().getDepartment();
-		int level = uploader.get().getLevel();
+		String department = uploader.getDepartment();
+		int level = uploader.getLevel();
 		LocalDateTime dateTime = LocalDateTime.now();
+		long size = file.getSize();
 
-		Doc document = new Doc(data, level, department, fileName, fileType, uploaderID, dateTime, file.getSize());
+		Doc document = new Doc(data, level, department, fileName, fileType, uploaderID, dateTime, size);
 
 		this.documentRepo.save(document);
 	}
 
 	//only the admin can upload the private Docs
 	public void uploadPersonalDocument(MultipartFile file, String uploaderID, String ownerID) throws IOException, IllegalAccessException {
-		Optional<Employee> owner = this.employeeRepo.findById(ownerID);
-
-		if(owner.isEmpty()) {
-			throw new IOException("Employee with id " + ownerID + " doesn't exist");
-		}
+		Employee owner = getEmployee(ownerID);
 
 		if(uploaderID.equals(ADMIN_ID)){
 			Binary data = new Binary(BsonBinarySubType.BINARY, file.getBytes());
@@ -104,10 +99,10 @@ public class DocumentService {
 			String fileType = file.getContentType();
 			LocalDateTime dateTime = LocalDateTime.now();
 
-			Doc document = new Doc(data, owner.get().getLevel(), owner.get().getDepartment(), fileName, fileType, ownerID, dateTime, file.getSize());
+			Doc document = new Doc(data, owner.getLevel(), owner.getDepartment(), fileName, fileType, ownerID, dateTime, file.getSize());
 
-			owner.get().getPersonalDocuments().add(document);
-			this.employeeRepo.save(owner.get());
+			owner.getPersonalDocuments().add(document);
+			this.employeeRepo.save(owner);
 		} else {
 			throw new IllegalAccessException("You don't have permission to upload!");
 		}
@@ -125,25 +120,19 @@ public class DocumentService {
 			throw new IllegalAccessException("Document not accessible!");
 		}
 
-		if(!documentToDownload.get().getDownloaders().contains(downloaderID)) {
-			documentToDownload.get().getDownloaders().add(downloaderID);
-		}
+		documentToDownload.get().getDownloaderIDs().add(downloaderID);
 
 		return documentToDownload.get();
 	}
 
 	//Both Employee and Admin can download a personal document
-	public Doc downloadPersonalDocument(int documentID, String downloaderID, String ownerID) throws IllegalArgumentException, IllegalAccessException {
-		Optional<Employee> owner = this.employeeRepo.findById(ownerID);
+	public Doc downloadPersonalDocument(int documentID, String downloaderID, String ownerID) throws IOException, IllegalAccessException {
+		Employee owner = getEmployee(ownerID);
 
-		if(owner.isEmpty()){
-			throw new IllegalArgumentException("Employee with id " + ownerID + " doesn't exist");
-		}
-
-		List<Doc> personalDocuments = owner.get().getPersonalDocuments();
+		List<Doc> personalDocuments = owner.getPersonalDocuments();
 
 		if(personalDocuments.size() <= documentID){
-			throw new IllegalArgumentException("Document with id " + documentID + " doesn't exists");
+			throw new IOException("Document with id " + documentID + " doesn't exists");
 		}
 
 		Doc document = personalDocuments.get(documentID);
@@ -155,11 +144,11 @@ public class DocumentService {
 		return document;
 	}
 
-	public void deletePublicDocument(String documentID, String employeeID) throws IllegalArgumentException, IllegalAccessException{
+	public void deletePublicDocument(String documentID, String employeeID) throws IOException, IllegalAccessException{
 		Optional<Doc> documentToDelete = this.documentRepo.findById(documentID);
 
 		if(documentToDelete.isEmpty()){
-			throw new IllegalArgumentException("Document not found!");
+			throw new IOException("Document not found!");
 		}
 
 		if(employeeID.equals(ADMIN_ID) || documentToDelete.get().getUploaderID().equals(employeeID)){
@@ -170,15 +159,11 @@ public class DocumentService {
 	}
 
 	//only admin can delete private documents
-	public void deletePersonalDocument(int documentID, String employeeID, String ownerID) throws IllegalArgumentException, IllegalAccessException{
-		Optional<Employee> owner = this.employeeRepo.findById(ownerID);
-
-		if(owner.isEmpty()){
-			throw new IllegalArgumentException("Owner not found!");
-		}
+	public void deletePersonalDocument(int documentID, String employeeID, String ownerID) throws IOException, IllegalAccessException{
+		Employee owner = getEmployee(ownerID);
 
 		if(employeeID.equals(ADMIN_ID)){
-			List<Doc> personalDocuments = owner.get().getPersonalDocuments();
+			List<Doc> personalDocuments = owner.getPersonalDocuments();
 
 			if(personalDocuments.size() <= documentID){
 				throw new IllegalArgumentException("Document with id " + documentID + " doesn't exists");
@@ -186,7 +171,7 @@ public class DocumentService {
 
 			personalDocuments.remove(documentID);
 
-			this.employeeRepo.save(owner.get());
+			this.employeeRepo.save(owner);
 		} else {
 			throw new IllegalAccessException("You don't have permission to delete document");
 		}
