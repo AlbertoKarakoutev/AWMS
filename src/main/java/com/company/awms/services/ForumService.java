@@ -61,16 +61,13 @@ public class ForumService {
         this.forumReplyRepo.save(newReply);
     }
 
-    public void markAsAnswered(String threadID) throws IOException{
-        ForumThread forumThread = getThread(threadID);
-
+    public void markAsAnswered(ForumThread forumThread) {
         forumThread.setAnswered(true);
 
         this.forumThreadRepo.save(forumThread);
     }
 
-    public void editThread(ForumThread newForumThread, String oldThreadID) throws IOException{
-        ForumThread oldThread = getThread(oldThreadID);
+    public ForumThread editThread(ForumThread newForumThread, ForumThread oldThread) {
         //TODO:
         //Validation? from Validator Class
         //We don't update the issuerID, time and isAnswered because they are presumed to be the same.
@@ -78,5 +75,7 @@ public class ForumService {
         oldThread.setTitle(newForumThread.getTitle());
 
         this.forumThreadRepo.save(oldThread);
+
+        return oldThread;
     }
 }

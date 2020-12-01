@@ -7,7 +7,6 @@
 	<title>Insert title here</title>
 </head>
 <body>
-<h2 align="center"> Hello ${name}!</h2>
-<h2>Current Time: ${time}</h2>
+<h2 align="center">Current Time: ${time}</h2>
 </body>
 </html>

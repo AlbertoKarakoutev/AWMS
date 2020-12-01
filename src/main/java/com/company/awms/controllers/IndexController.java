@@ -3,20 +3,15 @@ package com.company.awms.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Controller
 public class IndexController {
     
     @GetMapping({"/", "/index"})
-    public String index(@RequestParam String name, Model model) {
-
-        model.addAttribute("name", name);
-        model.addAttribute("time", LocalDate.now());
+    public String index(Model model) {
+        model.addAttribute("time", LocalDateTime.now());
         return "index";
     }
 }

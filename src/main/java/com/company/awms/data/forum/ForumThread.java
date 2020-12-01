@@ -14,11 +14,10 @@ public class ForumThread {
 	private String title;
 	private String body;
 	private String issuerID;
-	
-	public ForumThread() {}
-	
 	private LocalDateTime dateTime;
 	private boolean isAnswered;
+
+	public ForumThread() {}
 	
 	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered) {
 		this.issuerID = issuerID;
