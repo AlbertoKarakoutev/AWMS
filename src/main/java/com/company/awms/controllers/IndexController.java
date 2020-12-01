@@ -11,8 +11,8 @@ import java.time.LocalDate;
 
 @Controller
 public class IndexController {
-    
-    @GetMapping({"/", "/index"})
+
+    @RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
     public String index(@RequestParam String name, Model model) {
 
         model.addAttribute("name", name);
