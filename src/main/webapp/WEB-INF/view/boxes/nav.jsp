@@ -1,6 +1,14 @@
-<div class="vertical-menu">
-    <a href="#">Contacts</a>
-    <a href="#">Working Shedule</a>
-    <a href="#">Documents Access</a>
-    <a href="#">Forum</a>
+<ul class="vertical-menu">
+    <li>
+        <a href="#">Contacts</a>
+    </li>
+    <li>
+        <a href="#">Working Shedule</a>
+    </li>
+    <li>
+        <a href="#" tile="Documents">Documents Access</a>
+    </li>
+    <li>
+        <a href="#">Forum</a>
+    </li>
 </div>
