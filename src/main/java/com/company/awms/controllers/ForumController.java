@@ -3,11 +3,11 @@ package com.company.awms.controllers;
 import com.company.awms.data.forum.ForumReply;
 import com.company.awms.data.forum.ForumThread;
 import com.company.awms.data.forum.ThreadReplyDTO;
+import com.company.awms.security.EmployeeDetails;
 import com.company.awms.services.ForumService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,123 +31,147 @@ public class ForumController {
 	public String getAllThreads(Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreads();
+			model.addAttribute("threads", threads);
 
-			for (ForumThread thread: threads) {
-				model.addAttribute("thread", thread.getTitle());
-			}
 			return "forum";
 		} catch (Exception e) {
+			e.printStackTrace();
 			return "notFound";
 		}
 	}
 
 	@GetMapping(value = "/forum/thread/{threadID}")
-	public ResponseEntity<ForumThread> getThread(@PathVariable String threadID) {
+	public String getThread(@PathVariable String threadID, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
+			model.addAttribute("thread", forumThread);
 
-			return new ResponseEntity<>(forumThread, HttpStatus.OK);
+			return "thread";
 		} catch (IOException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return "notFound";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 
 	@GetMapping(value = "/forum/thread/{threadID}/replies")
-	public ResponseEntity<ThreadReplyDTO> getThreadWithReplies(@PathVariable String threadID) {
+	public String getThreadWithReplies(@PathVariable String threadID, Model model) {
 		try {
 			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
+			model.addAttribute("thread", threadAndReplies.getForumThread());
+			model.addAttribute("replies", threadAndReplies.getForumReplies());
 
-			return new ResponseEntity<>(threadAndReplies, HttpStatus.OK);
+			return "threadAndReplies";
 		} catch (IOException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return "notFound";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 
 	// maybe this belongs in EmployeeController
 	@GetMapping(value = "forum/employee/threads/{employeeID}")
-	public ResponseEntity<List<ForumThread>> getAllThreadsFromEmployee(@PathVariable String employeeID) {
+	public String getAllThreadsFromEmployee(@PathVariable String employeeID, Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreadsFromEmployee(employeeID);
+			model.addAttribute("threads", threads);
 
-			return new ResponseEntity<>(threads, HttpStatus.OK);
+			return "threadsFromEmployee";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 
 	// maybe this belongs in EmployeeController
 	@GetMapping(value = "forum/employee/replies/{employeeID}")
-	public ResponseEntity<List<ForumReply>> getAllRepliesFromEmployee(@PathVariable String employeeID) {
+	public String getAllRepliesFromEmployee(@PathVariable String employeeID, Model model) {
 		try {
 			List<ForumReply> replies = this.forumService.getAllRepliesFromEmployee(employeeID);
+			model.addAttribute("replies", replies);
 
-			return new ResponseEntity<>(replies, HttpStatus.OK);
+			return "repliesFromEmployee";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 
 	@PostMapping(value = "/forum/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> addThread(@RequestBody ForumThread forumThread) {
-		// TODO:
-		// Authenticate that current user is the same as the issuerId from forumThread.
-		// If not return 401 Not Authorized
+	public String addThread(@RequestBody ForumThread forumThread, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		forumThread.setIssuerID(employeeDetails.getID());
+
 		try {
 			this.forumService.addNewThread(forumThread);
 
-			return new ResponseEntity<>("Added new Thread", HttpStatus.OK);
+			model.addAttribute("thread", forumThread);
+
+			return "thread";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 
 	@PostMapping(value = "/forum/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID) {
-		// TODO:
-		// Authenticate that current user is the same as the issuerId from forumReply.
-		// If not return 401 Not Authorized
+	public String addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		forumReply.setIssuerID(employeeDetails.getID());
+		forumReply.setThreadID(threadID);
 		try {
 			this.forumService.addNewReply(forumReply);
+			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID);
+			model.addAttribute("thread", threadAndReplies.getForumThread());
+			model.addAttribute("replies", threadAndReplies.getForumReplies());
 
-			return new ResponseEntity<>("Added new Reply", HttpStatus.OK);
+			return "threadAndReplies";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 
 	@PutMapping(value = "/forum/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> markThreadAsAnswered(@PathVariable String threadID) {
-		// TODO:
-		// Authenticate that current user is the same as the issuerId from forumThread.
-		// If not return 401 Not Authorized
+	public String markThreadAsAnswered(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
-			this.forumService.markAsAnswered(threadID);
+			ForumThread forumThread = this.forumService.getThread(threadID);
 
-			return new ResponseEntity<>("Thread set to answered", HttpStatus.OK);
+			if(!employeeDetails.getID().equals(forumThread.getIssuerID())){
+				return "notAuthorized";
+			}
+
+			this.forumService.markAsAnswered(forumThread);
+			model.addAttribute("thread", forumThread);
+
+			return "thread";
 		} catch (IOException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return "notFound";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			e.printStackTrace();
+			return "internalSeverError";
 		}
 	}
 
 	@PutMapping(value = "/forum/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID) {
-		// TODO:
-		// Authenticate that current user is the same as the issuerId from
-		// newForumThread. If not return 401 Not Authorized
+	public String editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		newForumThread.setIssuerID(employeeDetails.getID());
 		try {
-			this.forumService.editThread(newForumThread, oldThreadID);
+			ForumThread oldThread = this.forumService.getThread(oldThreadID);
 
-			return new ResponseEntity<>("Edited Thread", HttpStatus.OK);
+			if(!oldThread.getIssuerID().equals(employeeDetails.getID())){
+				return "notAuthorized";
+			}
+
+			oldThread = this.forumService.editThread(newForumThread, oldThread);
+			model.addAttribute("thread", oldThread);
+
+			return "thread";
 		} catch (IOException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return "notFound";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 

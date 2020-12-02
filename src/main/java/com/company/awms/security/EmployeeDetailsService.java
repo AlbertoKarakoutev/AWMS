@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class EmployeeDetailsService implements UserDetailsService {
     private EmployeeRepo employeeRepo;
 
     @Autowired
-    public CustomUserDetailsService(EmployeeRepo employeeRepo) {
+    public EmployeeDetailsService(EmployeeRepo employeeRepo) {
         this.employeeRepo = employeeRepo;
     }
 
@@ -27,6 +27,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Employee with email " + email + " doesn't exist");
         }
 
-        return new CustomUserDetails(employee.get());
+        return new EmployeeDetails(employee.get());
     }
 }

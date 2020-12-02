@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,25 +53,25 @@ public class ForumService {
     public void addNewThread(ForumThread newThread) {
         //TODO:
         //Validation? from Validator Class
+        newThread.setDateTime(LocalDateTime.now());
+        newThread.setAnswered(false);
         this.forumThreadRepo.save(newThread);
     }
 
     public void addNewReply(ForumReply newReply) {
         //TODO:
         //Validation? from Validator Class
+        newReply.setDateTime(LocalDateTime.now());
         this.forumReplyRepo.save(newReply);
     }
 
-    public void markAsAnswered(String threadID) throws IOException{
-        ForumThread forumThread = getThread(threadID);
-
+    public void markAsAnswered(ForumThread forumThread) {
         forumThread.setAnswered(true);
 
         this.forumThreadRepo.save(forumThread);
     }
 
-    public void editThread(ForumThread newForumThread, String oldThreadID) throws IOException{
-        ForumThread oldThread = getThread(oldThreadID);
+    public ForumThread editThread(ForumThread newForumThread, ForumThread oldThread) {
         //TODO:
         //Validation? from Validator Class
         //We don't update the issuerID, time and isAnswered because they are presumed to be the same.
@@ -78,5 +79,7 @@ public class ForumService {
         oldThread.setTitle(newForumThread.getTitle());
 
         this.forumThreadRepo.save(oldThread);
+
+        return oldThread;
     }
 }

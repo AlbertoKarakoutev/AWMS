@@ -1,8 +1,7 @@
 package com.company.awms.data.documents;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
@@ -21,7 +20,7 @@ public class Doc {
 	private String type;
 	private String uploaderID;
 	private LocalDateTime uploadDateTime;
-	private List<String> downloaderIDs = new ArrayList<String>();
+	private Set<String> downloaderIDs = new HashSet<>();
 	private double size;
 	
 	public Doc() {
@@ -79,7 +78,7 @@ public class Doc {
 		return this.uploaderID;
 	}
 
-	public List<String> getDownloaders() {
+	public Set<String> getDownloaderIDs() {
 		return this.downloaderIDs;
 	}
 
@@ -115,7 +114,7 @@ public class Doc {
 		this.uploadDateTime = uploadDateTime;
 	}
 
-	public void setDownloaderIDs(List<String> downloaderIDs) {
+	public void setDownloaderIDs(Set<String> downloaderIDs) {
 		this.downloaderIDs = downloaderIDs;
 	}
 

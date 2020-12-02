@@ -7,6 +7,6 @@
     <title>Insert title here</title>
 </head>
 <body>
-NOT FOUND - 404
+NOT AUTHORIZED - 401
 </body>
 </html>

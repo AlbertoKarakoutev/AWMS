@@ -10,10 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.company.awms.security.EmployeeDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -105,10 +107,9 @@ public class AdminController {
     
     //Document methods
     @PostMapping(value = "/admin/document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID, @RequestParam String uploaderID){
+    public ResponseEntity<String> uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
         try{
-            //uploaderID can be taken from the authentication - only admin can upload to employeeID's private documents
-            this.documentService.uploadPersonalDocument(file, uploaderID, employeeID);
+            this.documentService.uploadPersonalDocument(file, employeeDetails.getID(), employeeID);
 
             return new ResponseEntity<>("Successfully uploaded document!", HttpStatus.OK);
         } catch (IOException e){
@@ -122,11 +123,9 @@ public class AdminController {
         }
     }
     @DeleteMapping(value = "/admin/document/personal/delete/{documentID}")
-    public ResponseEntity<String> deletePrivateDocument(@PathVariable int documentID, @RequestParam String employeeID, @RequestParam String ownerID){
+    public ResponseEntity<String> deletePrivateDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
         try{
-            //employeeID can be taken from the authentication
-
-            this.documentService.deletePersonalDocument(documentID, employeeID, ownerID);
+            this.documentService.deletePersonalDocument(documentID, employeeDetails.getID(), ownerID);
 
             return new ResponseEntity<>("Successfully deleted document!", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
@@ -138,6 +137,7 @@ public class AdminController {
         }
     }
 
+    //active modules methods
     @GetMapping("/admin/modules/get")
     public ResponseEntity<Map<String, Boolean>> getActives(){
     	File controllerDir = new File("target/classes/com/company/awms/controllers");

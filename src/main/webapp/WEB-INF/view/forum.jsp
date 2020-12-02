@@ -7,12 +7,6 @@
 </head>
 <body>
 
-<table>
-    <c:forEach items="${thread}" var="item">
-        <tr>
-            <td><c:out value="${item}" /></td>
-        </tr>
-    </c:forEach>
-</table>
+<h2 align="center">Forum view (all threads)</h2>
 
 </body>
