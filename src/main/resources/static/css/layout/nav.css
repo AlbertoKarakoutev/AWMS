@@ -1,0 +1,35 @@
+#moni {
+    margin: 0 auto;
+    text-align: left;
+    font-size: 30px;
+    color: #B9B9B9;
+    background-color: #232323;
+}
+.vertical-menu {
+        width: 100%;
+        background-color: var(--primary-color);
+        height: 100%; 
+      }
+
+      .vertical-menu a {
+        background-color:#232323; 
+        color: white; 
+        display: block; 
+        padding: 12px; 
+        text-decoration: none; 
+      }
+
+      .vertical-menu a:hover {
+        background-color: #ccc; 
+      }
+
+      .vertical-menu a.active {
+        background-color: #232323; 
+        color: white;
+      }
+      #body{
+          margin-top: 0px;
+    margin-left: 0px;
+    margin-bottom: 0px;
+    margin-right: 0px;
+      }

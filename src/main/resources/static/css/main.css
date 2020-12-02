@@ -8,3 +8,5 @@
 /*Components*/
 
 /*Layout*/
+@import "layout/panel.css";
+@import "layout/nav.css";

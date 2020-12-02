@@ -1,0 +1,18 @@
+.panel {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+}
+
+.navigation {
+    flex-grow: 0;
+    width: 380px;
+    height: 100%;
+}
+
+.page {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}

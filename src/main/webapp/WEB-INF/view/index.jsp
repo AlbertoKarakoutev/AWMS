@@ -10,10 +10,16 @@
 	<title>Insert title here</title>
 </head>
 <body>
-	
-<h2 align="center"> Hello ${name}!</h2>
+    <div class="panel">
+        <div class="navigation">
+        <%@include file="boxes/nav.jsp" %>
+        </div>
+        <div class="page">
+        <h2 align="center"> Hello ${name}!</h2>
 <h2>Current Time: ${time}</h2>
-<div class="btn btn-primary"></div>
+<div class="btn btn-primary">Button</div>
+</div>
+    </div>
 
 <!--Add main js file-->
 <script src="webjars/jquery/3.5.1/jquery.js"></script>
