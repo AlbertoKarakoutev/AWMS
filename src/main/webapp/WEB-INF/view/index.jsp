@@ -1,8 +1,9 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta Content-Type="text/css" charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href="webjars/bootstrap/4.5.3/css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/main.css" rel="stylesheet">
@@ -11,14 +12,19 @@
 </head>
 <body>
     <div class="panel">
-        <div class="navigation">
+        <nav class="navigation">
             <%@include file="boxes/nav.jsp" %>
-        </div>
-        <div class="page">
-            <h2 align="center"> Hello ${name}!</h2>
-            <h2>Current Time: ${time}</h2>
-            <div class="btn btn-primary">Button</div>
-        </div>
+        </nav>
+        <section class="page">
+            <header>
+                <%@include file="boxes/header.jsp" %>
+            </header>
+            <section class="p-2">
+                <h2 align="center"> Hello ${name}!</h2>
+                <h2>Current Time: ${time}</h2>
+                <div class="btn btn-primary">Button</div>
+            </section>
+        </section>
     </div>
 
 <!--Add main js file-->

@@ -1,10 +1,3 @@
-#moni {
-    margin: 0 auto;
-    text-align: left;
-    font-size: 30px;
-    color: #B9B9B9;
-    background-color: red;
-}
 .vertical-menu {
     width: 380px;
     background-color: var(--primary-color);
@@ -29,3 +22,10 @@
     background-color: #ccc; 
     color: white;
 }
+ 
+/* Portrait tablets and small desktops */ 
+@media (max-width: 991px) { 
+    .vertical-menu {
+        display: none;
+    }
+} 
