@@ -9,6 +9,6 @@
 	<title>Insert title here</title>
 </head>
 <body>
-<h2 align="center">Current Time: ${time}</h2>
+<h2 align="center">${employee}</h2>
 </body>
 </html>

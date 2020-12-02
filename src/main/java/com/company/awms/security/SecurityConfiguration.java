@@ -27,14 +27,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 				.antMatchers("/login").permitAll()
-				.antMatchers("/").permitAll()
+				.antMatchers("/").authenticated()
 				.antMatchers("/document/**").authenticated()
 				.antMatchers("/schedule/**").authenticated()
 				.antMatchers("/forum/**").authenticated()
 				.antMatchers("/salary/**").authenticated()
 				.antMatchers("/admin/**").hasAuthority("ADMIN")
 				.and().csrf().disable().formLogin().defaultSuccessUrl("/")
-				.and().logout().logoutSuccessUrl("/")
+				.and().logout().logoutSuccessUrl("/login")
 				.and().requiresChannel().anyRequest().requiresSecure();
 	}
 
