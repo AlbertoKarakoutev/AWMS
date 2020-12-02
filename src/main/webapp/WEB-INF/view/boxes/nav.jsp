@@ -11,4 +11,4 @@
     <li>
         <a href="#">Forum</a>
     </li>
-</div>
+</ul>

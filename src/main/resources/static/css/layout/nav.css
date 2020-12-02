@@ -6,7 +6,7 @@
     background-color: red;
 }
 .vertical-menu {
-    width: 100%;
+    width: 380px;
     background-color: var(--primary-color);
     height: 100%; 
     list-style-type: none;

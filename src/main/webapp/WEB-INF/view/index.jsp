@@ -12,13 +12,13 @@
 <body>
     <div class="panel">
         <div class="navigation">
-        <%@include file="boxes/nav.jsp" %>
+            <%@include file="boxes/nav.jsp" %>
         </div>
         <div class="page">
-        <h2 align="center"> Hello ${name}!</h2>
-<h2>Current Time: ${time}</h2>
-<div class="btn btn-primary">Button</div>
-</div>
+            <h2 align="center"> Hello ${name}!</h2>
+            <h2>Current Time: ${time}</h2>
+            <div class="btn btn-primary">Button</div>
+        </div>
     </div>
 
 <!--Add main js file-->
