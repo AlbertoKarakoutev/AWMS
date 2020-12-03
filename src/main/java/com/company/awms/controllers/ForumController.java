@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
+@RequestMapping("/forum")
 public class ForumController {
 
 	private static final boolean active = true;
@@ -27,7 +28,7 @@ public class ForumController {
 		this.forumService = forumService;
 	}
 
-	@GetMapping(value = "/forum")
+	@GetMapping("/all")
 	public String getAllThreads(Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreads();
@@ -40,7 +41,7 @@ public class ForumController {
 		}
 	}
 
-	@GetMapping(value = "/forum/thread/{threadID}")
+	@GetMapping("/thread/{threadID}")
 	public String getThread(@PathVariable String threadID, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
@@ -55,7 +56,7 @@ public class ForumController {
 		}
 	}
 
-	@GetMapping(value = "/forum/thread/{threadID}/replies")
+	@GetMapping("/thread/{threadID}/replies")
 	public String getThreadWithReplies(@PathVariable String threadID, Model model) {
 		try {
 			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
@@ -72,7 +73,7 @@ public class ForumController {
 	}
 
 	// maybe this belongs in EmployeeController
-	@GetMapping(value = "forum/employee/threads/{employeeID}")
+	@GetMapping("/employee/threads/{employeeID}")
 	public String getAllThreadsFromEmployee(@PathVariable String employeeID, Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreadsFromEmployee(employeeID);
@@ -86,7 +87,7 @@ public class ForumController {
 	}
 
 	// maybe this belongs in EmployeeController
-	@GetMapping(value = "forum/employee/replies/{employeeID}")
+	@GetMapping("/employee/replies/{employeeID}")
 	public String getAllRepliesFromEmployee(@PathVariable String employeeID, Model model) {
 		try {
 			List<ForumReply> replies = this.forumService.getAllRepliesFromEmployee(employeeID);
@@ -99,7 +100,7 @@ public class ForumController {
 		}
 	}
 
-	@PostMapping(value = "/forum/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String addThread(@RequestBody ForumThread forumThread, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		forumThread.setIssuerID(employeeDetails.getID());
 
@@ -115,7 +116,7 @@ public class ForumController {
 		}
 	}
 
-	@PostMapping(value = "/forum/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		forumReply.setIssuerID(employeeDetails.getID());
 		forumReply.setThreadID(threadID);
@@ -132,7 +133,7 @@ public class ForumController {
 		}
 	}
 
-	@PutMapping(value = "/forum/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String markThreadAsAnswered(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
@@ -153,7 +154,7 @@ public class ForumController {
 		}
 	}
 
-	@PutMapping(value = "/forum/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		newForumThread.setIssuerID(employeeDetails.getID());
 		try {

@@ -43,7 +43,6 @@ public class ScheduleService {
 
 		this.scheduleRepo = scheduleRepo;
 		this.employeeRepo = employeeRepo;
-
 	}
 
 	// Call employeeService.createEmployeeDailyReference(...) in the   
@@ -242,7 +241,7 @@ public class ScheduleService {
 	public void applySchedule() {
 		
 		//Clear next month's dates
-		for(int date = 1; date < LocalDate.now().plus(1, ChronoUnit.MONTHS).lengthOfMonth(); date++) {
+		for(int date = 1; date <= LocalDate.now().plus(1, ChronoUnit.MONTHS).lengthOfMonth(); date++) {
 			Optional<Day> day = scheduleRepo.findByDate(LocalDate.now().plus(1, ChronoUnit.MONTHS).withDayOfMonth(date));
 			if(!day.isEmpty()) {
 				scheduleRepo.deleteById(day.get().getID());
@@ -262,12 +261,15 @@ public class ScheduleService {
 			if((boolean)department.get("universalSchedule")) {
 				switch((String)department.get("scheduleType")) {
 				case "Regular":
+					System.out.println("regular");
 					applyRegularSchedule(departmentCode, 0);
 					break;
 				case "Irregular":
+					System.out.println("irregular");
 					applyIrregularSchedule(departmentCode, 0);
 					break;
 				case "OnCall":
+					System.out.println("oncall");
 					applyOnCallSchedule(departmentCode, 0);
 					break;
 				default:
@@ -277,15 +279,17 @@ public class ScheduleService {
 			}else {
 				for(int j = 0; j < ((JSONArray)department.get("levels")).size(); j++) {
 					JSONObject employeeLevel = getDepartmentAtLevel(departmentCode, j);
-					System.out.println((String)employeeLevel.get("scheduleType"));
 					switch((String)employeeLevel.get("scheduleType")) {
 					case "Regular":
+						System.out.println("regularlevel");
 						applyRegularSchedule(departmentCode, j);
 						break;
 					case "Irregular":
+						System.out.println("ierregularlevel" + departmentCode + j);
 						applyIrregularSchedule(departmentCode, j);
 						break;
 					case "OnCall":
+						System.out.println("oncalllevel");
 						applyOnCallSchedule(departmentCode, j);
 						break;
 					default:
@@ -426,6 +430,7 @@ public class ScheduleService {
 	}
 	
 	public boolean applyIrregularSchedule(String department, int level) {
+		System.out.println("inalg");
 		ArrayList<Day> month = new ArrayList<>();
 		LocalDate now = LocalDate.now().plus(1, ChronoUnit.MONTHS);
 		for (Day day : scheduleRepo.findAll()) {
@@ -435,7 +440,7 @@ public class ScheduleService {
 		}
 		for (Employee employee : this.employeeRepo.findByAccessLevel(department + Integer.toString(level))) {
 			boolean[] lastSevenDays = new boolean[7];
-			LocalDate lastMonth = now.withMonth(now.getMonthValue() - 1);
+			LocalDate lastMonth = now.minus(1, ChronoUnit.MONTHS);
 			int lengthOfPreviousMonth = YearMonth.of(now.getYear(), lastMonth.getMonth()).lengthOfMonth();
 			workWeekLoop: 
 			//Getting the last 7 days of the previous month to properly continue the work schedule

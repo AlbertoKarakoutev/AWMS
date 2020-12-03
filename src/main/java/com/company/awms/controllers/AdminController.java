@@ -5,12 +5,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.company.awms.security.EmployeeDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,16 +19,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.company.awms.data.employees.Employee;
+import com.company.awms.security.EmployeeDetails;
 import com.company.awms.services.DocumentService;
 import com.company.awms.services.EmployeeService;
 import com.company.awms.services.ScheduleService;
 
 @RestController
+@RequestMapping("/admin")
 public class AdminController {
 	
     private EmployeeService employeeService;
@@ -46,7 +46,7 @@ public class AdminController {
     }
 
     //Employee methods
-    @GetMapping("/admin/employee")
+    @GetMapping("/employee")
     public ResponseEntity<Employee> getEmployee(@RequestParam String employeeId){
         try {
             Employee employee = this.employeeService.getEmployee(employeeId);
@@ -59,7 +59,7 @@ public class AdminController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping(value = "/admin/employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registerEmployee(@RequestBody Employee newEmployee){
         try {
             this.employeeService.registerEmployee(newEmployee);
@@ -69,7 +69,7 @@ public class AdminController {
         	return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    @PutMapping(value = "/admin/employee/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/employee/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> editEmployeeInfo(@RequestBody Employee newEmployee, @RequestParam String employeeId){
         try {
             //TODO:
@@ -85,7 +85,7 @@ public class AdminController {
     }
     
     //Schedule methods
-	@PostMapping(value = "/admin/schedule/add")
+	@PostMapping(value = "/schedule/add")
 	public ResponseEntity<String> addWorkDay(@RequestParam String employeeID, @RequestParam LocalDate date, @RequestParam LocalTime startShift, @RequestParam LocalTime endShift) {
 		boolean success = scheduleService.addWorkDay(employeeID, date, true, startShift, endShift);
 		if(success) {
@@ -94,19 +94,20 @@ public class AdminController {
 			return new ResponseEntity<String>("Error applying scheduole!", HttpStatus.BAD_REQUEST);
 		}
 	}
-	@GetMapping("/admin/schedule/apply")
+	@GetMapping("/schedule/apply")
 	public ResponseEntity<String> applySchedule() {
 		try{
 			this.scheduleService.applySchedule();
 			
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 	}
     
     //Document methods
-    @PostMapping(value = "/admin/document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
         try{
             this.documentService.uploadPersonalDocument(file, employeeDetails.getID(), employeeID);
@@ -122,7 +123,7 @@ public class AdminController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @DeleteMapping(value = "/admin/document/personal/delete/{documentID}")
+    @DeleteMapping(value = "/document/personal/delete/{documentID}")
     public ResponseEntity<String> deletePrivateDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
         try{
             this.documentService.deletePersonalDocument(documentID, employeeDetails.getID(), ownerID);
@@ -138,7 +139,7 @@ public class AdminController {
     }
 
     //active modules methods
-    @GetMapping("/admin/modules/get")
+    @GetMapping("/modules/get")
     public ResponseEntity<Map<String, Boolean>> getActives(){
     	File controllerDir = new File("target/classes/com/company/awms/controllers");
     	File[] controllers = controllerDir.listFiles();
@@ -158,7 +159,7 @@ public class AdminController {
     	return new ResponseEntity<Map<String, Boolean>>(controllerConditions, HttpStatus.OK);	
     }
     
-    @PostMapping("/admin/modules/set")
+    @PostMapping("/modules/set")
     public ResponseEntity<String> setActives(@RequestParam Map<String, Boolean> actives){
     	for(String key : actives.keySet()) { 		
     		try {

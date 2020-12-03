@@ -65,8 +65,8 @@ public class Employee {
 	// Get employee information
 	@Override
 	public String toString() {
-		return String.format("Employee ID: %s %nName: %s %s %nNational ID: %s %nE-mail: %s %nAccess Level: %s %nIBAN: %s%nPhone number: %s", id, firstName,
-				lastName, nationalID, email, accessLevel, iban, phoneNumber);
+		return String.format("Employee ID: %s %nName: %s %s %nNational ID: %s %nE-mail: %s %nAccess Level: %s %nDepartment: %s %nLevel: %s %nIBAN: %s %nPhone number: %s", id, firstName,
+				lastName, nationalID, email, accessLevel, department, level, iban, phoneNumber);
 	}
 
 	public String getID() {

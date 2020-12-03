@@ -16,14 +16,49 @@
             <%@include file="boxes/nav.jsp" %>
         </nav>
         <section class="page">
-            <header>
+            <header class="header">
                 <%@include file="boxes/header.jsp" %>
             </header>
-            <section class="p-2">
-                <h2 align="center"> Hello ${name}!</h2>
-                <h2>Current Time: ${time}</h2>
-                <div class="btn btn-primary">Button</div>
+            <section class="p-4 content">
+                <header class="py-3">
+                    <h1 class="ty-page-title">Welcome, ${employee.getFirstName()} ${employee.getLastName()}!</h1>
+                </header>
+                <div class="py-3">
+                    <div class="avatar"></div>
+                </div>
+                <div class="py-3">
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <div class="row">
+                        <div class="col-12 col-md-6">
+                            Name: <span class="font-weight-bold">${employee.getFirstName()} ${employee.getLastName()}</span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            Role: <span class="font-weight-bold">${employee.getRole()}</span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            Natinal ID: <span class="font-weight-bold">${employee.getNationalID()}</span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            Salary: <span class="font-weight-bold">${employee.getSalary()}</span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            Phone Number: <span class="font-weight-bold">${employee.getPhoneNumber()}</span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            IBAN: <span class="font-weight-bold">${employee.getIBAN()}</span>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="row"></div>
+                    </div>
+                </div>
+                </div>
             </section>
+            <footer>
+                <%@include file="boxes/footer.jsp" %>
+            </footer>
         </section>
     </div>
 
