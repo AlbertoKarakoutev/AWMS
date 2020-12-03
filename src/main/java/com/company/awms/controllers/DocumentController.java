@@ -89,7 +89,7 @@ public class DocumentController {
     }
 
     @ResponseBody
-    @DeleteMapping(value = "/spublic/delete/{documentID}")
+    @DeleteMapping(value = "/public/delete/{documentID}")
     public ResponseEntity<String> deletePublicDocument(@PathVariable String documentID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
         try{
             this.documentService.deletePublicDocument(documentID, employeeDetails.getID());
@@ -133,6 +133,22 @@ public class DocumentController {
         }  catch (Exception e) {
             e.printStackTrace();
             return "internalServerError";
+        }
+    }
+
+    @GetMapping("/search")
+    @ResponseBody
+    public ResponseEntity<List<DocInfoDTO>> searchInDocuments(@RequestParam String name, @AuthenticationPrincipal EmployeeDetails employeeDetails){
+        try {
+            List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
+
+            List<DocInfoDTO> foundDocuments = this.documentService.searchInDocumentByName(documents, name);
+
+            return new ResponseEntity<>(foundDocuments, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
