@@ -69,7 +69,6 @@ public class Config implements WebMvcConfigurer {
 		resolver.setPrefix("/WEB-INF/view/");
 		resolver.setSuffix(".jsp");
 		resolver.setViewClass(JstlView.class);
-		System.out.println(resolver);
 		registry.viewResolver(resolver);
 	}
 
