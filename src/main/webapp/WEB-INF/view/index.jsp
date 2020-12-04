@@ -5,16 +5,24 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="webjars/bootstrap/4.5.3/css/bootstrap.min.css" rel="stylesheet" />
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous">
+    </script>  
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link href="css/main.css" rel="stylesheet">
+    <script src="assets/js/main.js"></script>
 
-	<title>Insert title here</title>
+	<title>Index</title>
 </head>
 <body>
     <div class="panel">
         <nav class="navigation">
             <%@include file="boxes/nav.jsp" %>
-        </nav>
+        </nav>       
         <section class="page">
             <header class="header">
                 <%@include file="boxes/header.jsp" %>
@@ -62,10 +70,5 @@
         </section>
     </div>
 
-<!--Add main js file-->
-<script src="webjars/jquery/3.5.1/jquery.js"></script>
-<script src="webjars/popper.js/1.16.0/umd/popper.js"></script>
-<script src="webjars/bootstrap/4.5.3/js/bootstrap.js"></script>
-<script src="assets/js/main.js"></script>
 </body>
 </html>
