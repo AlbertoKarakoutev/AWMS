@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.company.awms.data.documents.DocInfoDTO;
 import org.bson.BsonBinarySubType;
@@ -52,7 +54,7 @@ public class DocumentService {
 
 		for (Doc document : departmentDocuments) {
 			if (employee.getLevel() >= document.getLevel()) {
-				DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType(), document.getUploaderID());
+				DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(), document.getType(), document.getUploaderID());
 				accessibleDocumentsInfo.add(documentInfo);
 			}
 		}
@@ -65,8 +67,11 @@ public class DocumentService {
 		List<DocInfoDTO> privateDocumentsInfo = new ArrayList<>();
 		Employee employee = getEmployee(employeeID);
 
-		for (Doc document : employee.getPersonalDocuments()) {
-			DocInfoDTO documentInfo = new DocInfoDTO(document.getName(), document.getSize(), document.getType(), document.getUploaderID());
+		ArrayList<Doc> personalDocuments = (ArrayList<Doc>) employee.getPersonalDocuments();
+
+		for (int i = 0; i < personalDocuments.size(); i++) {
+			DocInfoDTO documentInfo = new DocInfoDTO(Integer.toString(i), personalDocuments.get(i).getName(),
+					personalDocuments.get(i).getSize(), personalDocuments.get(i).getType(), personalDocuments.get(i).getUploaderID());
 			privateDocumentsInfo.add(documentInfo);
 		}
 
@@ -175,6 +180,21 @@ public class DocumentService {
 		} else {
 			throw new IllegalAccessException("You don't have permission to delete document");
 		}
+	}
+
+	public List<DocInfoDTO> searchInDocumentByName(List<DocInfoDTO> documents, String name){
+		List<DocInfoDTO> foundDocuments = new ArrayList<>();
+
+		Pattern pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
+
+		for (DocInfoDTO document : documents) {
+			Matcher matcher = pattern.matcher(document.getName());
+			boolean matchFound = matcher.find();
+			if(matchFound) {
+				foundDocuments.add(document);
+			}
+		}
+		return foundDocuments;
 	}
 
 
