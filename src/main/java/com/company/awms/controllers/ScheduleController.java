@@ -58,11 +58,11 @@ public class ScheduleController {
 	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
-			List<EmployeeDailyReference> sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee.getDepartment(), authenticatedEmployee.getLevel());
+			List<List<EmployeeDailyReference>> sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee.getDepartment(), authenticatedEmployee.getLevel());
 
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 
-			return "calendar";
+			return "schedule";
 		} catch (IOException e) {
 			return "badRequest";
 		} catch (Exception e){

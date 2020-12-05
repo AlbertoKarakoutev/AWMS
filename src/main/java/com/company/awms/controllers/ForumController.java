@@ -85,6 +85,16 @@ public class ForumController {
 			return "internalServerError";
 		}
 	}
+	
+	@GetMapping("/thread/new")
+	public String newThread() {
+		try {
+			return "newThread";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
 
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/replies/{employeeID}")
@@ -153,7 +163,7 @@ public class ForumController {
 			return "internalSeverError";
 		}
 	}
-
+	
 	@PutMapping(value = "/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		newForumThread.setIssuerID(employeeDetails.getID());

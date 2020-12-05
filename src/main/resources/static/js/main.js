@@ -1,4 +1,5 @@
 $(document).ready(function() {
+<<<<<<< HEAD
     $('.navbar-toggler').on('click', function(){
         let navigation = document.getElementById('navigation');
         let navbar = document.querySelector('.navbar');
@@ -26,3 +27,9 @@ $(document).ready(function() {
         }
     });
 });
+=======
+  	function calendarClick(element){
+		console.log(element);
+	  }
+});
+>>>>>>> 4efe0f2b031dc77627cc1d6cd4953e62f0500dfa
