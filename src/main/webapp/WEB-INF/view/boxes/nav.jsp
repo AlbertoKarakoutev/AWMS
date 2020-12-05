@@ -1,4 +1,11 @@
-<header class="user-container p-2">
+<nav class="navbar navbar-expand-lg">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon">
+        <i class="fas fa-bars"></i>
+    </span>
+  </button>
+  <div class="collapse navbar-collapse" id="navigation">
+  <header class="user-container p-2">
     <div class="avatar-container">
         <div class="small-avatar"></div>
     </div>
@@ -6,8 +13,8 @@
         <div class="user-name">${employee.getFirstName()} ${employee.getLastName()}</div>
         <div class="user-email">${employee.getEmail()}</div>
     </div>
-</header>
-<ul class="vertical-menu">
+   </header>
+    <ul class="vertical-menu">
     <li class="vertical-item">
         <a href="#" title="Contacts">Contacts</a>
     </li>
@@ -31,9 +38,9 @@
     <li class="vertical-item">
         <a href="#" title="Forum">Forum</a>
     </li>   
-</ul>
-<footer class="button">
-    <a href="#" type="button" class="btn sign-out-btn" title="Sing out" >SING OUT</a>
-</footer>
-
-
+    </ul>
+    <footer class="button">
+        <a href="#" type="button" class="btn sign-out-btn" title="Sing out" >SING OUT</a>
+    </footer>
+  </div>
+</nav>
