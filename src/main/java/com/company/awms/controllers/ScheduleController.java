@@ -62,7 +62,7 @@ public class ScheduleController {
 
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 
-			return "calendar";
+			return "schedule";
 		} catch (IOException e) {
 			return "badRequest";
 		} catch (Exception e){
