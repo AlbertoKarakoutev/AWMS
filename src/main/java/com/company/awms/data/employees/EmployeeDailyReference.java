@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.company.awms.data.schedule.Task;
 
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
-@Document
 public class EmployeeDailyReference extends Employee {
 
 	private EmployeeRepo employeeRepo;
