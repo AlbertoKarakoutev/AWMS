@@ -5,10 +5,10 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="webjars/bootstrap/4.5.3/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="css/main.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <link href="/css/main.css" rel="stylesheet">
 
-	<title>Insert title here</title>
+	<title>Dashboard</title>
 </head>
 <body>
     <div class="panel">
@@ -63,9 +63,10 @@
     </div>
 
 <!--Add main js file-->
-<script src="webjars/jquery/3.5.1/jquery.js"></script>
-<script src="webjars/popper.js/1.16.0/umd/popper.js"></script>
-<script src="webjars/bootstrap/4.5.3/js/bootstrap.js"></script>
-<script src="assets/js/main.js"></script>
+<script src="/webjars/jquery/3.5.1/jquery.js"></script>
+<script src="/webjars/popper.js/2.5.2/umd/popper.js"></script>
+<script src="/webjars/bootstrap/4.5.3/js/bootstrap.js"></script>
+<script src="/webjars/font-awesome/5.15.1/js/fontawesome.js"></script>
+<script src="/js/main.js"></script>
 </body>
 </html>

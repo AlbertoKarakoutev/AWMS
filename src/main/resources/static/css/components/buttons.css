@@ -1,3 +1,9 @@
 .ap-button {
-    background-color: var(--primary-color);
+    background-color: var(--tertiary-color);
+    color: var(--primary-color);
+    transition: background-color var(--primary-transition) ease-in-out;
+}
+
+.ap-button:hover {
+    background-color: rgba(var(--tertiary-color), .6);
 }
