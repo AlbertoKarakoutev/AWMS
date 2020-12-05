@@ -3,8 +3,11 @@
     height: auto;
     width: 100%;
     background-color: var(--primary-color);
-    color: var(--secondary-color);
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+}
+
+.logo h1 {
+    color: var(--secondary-color);
 }
