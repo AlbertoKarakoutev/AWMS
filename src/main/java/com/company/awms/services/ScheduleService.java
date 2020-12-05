@@ -120,6 +120,9 @@ public class ScheduleService {
 			singleEmployee.add(edr);
 			currentDay.setEmployees(singleEmployee);
 		}
+
+		System.out.print(currentDay.getEmployees().get(0).getWorkTimeInfo());
+		//currentDay.setEmployees(new ArrayList<EmployeeDailyReference>());
 		scheduleRepo.save(currentDay);
 		return true;
 	}
@@ -149,12 +152,12 @@ public class ScheduleService {
 		receiverDay = receiverDayOptional.get();
 
 		for (EmployeeDailyReference edr : requestorDay.getEmployees()) {
-			if (edr.getNationalID().equals(requestorNationalID)) {
+			if (edr.getRefNationalID().equals(requestorNationalID)) {
 				requestor = edr;
 			}
 		}
 		for (EmployeeDailyReference edr : receiverDay.getEmployees()) {
-			if (edr.getNationalID().equals(receiverNationalID)) {
+			if (edr.getRefNationalID().equals(receiverNationalID)) {
 				receiver = edr;
 			}
 		}
@@ -191,7 +194,7 @@ public class ScheduleService {
 
 		Task task;
 		for (EmployeeDailyReference edr : currentDay.getEmployees()) {
-			if (edr.getNationalID().equals(receiverNationalID)) {
+			if (edr.getRefNationalID().equals(receiverNationalID)) {
 				task = createTask(receiverNationalID, currentDay, "Test task title", "Test task body");
 				if (edr.getTasks() != null) {
 					edr.getTasks().add(task);
@@ -227,7 +230,7 @@ public class ScheduleService {
 			thisDay = thisDayOptional.get();
 
 			for (int i = 0; i < thisDay.getEmployees().size(); i++) {
-				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(i).getNationalID());
+				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(i).getRefNationalID());
 				if(employeeOptional.isEmpty()){
 					throw new IOException("Invalid nationalID");
 				} else if(employeeOptional.get().getDepartment().equals(department) && employeeOptional.get().getLevel() == level){
