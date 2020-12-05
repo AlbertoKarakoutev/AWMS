@@ -1,0 +1,84 @@
+.parent {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+.day-box {
+    border: 1px solid black;
+    width: 150px;
+    height: 100px;
+}
+.working-shedule{
+    font-size: x-large;
+    font-style: italic;
+    font-family: sans-serif;
+
+}
+.monday { 
+    grid-area: 1 / 1 / 2 / 2; 
+    margin: auto; 
+    font-family: cursive;
+    font-size: large;}
+.tuesday { 
+    grid-area: 1 / 2 / 2 / 3; 
+    margin: auto;
+    font-family: cursive;
+    font-size: large;}
+.wednesday { 
+    grid-area: 1 / 3 / 2 / 4; 
+    margin: auto;
+    font-family: cursive;
+    font-size: large;}
+.thursday { 
+    grid-area: 1 / 4 / 2 / 5; 
+    margin: auto;
+    font-family: cursive;
+    font-size: large;}
+.friday { 
+    grid-area: 1 / 5 / 2 / 6;
+    margin: auto;
+    font-family: cursive;
+    font-size: large;}
+.saturday { 
+    grid-area: 1 / 6 / 2 / 7; 
+    margin: auto;
+    font-family: cursive;
+    font-size: large;}
+.sunday { 
+    grid-area: 1 / 7 / 2 / 8;
+    margin: auto;
+    font-family: cursive;
+    font-size: large;}
+.day1 { grid-area: 2 / 1 / 3 / 2;     font-size: xx-large}
+.day2 { grid-area: 2 / 2 / 3 / 3;     font-size: xx-large}
+.day3 { grid-area: 2 / 3 / 3 / 4;     font-size: xx-large}
+.day4 { grid-area: 2 / 4 / 3 / 5;     font-size: xx-large}
+.day5 { grid-area: 2 / 5 / 3 / 6;     font-size: xx-large}
+.day6 { grid-area: 2 / 6 / 3 / 7;     font-size: xx-large}
+.day7 { grid-area: 2 / 7 / 3 / 8;     font-size: xx-large}
+.day8 { grid-area: 3 / 1 / 4 / 2;     font-size: xx-large}
+.day9 { grid-area: 3 / 2 / 4 / 3;     font-size: xx-large}
+.day10 { grid-area: 3 / 3 / 4 / 4;    font-size: xx-large}
+.day11 { grid-area: 3 / 4 / 4 / 5;    font-size: xx-large}
+.day12 { grid-area: 3 / 5 / 4 / 6;    font-size: xx-large}
+.day13 { grid-area: 3 / 6 / 4 / 7;    font-size: xx-large}
+.day14 { grid-area: 3 / 7 / 4 / 8;    font-size: xx-large}
+.day15 { grid-area: 4 / 1 / 5 / 2;    font-size: xx-large}
+.day16 { grid-area: 4 / 2 / 5 / 3;    font-size: xx-large}
+.day17 { grid-area: 4 / 3 / 5 / 4;    font-size: xx-large}
+.day18 { grid-area: 4 / 4 / 5 / 5;    font-size: xx-large}
+.day19 { grid-area: 4 / 5 / 5 / 6;    font-size: xx-large}
+.day20 { grid-area: 4 / 6 / 5 / 7;    font-size: xx-large}
+.day21 { grid-area: 4 / 7 / 5 / 8;    font-size: xx-large}
+.day22 { grid-area: 5 / 1 / 6 / 2;    font-size: xx-large}
+.day23 { grid-area: 5 / 2 / 6 / 3;    font-size: xx-large}
+.day24 { grid-area: 5 / 3 / 6 / 4;    font-size: xx-large}
+.day25 { grid-area: 5 / 4 / 6 / 5;    font-size: xx-large}
+.day26 { grid-area: 5 / 5 / 6 / 6;    font-size: xx-large}
+.day27 { grid-area: 5 / 6 / 6 / 7;    font-size: xx-large}
+.day28 { grid-area: 5 / 7 / 6 / 8;    font-size: xx-large}
+.day29 { grid-area: 6 / 1 / 7 / 2;    font-size: xx-large}
+.day30 { grid-area: 6 / 2 / 7 / 3;    font-size: xx-large}
+.day31 { grid-area: 6 / 3 / 7 / 4;    font-size: xx-large}

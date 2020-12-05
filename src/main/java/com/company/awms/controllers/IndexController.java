@@ -22,7 +22,7 @@ public class IndexController {
         this.employeeService = employeeService;
     }
 
-    @GetMapping({"/", "/index"})
+    @GetMapping({ "/", "/index" })
     public String index(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
 
         try {

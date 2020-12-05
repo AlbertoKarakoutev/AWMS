@@ -1,0 +1,42 @@
+.vertical-menu {
+    width: 280px;
+    height: 81%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0px 45px;
+}
+
+.vertical-menu a {
+    color: white; 
+    display: block; 
+    padding: 12px; 
+    text-decoration: none; 
+    text-align: left;
+}
+
+.vertical-menu a:hover {
+    background-color: #ccc; 
+}
+
+.vertical-menu a:active {
+    background-color: #ccc; 
+    color: white;
+}
+
+.sign-out-btn {
+    color: white;
+    text-decoration: underline;
+    text-decoration-color: #A8F8E7;
+}
+
+.sign-out-btn:hover {
+    background-color: gray;
+}
+
+ 
+/* Portrait tablets and small desktops */ 
+@media (max-width: 991px) { 
+    .vertical-menu {
+        display: none;
+    }
+} 

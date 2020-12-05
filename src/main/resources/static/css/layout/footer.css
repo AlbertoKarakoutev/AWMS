@@ -1,0 +1,15 @@
+.footer{
+    width: 100%;
+    border-top: 1px dashed var(--primary-color);
+    height: 75px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: left;
+}
+
+.footer p {
+    width: 100%;
+    text-align: left;
+    flex-grow: 1;
+}

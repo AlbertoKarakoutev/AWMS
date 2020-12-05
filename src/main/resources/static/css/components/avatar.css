@@ -1,0 +1,15 @@
+.avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: block;
+    background-color: var(--secondary-color);
+}
+
+@media(max-width: 468px) {
+    .avatar {
+        margin: auto;
+        width: 200px;
+        height: 200px;
+    }
+}

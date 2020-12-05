@@ -53,14 +53,14 @@ public class Config implements WebMvcConfigurer {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/css/*.css")
-				.addResourceLocations("classpath:/static/css/")
-				.setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
-				.resourceChain(true).addResolver(new PathResourceResolver());
-		registry.addResourceHandler("/js/**")
-				.addResourceLocations("classpath:/static/js/")
-				.setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
-				.resourceChain(true).addResolver(new PathResourceResolver());
+		registry.addResourceHandler("/css/**").addResourceLocations("classpath:/static/css/")
+				.setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS)).resourceChain(true)
+				.addResolver(new PathResourceResolver());
+		registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/")
+				.setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS)).resourceChain(true)
+				.addResolver(new PathResourceResolver());
+		registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/")
+				.setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS)).resourceChain(true);
 	}
 
 	@Override
