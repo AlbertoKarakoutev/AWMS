@@ -1,3 +1,5 @@
 $(document).ready(function() {
-    console.log('test');
+  	function calendarClick(element){
+		console.log(element);
+	  }
 });
