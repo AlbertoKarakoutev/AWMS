@@ -54,7 +54,7 @@ public class ScheduleController {
 		}
 	}
 
-	@GetMapping("/")
+	@GetMapping("")
 	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
@@ -62,7 +62,7 @@ public class ScheduleController {
 
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 
-			return "schedule";
+			return "calendar";
 		} catch (IOException e) {
 			return "badRequest";
 		} catch (Exception e){
