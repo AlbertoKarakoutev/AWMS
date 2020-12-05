@@ -14,7 +14,7 @@
     <div class="panel">
         <nav class="navigation">
             <%@include file="boxes/nav.jsp" %>
-        </nav>
+        </nav>       
         <section class="page">
             <header class="header">
                 <%@include file="boxes/header.jsp" %>
