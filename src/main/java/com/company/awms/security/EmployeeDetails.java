@@ -14,17 +14,29 @@ public class EmployeeDetails implements UserDetails {
     private String password;
     private String role;
     private String ID;
+    private String firstName;
+    private String lastName;
 
     EmployeeDetails(Employee employee) {
         this.username = employee.getEmail();
         this.password = employee.getPassword();
         this.role = employee.getRole();
         this.ID = employee.getID();
+        this.firstName = employee.getFirstName();
+        this.lastName = employee.getLastName();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(this.role));
+    }
+
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public String getLastName() {
+        return this.lastName;
     }
 
     public String getID() {
