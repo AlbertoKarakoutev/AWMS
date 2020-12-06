@@ -44,6 +44,7 @@ public class DocumentController {
 
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
             model.addAttribute("documents", documents);
+            injectEmailAndNameIntoModel(model, employeeDetails);
 
             return "publicDocuments";
         } catch (IOException e){
@@ -111,6 +112,7 @@ public class DocumentController {
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
             model.addAttribute("documents", documents);
+            injectEmailAndNameIntoModel(model, employeeDetails);
 
             return "publicDocuments";
         } catch (IOException e) {
@@ -128,6 +130,7 @@ public class DocumentController {
             List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeDetails.getID());
 
             model.addAttribute("documents", documents);
+            injectEmailAndNameIntoModel(model, employeeDetails);
 
             return "personalDocuments";
         }  catch (Exception e) {
@@ -150,6 +153,12 @@ public class DocumentController {
         } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private void injectEmailAndNameIntoModel(Model model, EmployeeDetails employeeDetails){
+        model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+        model.addAttribute("employeeEmail", employeeDetails.getUsername());
+        model.addAttribute("employeeId", employeeDetails.getID());
     }
 
 	public static boolean getActive() {

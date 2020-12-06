@@ -14,12 +14,16 @@ public class EmployeeDetails implements UserDetails {
     private String password;
     private String role;
     private String ID;
+    private String firstName;
+    private String lastName;
 
     EmployeeDetails(Employee employee) {
         this.username = employee.getEmail();
         this.password = employee.getPassword();
         this.role = employee.getRole();
         this.ID = employee.getID();
+        this.firstName = employee.getFirstName();
+        this.lastName = employee.getLastName();
     }
 
     @Override
@@ -39,6 +43,14 @@ public class EmployeeDetails implements UserDetails {
     @Override
     public String getUsername() {
         return this.username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     @Override

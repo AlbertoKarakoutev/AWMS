@@ -60,6 +60,7 @@ public class ScheduleController {
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
 			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee.getDepartment(), authenticatedEmployee.getLevel());
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "schedule";
 		} catch (IOException e) {
@@ -68,6 +69,12 @@ public class ScheduleController {
 			e.printStackTrace();
 			return "internalServerError";
 		}
+	}
+
+	private void injectEmailAndNameIntoModel(Model model, EmployeeDetails employeeDetails){
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeId", employeeDetails.getID());
 	}
 
 	public static boolean getActive() {
