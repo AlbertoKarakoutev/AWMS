@@ -39,7 +39,7 @@
     </li>
 
     <li class="vertical-item">
-        <a href="/forum/all" title="Forum">Forum</a>
+        <a href="/forum" title="Forum">Forum</a>
     </li>   
     </ul>
     <footer class="button">

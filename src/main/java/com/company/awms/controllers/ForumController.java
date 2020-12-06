@@ -28,7 +28,7 @@ public class ForumController {
 		this.forumService = forumService;
 	}
 
-	@GetMapping("/all")
+	@GetMapping("")
 	public String getAllThreads(Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreads();
@@ -110,10 +110,14 @@ public class ForumController {
 		}
 	}
 
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String addThread(@RequestBody ForumThread forumThread,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	@PostMapping(value = "/add")
+	public String addThread(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model,
+			@RequestParam String thread_title, @RequestParam String thread_content) {
+
+		ForumThread forumThread = new ForumThread();
 		forumThread.setIssuerID(employeeDetails.getID());
+		forumThread.setBody(thread_content);
+		forumThread.setTitle(thread_title);
 
 		try {
 			this.forumService.addNewThread(forumThread);
