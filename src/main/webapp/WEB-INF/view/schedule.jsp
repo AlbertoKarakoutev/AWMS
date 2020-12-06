@@ -2,6 +2,8 @@
          pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%> 
 <%@page import="com.company.awms.data.employees.EmployeeDailyReference"%> 
+<%@page import="java.time.LocalDate"%> 
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
@@ -40,20 +42,42 @@
                     <div class="friday">Friday</div>
                     <div class="saturday">Saturday</div>
                     <div class="sunday">Sunday</div>
+                    
                     <%
-                    List<List<EmployeeDailyReference>> sameLevelEmployees = (List<List<EmployeeDailyReference>>)request.getAttribute("sameLevelEmployees");
-                    for(int i = 0; i < 34; i++){        
-                    %>
-		                    <button class='day-box'></button>
-		                    	<div class='modal'>
-		                    		<div class='modal-content'>
-		                    			<span class='close'>&times;</span>
-		                    			<p class='info'><% if(sameLevelEmployees.size()>0){sameLevelEmployees.get(i).get(0).getRefFirstName();} %></p>
-		                    		</div>
-		                    	</div>
+                   	List<EmployeeDailyReference>[] sle = (List<EmployeeDailyReference>[])request.getAttribute("sameLevelEmployees");
+                   	int firstWeekday = LocalDate.now().withDayOfMonth(1).getDayOfWeek().getValue();
+                   	for(int i = 0; i <= 34; i++){  
+                   	%>
+                   	
+                    <button class='day-box'></button>
+                    	<div class='modal'>
+                    		<div class='modal-content'>
+                    			<span class='close'>&times;</span>
+                    			<p class='info'>
+                    			
+                    			<% 
+                    			if(i>=firstWeekday-1 && i <=LocalDate.now().lengthOfMonth()-2){
+                    				if(sle[i] != null){
+	                    				for(int j = 0; j < sle[i].size(); j++){
+	                    					
+	                    					out.println(sle[i].get(j).getRefFirstName() + " " + sle[i].get(j).getRefLastName() + " " + sle[i].get(j).getWorkTimeInfo());
+	                    		%>
+	                    		</br>
+	                    		<%       		
+	                    					
+	                    				}
+                    				}
+                    			}
+                    			%>
+                    			
+                    			</p>
+                    		</div>
+                    	</div>
+					
 					<%
-					}
+                    }
                     %>
+                    
                 </div>
             </section>
             <footer>

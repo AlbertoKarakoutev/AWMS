@@ -12,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.company.awms.data.schedule.Task;
 
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
-public class EmployeeDailyReference extends Employee {
+public class EmployeeDailyReference {
 
-	private EmployeeRepo employeeRepo;
-	
 	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
 	private LocalTime[] workTime;
 	private String refFirstName;
@@ -24,19 +22,17 @@ public class EmployeeDailyReference extends Employee {
 	private List<Task> tasks = new ArrayList<>();
 	private LocalDate date;
 
-	/*public EmployeeDailyReference() {}
+	public EmployeeDailyReference() {}
 
-	@Autowired
+	/*@Autowired
 	public EmployeeDailyReference(EmployeeRepo employeeRepo) {
 		this.employeeRepo = employeeRepo;
 	}*/
 
-	@Autowired
 	public EmployeeDailyReference(EmployeeRepo employeeRepo, String nationalID) throws IOException {
-		this.employeeRepo = employeeRepo;
 		this.refNationalID = nationalID;
 
-		Optional<Employee> employee = this.employeeRepo.findByNationalID(nationalID);
+		Optional<Employee> employee = employeeRepo.findByNationalID(nationalID);
 
 		if(employee.isEmpty()) {
 			throw new IOException("Employee not found!");
@@ -56,7 +52,7 @@ public class EmployeeDailyReference extends Employee {
 	}
 	
 	public String getWorkTimeInfo() {
-		return String.format("%s:%s - %s:%s", workTime[0], workTime[1], workTime[2], workTime[3]);
+		return String.format("%s - %s", workTime[0], workTime[1]);
 	}
 
 	public LocalTime[] getWorkTime() {

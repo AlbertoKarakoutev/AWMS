@@ -35,7 +35,7 @@ public class SalaryService {
 					throw new IOException("Day is missing in the database!");
 				}
 				for (EmployeeDailyReference edr : thisDay.get().getEmployees()) {
-					if (edr.getNationalID().equals(nationalID)) {
+					if (edr.getRefNationalID().equals(nationalID)) {
 						for(Task currentTask : edr.getTasks()) {	
 							if (currentTask.getCompleted() && !currentTask.getPaidFor() && currentTask.getTaskReward()!=0.0) {
 								currentTask.setPaidFor(true);
@@ -73,7 +73,7 @@ public class SalaryService {
 					throw new IOException("Day is missing in the database!");
 				}
 				for (EmployeeDailyReference edr : thisDay.get().getEmployees()) {
-					if (edr.getNationalID().equals(nationalID)) {
+					if (edr.getRefNationalID().equals(nationalID)) {
 						Duration shiftLength =  Duration.between(edr.getWorkTime()[1], edr.getWorkTime()[0]);
 						hours += (double)shiftLength.toHours();
 					}

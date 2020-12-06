@@ -86,12 +86,12 @@ public class AdminController {
     
     //Schedule methods
 	@PostMapping(value = "/schedule/add")
-	public ResponseEntity<String> addWorkDay(@RequestParam String employeeID, @RequestParam LocalDate date, @RequestParam LocalTime startShift, @RequestParam LocalTime endShift) {
-		boolean success = scheduleService.addWorkDay(employeeID, date, true, startShift, endShift);
+	public ResponseEntity<String> addWorkDay(@RequestParam String employeeID, @RequestParam String date, @RequestParam String startShift, @RequestParam String endShift) {
+		boolean success = scheduleService.addWorkDay(employeeID, LocalDate.parse(date), true, LocalTime.parse(startShift), LocalTime.parse(endShift));
 		if(success) {
 			return new ResponseEntity<String>("Successfully applied schedule!", HttpStatus.OK);
 		}else {
-			return new ResponseEntity<String>("Error applying scheduole!", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>("Error applying schedule!", HttpStatus.BAD_REQUEST);
 		}
 	}
 	@GetMapping("/schedule/apply")

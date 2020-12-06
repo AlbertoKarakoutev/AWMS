@@ -18,6 +18,8 @@ public class Day {
 	private LocalDate date;
 	private List<EmployeeDailyReference> employees = new ArrayList<>();
 
+	public Day () {}
+
 	public Day(LocalDate date) {
 		this.date = date;
 	}
