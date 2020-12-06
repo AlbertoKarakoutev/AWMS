@@ -74,6 +74,7 @@ public class ScheduleController {
 	private void injectEmailAndNameIntoModel(Model model, EmployeeDetails employeeDetails){
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeId", employeeDetails.getID());
 	}
 
 	public static boolean getActive() {
