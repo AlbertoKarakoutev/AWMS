@@ -10,8 +10,8 @@
         <div class="small-avatar"></div>
     </div>
     <div class="user-info-container">
-        <div class="user-name">${employee.getFirstName()} ${employee.getLastName()}</div>
-        <div class="user-email">${employee.getEmail()}</div>
+        <div class="user-name">${employeeName}</div>
+        <div class="user-email">${employeeEmail}</div>
     </div>
    </header>
     <ul class="vertical-menu">
