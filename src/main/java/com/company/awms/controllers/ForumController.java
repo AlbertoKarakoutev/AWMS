@@ -85,7 +85,7 @@ public class ForumController {
 			return "internalServerError";
 		}
 	}
-	
+
 	@GetMapping("/thread/new")
 	public String newThread() {
 		try {
@@ -111,7 +111,8 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String addThread(@RequestBody ForumThread forumThread, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String addThread(@RequestBody ForumThread forumThread,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		forumThread.setIssuerID(employeeDetails.getID());
 
 		try {
@@ -127,7 +128,8 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String addReply(@RequestBody ForumReply forumReply, @PathVariable String threadID,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		forumReply.setIssuerID(employeeDetails.getID());
 		forumReply.setThreadID(threadID);
 		try {
@@ -144,11 +146,12 @@ public class ForumController {
 	}
 
 	@PutMapping(value = "/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String markThreadAsAnswered(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String markThreadAsAnswered(@PathVariable String threadID,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
 
-			if(!employeeDetails.getID().equals(forumThread.getIssuerID())){
+			if (!employeeDetails.getID().equals(forumThread.getIssuerID())) {
 				return "notAuthorized";
 			}
 
@@ -163,14 +166,15 @@ public class ForumController {
 			return "internalSeverError";
 		}
 	}
-	
+
 	@PutMapping(value = "/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		newForumThread.setIssuerID(employeeDetails.getID());
 		try {
 			ForumThread oldThread = this.forumService.getThread(oldThreadID);
 
-			if(!oldThread.getIssuerID().equals(employeeDetails.getID())){
+			if (!oldThread.getIssuerID().equals(employeeDetails.getID())) {
 				return "notAuthorized";
 			}
 
