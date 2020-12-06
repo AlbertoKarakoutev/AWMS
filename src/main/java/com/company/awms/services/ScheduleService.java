@@ -10,8 +10,6 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,8 +40,7 @@ public class ScheduleService {
 	public ScheduleService(ScheduleRepo scheduleRepo, EmployeeRepo employeeRepo) {
 
 		this.scheduleRepo = scheduleRepo;
-		this.employeeRepo = employeeRepo;
-	}
+		this.employeeRepo = employeeRepo;	}
 
 	// Call employeeService.createEmployeeDailyReference(...) in the   
 	// ScheduleController and them get edr from the arguments
@@ -218,23 +215,24 @@ public class ScheduleService {
 
 	// Get all equivalent access level employees with their schedules, by iterating
 	// over dates up to a month ahead  
-	public List<List<EmployeeDailyReference>> viewSchedule(String department, int level) throws IOException {
-		List<List<EmployeeDailyReference>> sameLevelEmployees = new ArrayList<>();
-		for (LocalDate startDate = LocalDate.now(); startDate.isBefore(LocalDate.now().plusMonths(1)); startDate = startDate.plusDays(1)) {
+	public List<EmployeeDailyReference>[] viewSchedule(String department, int level) throws IOException {
+		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[LocalDate.now().lengthOfMonth()];
+		for (int i = 1; i < LocalDate.now().lengthOfMonth(); i++) {
+			LocalDate date = LocalDate.now().withDayOfMonth(i);
 			Day thisDay;
-			Optional<Day> thisDayOptional = scheduleRepo.findByDate(startDate);
+			Optional<Day> thisDayOptional = scheduleRepo.findByDate(date);
 			if(thisDayOptional.isEmpty()){
 				throw new IOException("Invalid date!");
 			}
 			
 			thisDay = thisDayOptional.get();
 
-			for (int i = 0; i < thisDay.getEmployees().size(); i++) {
-				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(i).getRefNationalID());
+			for (int j = 0; j < thisDay.getEmployees().size(); j++) {
+				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(j).getRefNationalID());
 				if(employeeOptional.isEmpty()){
 					throw new IOException("Invalid nationalID");
 				} else if(employeeOptional.get().getDepartment().equals(department) && employeeOptional.get().getLevel() == level){
-					sameLevelEmployees.add(thisDay.getEmployees());
+					sameLevelEmployees[i] = thisDay.getEmployees();
 				}
 			}
 		}
