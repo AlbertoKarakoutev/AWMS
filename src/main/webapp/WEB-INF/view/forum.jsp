@@ -22,24 +22,31 @@
             <header class="header">
                 <%@include file="boxes/header.jsp" %>
             </header>
-            <section class="p-4 content">
+            <section class="content">
+                <div class="p-4">
                 <header class="py-3">
                     <h1 class="ty-page-title">Forum</h1>
                 </header>
                 <div class="py-3">
                     <div class="d-flex flex-row-reverse">
-                        <button class="btn ap-button">New question</button>
+                        <a class="btn btn-dark" href="/forum/thread/new" title="New thread">New question</a>
                     </div>
                 </div>
                 <div class="my-3">
-                    <div class="forum-questions">
-                        <h3 class="text-light">Do you smoke?</h3>
+                <c:forEach items="${threads}" var="thread">
+                    <div class="forum-questions d-flex align-items-center my-2">
+                        <h3 class="text-light">${thread.getTitle()}</h3>
+                        <a class="btn btn-dark ml-auto" href="/forum/thread/${thread.getID()}" title="${thread.getTitle()}">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
+                </c:forEach>
                 </div>
+                </div>
+                <footer>
+                    <%@include file="boxes/footer.jsp" %>
+                </footer>
             </section>
-            <footer>
-                <%@include file="boxes/footer.jsp" %>
-            </footer>
         </section>
     </div>
 </body>

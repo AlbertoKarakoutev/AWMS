@@ -16,10 +16,13 @@
    </header>
     <ul class="vertical-menu">
     <li class="vertical-item">
+        <a href="/" title="Dashboard">Dashboard</a>
+    </li>
+    <li class="vertical-item">
         <a href="#" title="Contacts">Contacts</a>
     </li>
     <li class="vertical-item">
-        <a href="#" title="Working Shedule">Working Shedule</a>
+        <a href="/schedule" title="Working Shedule">Working Shedule</a>
     </li>
     <li class="vertical-item">
         <div class="dropdown">
@@ -36,7 +39,7 @@
     </li>
 
     <li class="vertical-item">
-        <a href="#" title="Forum">Forum</a>
+        <a href="/forum/all" title="Forum">Forum</a>
     </li>   
     </ul>
     <footer class="button">

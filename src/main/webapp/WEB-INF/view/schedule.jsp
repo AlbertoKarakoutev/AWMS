@@ -62,6 +62,7 @@
 	                    					
 	                    					out.println(sle[i].get(j).getRefFirstName() + " " + sle[i].get(j).getRefLastName() + " " + sle[i].get(j).getWorkTimeInfo());
 	                    		%>
+                                ${sle[i].get(j).getRefFirstName()}
 	                    		</br>
 	                    		<%       		
 	                    					
