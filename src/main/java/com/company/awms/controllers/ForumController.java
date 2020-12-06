@@ -29,10 +29,11 @@ public class ForumController {
 	}
 
 	@GetMapping("")
-	public String getAllThreads(Model model) {
+	public String getAllThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreads();
 			model.addAttribute("threads", threads);
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "forum";
 		} catch (Exception e) {
@@ -42,10 +43,11 @@ public class ForumController {
 	}
 
 	@GetMapping("/thread/{threadID}")
-	public String getThread(@PathVariable String threadID, Model model) {
+	public String getThread(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
 			model.addAttribute("thread", forumThread);
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "thread";
 		} catch (IOException e) {
@@ -57,11 +59,12 @@ public class ForumController {
 	}
 
 	@GetMapping("/thread/{threadID}/replies")
-	public String getThreadWithReplies(@PathVariable String threadID, Model model) {
+	public String getThreadWithReplies(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
 			model.addAttribute("thread", threadAndReplies.getForumThread());
 			model.addAttribute("replies", threadAndReplies.getForumReplies());
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "threadAndReplies";
 		} catch (IOException e) {
@@ -74,10 +77,11 @@ public class ForumController {
 
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/threads/{employeeID}")
-	public String getAllThreadsFromEmployee(@PathVariable String employeeID, Model model) {
+	public String getAllThreadsFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreadsFromEmployee(employeeID);
 			model.addAttribute("threads", threads);
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "threadsFromEmployee";
 		} catch (Exception e) {
@@ -87,8 +91,10 @@ public class ForumController {
 	}
 
 	@GetMapping("/thread/new")
-	public String newThread() {
+	public String newThread(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
+			injectEmailAndNameIntoModel(model, employeeDetails);
+			
 			return "newThread";
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -98,10 +104,11 @@ public class ForumController {
 
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/replies/{employeeID}")
-	public String getAllRepliesFromEmployee(@PathVariable String employeeID, Model model) {
+	public String getAllRepliesFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<ForumReply> replies = this.forumService.getAllRepliesFromEmployee(employeeID);
 			model.addAttribute("replies", replies);
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "repliesFromEmployee";
 		} catch (Exception e) {
@@ -123,6 +130,7 @@ public class ForumController {
 			this.forumService.addNewThread(forumThread);
 
 			model.addAttribute("thread", forumThread);
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "thread";
 		} catch (Exception e) {
@@ -141,6 +149,7 @@ public class ForumController {
 			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID);
 			model.addAttribute("thread", threadAndReplies.getForumThread());
 			model.addAttribute("replies", threadAndReplies.getForumReplies());
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "threadAndReplies";
 		} catch (Exception e) {
@@ -161,6 +170,7 @@ public class ForumController {
 
 			this.forumService.markAsAnswered(forumThread);
 			model.addAttribute("thread", forumThread);
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "thread";
 		} catch (IOException e) {
@@ -184,6 +194,7 @@ public class ForumController {
 
 			oldThread = this.forumService.editThread(newForumThread, oldThread);
 			model.addAttribute("thread", oldThread);
+			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "thread";
 		} catch (IOException e) {
@@ -192,6 +203,11 @@ public class ForumController {
 			e.printStackTrace();
 			return "internalServerError";
 		}
+	}
+
+	private void injectEmailAndNameIntoModel(Model model, EmployeeDetails employeeDetails){
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
 	}
 
 	public static boolean getActive() {
