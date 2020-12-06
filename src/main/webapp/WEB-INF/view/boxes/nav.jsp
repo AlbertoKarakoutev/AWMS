@@ -27,23 +27,22 @@
     <li class="vertical-item">
         <div class="dropdown">
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" role="button"
-                aria-haspopup="true" aria-expanded="false" title="Documents">Documents Access</a>
+                aria-haspopup="true" aria-expanded="false" title="Forum">Forum</a>
             <div class="dropdown-menu">
-                <a class="dropdown-item pl-4" title="Module" href="#">All Documents</a>
-                <a class="dropdown-item pl-4" title="Module" href="#">Document1</a>
-                <a class="dropdown-item pl-4" title="Module" href="#">Document2</a>
-                <a class="dropdown-item pl-4" title="Module" href="#">Document3</a>
-                <a class="dropdown-item pl-4" title="Module" href="#">Document4</a>
+                <a class="dropdown-item pl-4" title="Module" href="/forum">My topics</a>
+                <a class="dropdown-item pl-4" title="Module" href="#">Answered</a>
+                <a class="dropdown-item pl-4" title="Module" href="#">Unanswered</a>
+               
             </div>
         </div>
     </li>
 
     <li class="vertical-item">
-        <a href="/forum" title="Forum">Forum</a>
+        <a href="#" title="Documents">Documents Access</a>
     </li>   
     </ul>
     <footer class="button">
-        <a href="#" type="button" class="btn sign-out-btn" title="Sing out" >SING OUT</a>
+        <a href="/login" type="button" class="btn sign-out-btn" title="Sing out" >SING OUT</a>
     </footer>
   </div>
 </nav>
