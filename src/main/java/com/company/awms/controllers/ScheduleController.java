@@ -1,21 +1,27 @@
 package com.company.awms.controllers;
 
-import com.company.awms.data.employees.Employee;
-import com.company.awms.data.employees.EmployeeDailyReference;
-import com.company.awms.security.EmployeeDetails;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.ServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.company.awms.data.employees.Employee;
+import com.company.awms.data.employees.EmployeeDailyReference;
+import com.company.awms.security.EmployeeDetails;
 import com.company.awms.services.EmployeeService;
 import com.company.awms.services.ScheduleService;
-
-import java.io.IOException;
-import java.util.List;
 
 @Controller
 @RequestMapping("/schedule")
@@ -55,11 +61,14 @@ public class ScheduleController {
 	}
 
 	@GetMapping("")
-	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam int month) {
+		
 		try {
+			
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
-			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee.getDepartment(), authenticatedEmployee.getLevel());
+			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee.getDepartment(), authenticatedEmployee.getLevel(),month);
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
+			model.addAttribute("month", month);
 			injectEmailAndNameIntoModel(model, employeeDetails);
 
 			return "schedule";
