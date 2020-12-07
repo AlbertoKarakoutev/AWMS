@@ -13,16 +13,18 @@ public class ForumReply {
 
 	private String threadID;
 	private String issuerID;
+	private String issuerName;
 	private String body;
 	private LocalDateTime dateTime;
 	
 	public ForumReply() {}
 
-	public ForumReply(String threadID, String issuerID, String body, LocalDateTime dateTime) {
+	public ForumReply(String threadID, String issuerID, String body, LocalDateTime dateTime, String issuerName) {
 		this.threadID = threadID;
 		this.issuerID = issuerID;
 		this.body = body;
 		this.dateTime = dateTime;
+		this.issuerName = issuerName;
 	}
 
 	public String getId() {
@@ -45,6 +47,10 @@ public class ForumReply {
 		return body;
 	}
 
+	public String getIssuerName() {
+		return issuerName;
+	}
+
 	public void setIssuerID(String issuerID) {
 		this.issuerID = issuerID;
 	}
@@ -59,5 +65,9 @@ public class ForumReply {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public void setIssuerName(String issuerName) {
+		this.issuerName = issuerName;
 	}
 }

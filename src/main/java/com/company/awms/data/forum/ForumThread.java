@@ -14,13 +14,15 @@ public class ForumThread {
 	private String title;
 	private String body;
 	private String issuerID;
+	private String issuerName;
 	private LocalDateTime dateTime;
 	private boolean isAnswered;
 
 	public ForumThread() {}
 	
-	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered) {
+	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered, String issuerName) {
 		this.issuerID = issuerID;
+		this.issuerName = issuerName;
 		this.title = title;
 		this.body = body;
 		this.dateTime = time;
@@ -33,6 +35,10 @@ public class ForumThread {
 
 	public String getIssuerID() {
 		return this.issuerID;
+	}
+
+	public void setIssuerName(String issuerName) {
+		this.issuerName = issuerName;
 	}
 
 	public LocalDateTime getDateTime() {
@@ -53,6 +59,10 @@ public class ForumThread {
 
 	public void setIssuerID(String issuerID) {
 		this.issuerID = issuerID;
+	}
+
+	public String getIssuerName() {
+		return issuerName;
 	}
 
 	public void setDateTime(LocalDateTime dateTime) {

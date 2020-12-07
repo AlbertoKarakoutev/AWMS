@@ -69,7 +69,7 @@ public class ScheduleController {
 			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee.getDepartment(), authenticatedEmployee.getLevel(),month);
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 			model.addAttribute("month", month);
-			injectEmailAndNameIntoModel(model, employeeDetails);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "schedule";
 		} catch (IOException e) {
@@ -80,10 +80,10 @@ public class ScheduleController {
 		}
 	}
 
-	private void injectEmailAndNameIntoModel(Model model, EmployeeDetails employeeDetails){
+	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
-		model.addAttribute("employeeId", employeeDetails.getID());
+		model.addAttribute("employeeID", employeeDetails.getID());
 	}
 
 	public static boolean getActive() {
