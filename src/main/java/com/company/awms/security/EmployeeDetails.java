@@ -31,6 +31,14 @@ public class EmployeeDetails implements UserDetails {
         return Collections.singletonList(new SimpleGrantedAuthority(this.role));
     }
 
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public String getLastName() {
+        return this.lastName;
+    }
+
     public String getID() {
         return ID;
     }
