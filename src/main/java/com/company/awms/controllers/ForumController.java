@@ -42,22 +42,6 @@ public class ForumController {
 		}
 	}
 
-	/*@GetMapping("/thread/{threadID}")
-	public String getThread(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		try {
-			ForumThread forumThread = this.forumService.getThread(threadID);
-			model.addAttribute("thread", forumThread);
-			injectEmailAndNameIntoModel(model, employeeDetails);
-
-			return "thread";
-		} catch (IOException e) {
-			return "notFound";
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "internalServerError";
-		}
-	}*/
-
 	@GetMapping("/thread/{threadID}")
 	public String getThreadWithReplies(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
