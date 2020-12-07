@@ -1,7 +1,7 @@
 var parent = document.getElementsByClassName("parent")[0];
 
 var now = new Date();
-var numberOfDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate()+1;
+var numberOfDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
 console.log(numberOfDays);
 var modals = document.getElementsByClassName("modal");
 var btns = document.getElementsByClassName("day-box");
@@ -17,11 +17,4 @@ for(let i = 0; i <= numberOfDays; i++){
 	spans[i].onclick = function () {
 		modals[i].style.display = "none";
 	}
-	
-	window.onclick = function (event) {
-		if (event.target == modals[i]) {
-			modals[i].style.display = "none";
-		}
-	}
-
 }
