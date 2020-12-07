@@ -101,7 +101,7 @@ public class ForumController {
 		}
 	}
 
-	@GetMapping("/thread/new")
+	@GetMapping("/thread/reply/new")
 	public String newReply(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
