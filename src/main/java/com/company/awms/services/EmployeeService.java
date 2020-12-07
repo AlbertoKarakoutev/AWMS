@@ -35,6 +35,20 @@ public class EmployeeService {
         return employee.get();
     }
 
+    public Employee getOwner() throws IOException {
+        Optional<Employee> owner = this.employeeRepo.findByRole("OWNER");
+
+        if(owner.isEmpty()){
+            throw new IOException("Owner does not exist in database!");
+        }
+
+        return owner.get();
+    }
+
+    public List<Employee> getManagers() throws IOException {
+        return this.employeeRepo.findAllByRole("MANAGER");
+    }
+
     public void registerEmployee(Employee newEmployee){
         //TODO:
         //Validation? from Validator Class
