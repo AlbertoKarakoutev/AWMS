@@ -101,6 +101,18 @@ public class ForumController {
 		}
 	}
 
+	@GetMapping("/thread/new")
+	public String newReply(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		try {
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+
+			return "threadReply";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+
 	@PostMapping(value = "/add")
 	public String addThread(@RequestParam String title, @RequestParam String body, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
@@ -116,7 +128,7 @@ public class ForumController {
 		}
 	}
 
-	@PostMapping(value = "/thread/{threadID}/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/thread/{threadID}/add")
 	public String addReply(@RequestParam String body, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.forumService.addNewReply(employeeDetails, body, threadID);
@@ -132,7 +144,7 @@ public class ForumController {
 		}
 	}
 
-	@PutMapping(value = "/thread/{threadID}/answered", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/thread/{threadID}/answered")
 	public String markThreadAsAnswered(@PathVariable String threadID,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
