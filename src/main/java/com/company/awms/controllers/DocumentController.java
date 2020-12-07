@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +47,7 @@ public class DocumentController {
 
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
             model.addAttribute("documents", documents);
-            injectEmailAndNameIntoModel(model, employeeDetails);
+            injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "publicDocuments";
         } catch (IOException e){
@@ -55,13 +58,17 @@ public class DocumentController {
         }
     }
 
-    @ResponseBody
     @GetMapping(value = "/public/download/{documentID}")
-    public ResponseEntity<Doc> downloadPublicDocument(@PathVariable String documentID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
+    public ResponseEntity<Resource> downloadPublicDocument(@PathVariable String documentID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
         try {
             Doc document = this.documentService.downloadPublicDocument(documentID, employeeDetails.getID());
 
-            return new ResponseEntity<>(document, HttpStatus.OK);
+            ByteArrayResource byteArrayResource = new ByteArrayResource(document.getData().getData());
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
+                    .contentLength(document.getData().length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(byteArrayResource);
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (IllegalAccessException e) {
@@ -72,13 +79,17 @@ public class DocumentController {
         }
     }
 
-    @ResponseBody
     @GetMapping(value = "/personal/download/{documentID}")
-    public ResponseEntity<Doc> downloadPersonalDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
+    public ResponseEntity<Resource> downloadPersonalDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
         try {
         	Doc document = documentService.downloadPersonalDocument(documentID, employeeDetails.getID(), ownerID);
 
-            return new ResponseEntity<>(document, HttpStatus.OK);            
+            ByteArrayResource byteArrayResource = new ByteArrayResource(document.getData().getData());
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
+                    .contentLength(document.getData().length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(byteArrayResource);
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (IllegalAccessException e){
@@ -112,7 +123,7 @@ public class DocumentController {
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
             model.addAttribute("documents", documents);
-            injectEmailAndNameIntoModel(model, employeeDetails);
+            injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "publicDocuments";
         } catch (IOException e) {
@@ -130,7 +141,7 @@ public class DocumentController {
             List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeDetails.getID());
 
             model.addAttribute("documents", documents);
-            injectEmailAndNameIntoModel(model, employeeDetails);
+            injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "personalDocuments";
         }  catch (Exception e) {
@@ -155,10 +166,10 @@ public class DocumentController {
         }
     }
 
-    private void injectEmailAndNameIntoModel(Model model, EmployeeDetails employeeDetails){
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
         model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
         model.addAttribute("employeeEmail", employeeDetails.getUsername());
-        model.addAttribute("employeeId", employeeDetails.getID());
+        model.addAttribute("employeeID", employeeDetails.getID());
     }
 
 	public static boolean getActive() {
