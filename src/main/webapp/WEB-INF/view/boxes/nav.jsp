@@ -19,7 +19,7 @@
         <a href="/" title="Dashboard">Dashboard</a>
     </li>
     <li class="vertical-item">
-        <a href="#" title="Contacts">Contacts</a>
+        <a href="/contacts" title="Contacts">Contacts</a>
     </li>
     <li class="vertical-item">
         <a href="/schedule" title="Working Shedule">Working Shedule</a>
