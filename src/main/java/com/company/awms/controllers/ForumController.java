@@ -101,9 +101,10 @@ public class ForumController {
 		}
 	}
 
-	@GetMapping("/thread/reply/new")
-	public String newReply(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	@GetMapping("/thread/{threadID}/reply/new")
+	public String newReply(@RequestParam String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
+			model.addAttribute("threadID", threadID);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "threadReply";
