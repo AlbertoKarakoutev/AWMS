@@ -1,6 +1,8 @@
 package com.company.awms.services;
 
+import com.company.awms.data.employees.Employee;
 import com.company.awms.data.forum.*;
+import com.company.awms.security.EmployeeDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,18 +52,23 @@ public class ForumService {
         return this.forumReplyRepo.findByIssuerID(issuerID);
     }
 
-    public void addNewThread(ForumThread newThread) {
+    public ForumThread addNewThread(EmployeeDetails employeeDetails, String title, String body) {
         //TODO:
         //Validation? from Validator Class
-        newThread.setDateTime(LocalDateTime.now());
-        newThread.setAnswered(false);
+        ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(),
+                false, employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+
         this.forumThreadRepo.save(newThread);
+
+        return newThread;
     }
 
-    public void addNewReply(ForumReply newReply) {
+    public void addNewReply(EmployeeDetails employeeDetails, String body, String threadID) {
         //TODO:
         //Validation? from Validator Class
-        newReply.setDateTime(LocalDateTime.now());
+        ForumReply newReply = new ForumReply(threadID, employeeDetails.getID(), body, LocalDateTime.now(),
+                employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+
         this.forumReplyRepo.save(newReply);
     }
 

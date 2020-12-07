@@ -1,3 +1,4 @@
+<%@page import="java.time.LocalDate"%>
 <nav class="navbar navbar-expand-lg">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon">
@@ -10,8 +11,8 @@
         <div class="small-avatar"></div>
     </div>
     <div class="user-info-container">
-        <div class="user-name">${employee.getFirstName()} ${employee.getLastName()}</div>
-        <div class="user-email">${employee.getEmail()}</div>
+        <div class="user-name">${employeeName}</div>
+        <div class="user-email">${employeeEmail}</div>
     </div>
    </header>
     <ul class="vertical-menu">
@@ -22,7 +23,7 @@
         <a href="/contacts" title="Contacts">Contacts</a>
     </li>
     <li class="vertical-item">
-        <a href="/schedule" title="Working Shedule">Working Shedule</a>
+        <a href="/schedule/?month=<%=LocalDate.now().getMonthValue()%>" title="Working Shedule">Schedule</a>
     </li>
     <li class="vertical-item">
         <div class="dropdown">

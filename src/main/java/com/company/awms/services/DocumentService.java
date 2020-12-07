@@ -114,20 +114,23 @@ public class DocumentService {
 	}
 
 	public Doc downloadPublicDocument(String documentID, String downloaderID) throws IOException, IllegalAccessException {
-		Optional<Doc> documentToDownload = this.documentRepo.findById(documentID);
+		Optional<Doc> documentToDownloadOptional = this.documentRepo.findById(documentID);
 
-		if(documentToDownload.isEmpty()){
+		if(documentToDownloadOptional.isEmpty()){
 			throw new IOException("Document not found!");
 		}
 
-		if(!isAccessible(documentToDownload.get().getDepartment(), documentToDownload.get().getLevel(), downloaderID)
+		Doc documentToDownload = documentToDownloadOptional.get();
+
+		if(!isAccessible(documentToDownload.getDepartment(), documentToDownload.getLevel(), downloaderID)
 				&& !downloaderID.equals(ADMIN_ID)){
 			throw new IllegalAccessException("Document not accessible!");
 		}
 
-		documentToDownload.get().getDownloaderIDs().add(downloaderID);
+		documentToDownload.getDownloaderIDs().add(downloaderID);
+		this.documentRepo.save(documentToDownload);
 
-		return documentToDownload.get();
+		return documentToDownload;
 	}
 
 	//Both Employee and Admin can download a personal document

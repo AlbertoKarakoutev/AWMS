@@ -215,9 +215,11 @@ public class ScheduleService {
 
 	// Get all equivalent access level employees with their schedules, by iterating
 	// over dates up to a month ahead  
-	public List<EmployeeDailyReference>[] viewSchedule(String department, int level) throws IOException {
-		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[LocalDate.now().lengthOfMonth()];
-		for (int i = 1; i < LocalDate.now().lengthOfMonth(); i++) {
+	@SuppressWarnings("unchecked")
+	public List<EmployeeDailyReference>[] viewSchedule(String department, int level, int month) throws IOException {
+		int monthLength = LocalDate.now().withMonth(month).lengthOfMonth();
+		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[monthLength];
+		for (int i = 1; i < monthLength; i++) {
 			LocalDate date = LocalDate.now().withDayOfMonth(i);
 			Day thisDay;
 			Optional<Day> thisDayOptional = scheduleRepo.findByDate(date);

@@ -20,7 +20,7 @@ public class Doc {
 	private String type;
 	private String uploaderID;
 	private LocalDateTime uploadDateTime;
-	private Set<String> downloaderIDs = new HashSet<>();
+	private List<String> downloaderIDs = new ArrayList<>();
 	private double size;
 	
 	public Doc() {
@@ -78,7 +78,7 @@ public class Doc {
 		return this.uploaderID;
 	}
 
-	public Set<String> getDownloaderIDs() {
+	public List<String> getDownloaderIDs() {
 		return this.downloaderIDs;
 	}
 
@@ -114,7 +114,7 @@ public class Doc {
 		this.uploadDateTime = uploadDateTime;
 	}
 
-	public void setDownloaderIDs(Set<String> downloaderIDs) {
+	public void setDownloaderIDs(List<String> downloaderIDs) {
 		this.downloaderIDs = downloaderIDs;
 	}
 
