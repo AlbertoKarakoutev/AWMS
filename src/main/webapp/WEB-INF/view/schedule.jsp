@@ -57,9 +57,11 @@
 		                    		<span class='close'>&times;</span>
 		                    		<div class='work-shifts'>
 		                    			<p class="title">Employees</p>
-				                    	  	<%if(sle[i-offset] != null){
-				                    			for(int j = 0; j < sle[i-offset].size(); j++){
-					                    			out.println(sle[i-offset].get(j).getRefFirstName() + " " + sle[i-offset].get(j).getRefLastName() + " " + sle[i-offset].get(j).getWorkTimeInfo());%>
+				                    	  	<%
+				                    	  		if(sle[i-offset] != null){
+				                    	  			                    	  			                    			for(int j = 0; j < sle[i-offset].size(); j++){
+				                    	  			                    	  				                    			out.println(sle[i-offset].get(j).getFirstName() + " " + sle[i-offset].get(j).getLastName() + " " + sle[i-offset].get(j).getWorkTimeInfo());
+				                    	  	%>
 					                    	</br>
 			                    	
 			                    

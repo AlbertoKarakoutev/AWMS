@@ -148,12 +148,12 @@ public class ScheduleService {
 		receiverDay = receiverDayOptional.get();
 
 		for (EmployeeDailyReference edr : requestorDay.getEmployees()) {
-			if (edr.getRefNationalID().equals(requestorNationalID)) {
+			if (edr.getNationalID().equals(requestorNationalID)) {
 				requestor = edr;
 			}
 		}
 		for (EmployeeDailyReference edr : receiverDay.getEmployees()) {
-			if (edr.getRefNationalID().equals(receiverNationalID)) {
+			if (edr.getNationalID().equals(receiverNationalID)) {
 				receiver = edr;
 			}
 		}
@@ -190,7 +190,7 @@ public class ScheduleService {
 
 		Task task;
 		for (EmployeeDailyReference edr : currentDay.getEmployees()) {
-			if (edr.getRefNationalID().equals(receiverNationalID)) {
+			if (edr.getNationalID().equals(receiverNationalID)) {
 				task = createTask(receiverNationalID, currentDay, "Test task title", "Test task body");
 				System.out.println(currentDay);
 				if (edr.getTasks() != null) {
@@ -214,7 +214,7 @@ public class ScheduleService {
 	// Get all equivalent access level employees with their schedules, by iterating
 	// over dates up to a month ahead
 	@SuppressWarnings("unchecked")
-	public List<EmployeeDailyReference>[] viewSchedule(String department, int level, int month) throws IOException {
+	public List<EmployeeDailyReference>[] viewSchedule(Employee viewer, int month) throws IOException {
 		int monthLength = LocalDate.now().withMonth(month).lengthOfMonth();
 		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[monthLength];
 		for (int i = 1; i < monthLength; i++) {
@@ -225,12 +225,21 @@ public class ScheduleService {
 			}
 
 			thisDay = thisDayOptional.get();
-
+			if(thisDay.getEmployees().isEmpty()) {
+				continue;
+			}
 			for (int j = 0; j < thisDay.getEmployees().size(); j++) {
-				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(j).getRefNationalID());
+				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(j).getNationalID());
+				System.out.println(thisDay.getEmployees().get(j).getNationalID());
 				if (employeeOptional.isEmpty()) {
 					throw new IOException("Invalid nationalID");
-				} else if (employeeOptional.get().getDepartment().equals(department) && employeeOptional.get().getLevel() == level) {
+				} else if (employeeOptional.get().getDepartment().equals(viewer.getDepartment()) && employeeOptional.get().getLevel() == viewer.getLevel()) {
+					if (!employeeOptional.get().getNationalID().equals(viewer.getNationalID())) {
+						sameLevelEmployees[i] = thisDay.getEmployees();
+						continue;
+					}
+				}
+				if(viewer.getRole().equals("ADMIN")){
 					sameLevelEmployees[i] = thisDay.getEmployees();
 				}
 			}
@@ -255,13 +264,13 @@ public class ScheduleService {
 			EmployeeDailyReference thisEDR = null;
 
 			edrLoop: for (EmployeeDailyReference edr : taskDay.getEmployees()) {
-				if (edr.getRefNationalID().equals(employee.getNationalID())) {
+				if (edr.getNationalID().equals(employee.getNationalID())) {
 					thisEDR = edr;
 					break edrLoop;
 				}
 			}
-			if(thisEDR!=null) {
-				if(thisEDR.getTasks()!=null) {
+			if (thisEDR != null) {
+				if (thisEDR.getTasks() != null) {
 					tasks[i] = thisEDR.getTasks();
 				}
 			}
@@ -485,7 +494,7 @@ public class ScheduleService {
 					return false;
 				}
 				for (EmployeeDailyReference edrl : thisDay.get().getEmployees()) {
-					if (edrl.getRefNationalID().equals(employee.getNationalID())) {
+					if (edrl.getNationalID().equals(employee.getNationalID())) {
 						lastSevenDays[(date.getDayOfMonth() - (lengthOfPreviousMonth - 7)) - 1] = true;
 						continue workWeekLoop;
 					}

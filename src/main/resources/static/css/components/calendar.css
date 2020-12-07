@@ -45,13 +45,9 @@
 	background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal:active {
-	box-shadow: 2px black;
-	border: none;
-}
-
 .modal-content {
-	display:block;
+	display:flex;
+	flex-wrap:nowrap;
 	background-color: #fefefe;
 	margin: 15% auto;
 	padding: 20px;
@@ -60,25 +56,19 @@
 }
 
 .work-shifts {
-	width:auto;
-	height:90%;
-	display:inline-block;
 	background-color: gray;
 	margin:5px;
 	border:2px solid dark-gray;
 	border-radius: 2px;
-	vertical-align:top;
+	flex-grow:1;
 }
 
 .tasks {
-	width:47%;
-	height:90%;
-	display:inline-block;
 	background-color: gray;
 	margin:5px;
 	border:2px solid dark-gray;
 	border-radius:2px;
-	vertical-align:top;
+	flex-grow:1;
 }
 .title{
 	text-align:center;

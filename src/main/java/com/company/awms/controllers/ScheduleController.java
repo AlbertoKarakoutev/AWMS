@@ -65,7 +65,7 @@ public class ScheduleController {
 		try {
 			
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
-			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee.getDepartment(), authenticatedEmployee.getLevel(),month);
+			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee,month);
 			List<Task>[] tasks = this.scheduleService.viewTasks(authenticatedEmployee, month);
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 			model.addAttribute("month", month);
@@ -74,6 +74,7 @@ public class ScheduleController {
 
 			return "schedule";
 		} catch (IOException e) {
+			e.printStackTrace();
 			return "badRequest";
 		} catch (Exception e){
 			e.printStackTrace();

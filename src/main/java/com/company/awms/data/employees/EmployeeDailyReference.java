@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.company.awms.data.schedule.Task;
 
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
@@ -16,9 +14,9 @@ public class EmployeeDailyReference {
 
 	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
 	private LocalTime[] workTime;
-	private String refFirstName;
-	private String refLastName;
-	private String refNationalID;
+	private String firstName;
+	private String lastName;
+	private String nationalID;
 	private List<Task> tasks = new ArrayList<>();
 	private LocalDate date;
 
@@ -30,15 +28,15 @@ public class EmployeeDailyReference {
 	}*/
 
 	public EmployeeDailyReference(EmployeeRepo employeeRepo, String nationalID) throws IOException {
-		this.refNationalID = nationalID;
+		this.nationalID = nationalID;
 
 		Optional<Employee> employee = employeeRepo.findByNationalID(nationalID);
 
 		if(employee.isEmpty()) {
 			throw new IOException("Employee not found!");
 		} else {
-			this.refFirstName = employee.get().getFirstName();
-			this.refLastName = employee.get().getLastName();
+			this.firstName = employee.get().getFirstName();
+			this.lastName = employee.get().getLastName();
 			this.workTime = new LocalTime[2];
 		}
 	}
@@ -47,8 +45,8 @@ public class EmployeeDailyReference {
 		tasks.add(task);
 	}
 	
-	public String getRefNationalID() {
-		return this.refNationalID;
+	public String getNationalID() {
+		return this.nationalID;
 	}
 	
 	public String getWorkTimeInfo() {
@@ -59,12 +57,12 @@ public class EmployeeDailyReference {
 		return this.workTime;
 	}
 
-	public String getRefFirstName() {
-		return refFirstName;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public String getRefLastName() {
-		return refLastName;
+	public String getLastName() {
+		return lastName;
 	}
 
 	public LocalDate getDate() {
@@ -75,12 +73,12 @@ public class EmployeeDailyReference {
 		return tasks;
 	}
 
-	public void setRefFirstName(String refFirstName) {
-		this.refFirstName = refFirstName;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 	
-	public void setRefLastName(String refLastName) {
-		this.refLastName = refLastName;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 	
 	public void setWorkTime(LocalTime[] workTime) {
