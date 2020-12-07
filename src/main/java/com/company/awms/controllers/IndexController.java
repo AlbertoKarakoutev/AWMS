@@ -29,10 +29,17 @@ public class IndexController {
             Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
 
             model.addAttribute("employee", employee);
+            injectLoggedInEmployeeInfo(model, employeeDetails);
             return "index";
         } catch (IOException e) {
             e.printStackTrace();
             return "notFound";
         }
+    }
+
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+        model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+        model.addAttribute("employeeEmail", employeeDetails.getUsername());
+        model.addAttribute("employeeID", employeeDetails.getID());
     }
 }
