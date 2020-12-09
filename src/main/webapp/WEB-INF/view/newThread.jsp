@@ -31,12 +31,12 @@
                     <form method="POST" action="/forum/add">
                         <div class="form-group">
                             <label for="exampleInputEmail1">Тема</label>
-                            <input type="text" name="thread_title" class="form-control" id="threadTitle" aria-describedby="threadTitle" placeholder="Enter Title" required>
+                            <input type="text" name="title" class="form-control" id="threadTitle" aria-describedby="threadTitle" placeholder="Enter Title" required>
                             <small id="threadTitleHelp" class="form-text text-muted">Заглавие на темата</small>
                         </div>
                         <div class="form-group">
                             <label for="threadContent">Текст</label>
-                            <textarea name="thread_content" class="form-control" id="threadContent" rows="8" required></textarea>
+                            <textarea name="body" class="form-control" id="threadContent" rows="8" required></textarea>
                             <small id="threadContentHelp" class="form-text text-muted">Тема</small>
                         </div>
                         <button type="submit" class="btn btn-dark">Създай</button>
