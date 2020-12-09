@@ -50,7 +50,7 @@
                             </c:if>
                         </div>
                         <div class="mt-2 text-right">
-                            <c:if test="${thread.getIssuerID() != employeeId}">
+                            <c:if test="${thread.getIssuerID() == employeeID}">
                                 <a href="/forum/thread/${thread.getID()}/edit" class="btn btn-dark btn-md">
                                     <i class="fas fa-edit"></i> Редактирай
                                 </a>

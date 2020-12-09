@@ -24,12 +24,15 @@
                 <%@include file="boxes/header.jsp" %>
             </header>
 
-
             <section class="content">
-                <div class="container text-center">
-                    <h2 class="contacts mb-5 ">Contacts</h2>
+                <div class="p-4">
+                    <header class="py-3">
+                        <h1 class="ty-page-title font-italic">Contacts</h1>
+                    </header>
+                    <div class="container">
                     <div class="row">
-                        <div class="col-md-4 mb-4 card-body">
+                        <div class="col-md-4">
+                        <div class="card-body">
                             <div class="border rounded p-4 h-100">
                                 <div class="name-contact">
                                     <i class="fas fa-signature"> Name:</i>
@@ -41,8 +44,10 @@
                                     <i class="fas fa-phone-alt"> Telephone number:</i>
                                 </div>
                             </div>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-4 card-body" >
+                        <div class="col-md-4">
+                           <div class="card-body">
                             <div class="border rounded p-4 h-100">
                                 <div class="name-contact">
                                     <i class="fas fa-signature"> Name:</i>
@@ -54,8 +59,10 @@
                                     <i class="fas fa-phone-alt"> Telephone number:</i>
                                 </div>
                             </div>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-4 card-body" >
+                        <div class="col-md-4">
+                          <div class="card-body">
                             <div class="border rounded p-4 h-100">
                                 <div class="name-contact">
                                     <i class="fas fa-signature"> Name:</i>
@@ -67,8 +74,10 @@
                                     <i class="fas fa-phone-alt"> Telephone number:</i>
                                 </div>
                             </div>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-4 card-body" >
+                        <div class="col-md-4">
+                          <div class="card-body">
                             <div class="border rounded p-4 h-100">
                                 <div class="name-contact">
                                     <i class="fas fa-signature"> Name:</i>
@@ -80,8 +89,10 @@
                                     <i class="fas fa-phone-alt"> Telephone number:</i>
                                 </div>
                             </div>
+                          </div>
                         </div>
-                        <div class="col-md-4 mb-4 card-body" >
+                        <div class="col-md-4">
+                          <div class="card-body">
                             <div class="border rounded p-4 h-100">
                                 <div class="name-contact">
                                     <i class="fas fa-signature"> Name:</i>
@@ -93,8 +104,10 @@
                                     <i class="fas fa-phone-alt"> Telephone number:</i>
                                 </div>
                             </div>
+                          </div>
                         </div>
-                        <div class="col-md-4 mb-4 card-body" >
+                        <div class="col-md-4">
+                          <div class="card-body">
                             <div class="border rounded p-4 h-100">
                                 <div class="name-contact">
                                     <i class="fas fa-signature"> Name:</i>
@@ -105,10 +118,12 @@
                                 <div class="telephone-num">
                                     <i class="fas fa-phone-alt"> Telephone number:</i>
                                 </div>
+                            </div>
                             </div>
                         </div>
 
                     </div>
+                </div>
                 </div>
             </section>
 
