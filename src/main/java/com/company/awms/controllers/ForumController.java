@@ -43,7 +43,8 @@ public class ForumController {
 	}
 
 	@GetMapping("/thread/{threadID}")
-	public String getThreadWithReplies(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getThreadWithReplies(@PathVariable String threadID,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
 			model.addAttribute("thread", threadAndReplies.getForumThread());
@@ -61,7 +62,8 @@ public class ForumController {
 
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/threads/{employeeID}")
-	public String getAllThreadsFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getAllThreadsFromEmployee(@PathVariable String employeeID,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreadsFromEmployee(employeeID);
 			model.addAttribute("threads", threads);
@@ -78,7 +80,7 @@ public class ForumController {
 	public String newThread(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			
+
 			return "newThread";
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -88,7 +90,8 @@ public class ForumController {
 
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/replies/{employeeID}")
-	public String getAllRepliesFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getAllRepliesFromEmployee(@PathVariable String employeeID,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<ForumReply> replies = this.forumService.getAllRepliesFromEmployee(employeeID);
 			model.addAttribute("replies", replies);
@@ -102,12 +105,18 @@ public class ForumController {
 	}
 
 	@GetMapping("/thread/{threadID}/reply/new")
-	public String newReply(@RequestParam String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String newReply(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails,
+			Model model) {
 		try {
+			ForumThread thread = this.forumService.getThread(threadID);
+
 			model.addAttribute("threadID", threadID);
+			model.addAttribute("threadTitle", thread.getTitle());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "threadReply";
+		} catch (IOException e) {
+			return "notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "internalServerError";
@@ -115,7 +124,8 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/add")
-	public String addThread(@RequestParam String title, @RequestParam String body, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String addThread(@RequestParam String title, @RequestParam String body,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.addNewThread(employeeDetails, title, body);
 
@@ -130,7 +140,8 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/thread/{threadID}/add")
-	public String addReply(@RequestParam String body, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String addReply(@RequestParam String body, @PathVariable String threadID,
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.forumService.addNewReply(employeeDetails, body, threadID);
 			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID);
@@ -192,7 +203,7 @@ public class ForumController {
 		}
 	}
 
-	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
 		model.addAttribute("employeeID", employeeDetails.getID());

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,9 +34,9 @@
                     </div>
                     <div class="w-100">
                         <div class="card w-100">
-                            <c:if test="${not empty thread.getIssuerID()}">
+                            <c:if test="${not empty thread.getIssuerName()}">
                                 <div class="card-header">
-                                    <p><b>Създадена от:</b> ${thread.getIssuerID()}</p>
+                                    <p><b>Създадена от:</b> ${thread.getIssuerName()}</p>
                                 </div>
                             </c:if>
                             <div class="card-body">
@@ -53,10 +54,28 @@
                                     <i class="fas fa-edit"></i> Редактирай
                                 </a>
                             </c:if>
-                            <a class="btn btn-dark btn-md" href="#" title="reply">
+                            <a class="btn btn-dark btn-md" href="/forum/thread/${thread.getID()}/reply/new" title="reply">
                                 <i class="fas fa-reply"></i> Отговори
                             </a>
                         </div>
+                        <br />
+                        <c:forEach items="${replies}" var="reply">
+                            <div class="card w-100 my-2">
+                                <c:if test="${not empty reply.getIssuerName()}">
+                                    <div class="card-header">
+                                        <p><b>Отговор от:</b> ${reply.getIssuerName()}</p>
+                                    </div>
+                                </c:if>
+                                <div class="card-body">
+                                    <c:out value="${reply.getBody()}" escapeXml="false" />
+                                </div>
+                                <c:if test="${not empty reply.getDateTime()}">
+                                    <div class="card-footer text-muted">
+                                        <p><b>Отговорено на:</b> ${reply.getDateTime()}</p>
+                                    </div>
+                                </c:if>
+                            </div>
+                        </c:forEach>
                     </div>
                 </div>
                 </div>

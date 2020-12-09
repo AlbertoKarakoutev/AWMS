@@ -30,6 +30,7 @@
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" role="button"
                 aria-haspopup="true" aria-expanded="false" title="Forum">Forum</a>
             <div class="dropdown-menu">
+                <a class="dropdown-item pl-4" title="Module" href="/forum">All topics</a>
                 <a class="dropdown-item pl-4" title="Module" href="/forum">My topics</a>
                 <a class="dropdown-item pl-4" title="Module" href="#">Answered</a>
                 <a class="dropdown-item pl-4" title="Module" href="#">Unanswered</a>
