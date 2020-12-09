@@ -49,6 +49,20 @@ public class ForumService {
         return allThreads;
     }
 
+    public List<ForumThread> getAllAnsweredThreads() {
+        List<ForumThread> allThreads = getAllThreads();
+        allThreads.removeIf(t -> !t.getAnswered());
+
+        return allThreads;
+    }
+
+    public List<ForumThread> getAllUnansweredThreads() {
+        List<ForumThread> allThreads = getAllThreads();
+        allThreads.removeIf(ForumThread::getAnswered);
+
+        return allThreads;
+    }
+
     public List<ForumThread> getAllThreadsFromEmployee(String issuerID) {
         List<ForumThread> employeeThreads = this.forumThreadRepo.findByIssuerID(issuerID);
         employeeThreads.sort(new ForumComparator());
