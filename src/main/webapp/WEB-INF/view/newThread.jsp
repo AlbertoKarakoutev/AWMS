@@ -41,6 +41,9 @@
                             </textarea>
                             <small id="threadContentHelp" class="form-text text-muted">Тема</small>
                         </div>
+                        <div class="form-group">
+                            <input type="hidden" value="${thread.getID()}" name="oldThreadID"/>
+                        </div>
                         <button type="submit" class="btn btn-dark">${thread != null ? "Редактирай": "Създай"}</button>
                     </form>
                 </div>
