@@ -25,21 +25,23 @@
             <section class="content">
                 <div class="p-4">
                 <header class="py-3">
-                    <h1 class="ty-page-title">Създай нова тема</h1>
+                    <h1 class="ty-page-title">${thread != null ? "Редактирай темата" : "Създай нова тема"}</h1>
                 </header>
                 <div class="my-3">
-                    <form method="POST" action="/forum/add">
+                    <form method="POST" action="${thread != null ? String.format("/forum/thread/%s/edit", thread.getID()) : '/forum/add'}">
                         <div class="form-group">
                             <label for="exampleInputEmail1">Тема</label>
-                            <input type="text" name="thread_title" class="form-control" id="threadTitle" aria-describedby="threadTitle" placeholder="Enter Title" required>
+                            <input type="text" name="title" class="form-control" value="${thread != null ? thread.getTitle() : null}" id="threadTitle" aria-describedby="threadTitle" placeholder="Enter Title" required>
                             <small id="threadTitleHelp" class="form-text text-muted">Заглавие на темата</small>
                         </div>
                         <div class="form-group">
                             <label for="threadContent">Текст</label>
-                            <textarea name="thread_content" class="form-control" id="threadContent" rows="8" required></textarea>
+                            <textarea name="body" class="form-control" id="threadContent" rows="8" required>
+                                ${thread != null ? thread.getBody() : null}
+                            </textarea>
                             <small id="threadContentHelp" class="form-text text-muted">Тема</small>
                         </div>
-                        <button type="submit" class="btn btn-dark">Създай</button>
+                        <button type="submit" class="btn btn-dark">${thread != null ? "Редактирай": "Създай"}</button>
                     </form>
                 </div>
                 </div>

@@ -104,6 +104,26 @@ public class ForumController {
 		}
 	}
 
+	// Forum edit thread
+	@GetMapping("/thread/{threadID}/edit")
+	public String getThreadEdit(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails,
+			Model model) {
+		try {
+			ForumThread thread = this.forumService.getThread(threadID);
+
+			model.addAttribute("thread", thread);
+
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+
+			return "newThread";
+		} catch (IOException e) {
+			return "notFound";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+
 	@GetMapping("/thread/{threadID}/reply/new")
 	public String newReply(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails,
 			Model model) {
