@@ -173,10 +173,9 @@ public class ForumController {
 		}
 	}
 
-	@PutMapping(value = "/thread/{oldThreadID}/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String editThread(@RequestBody ForumThread newForumThread, @PathVariable String oldThreadID,
+	@PostMapping(value = "/thread/{oldThreadID}/edit")
+	public String editThread(@PathVariable String title, @PathVariable String body, @PathVariable String oldThreadID,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		newForumThread.setIssuerID(employeeDetails.getID());
 		try {
 			ForumThread oldThread = this.forumService.getThread(oldThreadID);
 
@@ -184,8 +183,11 @@ public class ForumController {
 				return "notAuthorized";
 			}
 
-			oldThread = this.forumService.editThread(newForumThread, oldThread);
+			oldThread = this.forumService.editThread(body, title, oldThread);
+
+			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(oldThreadID);
 			model.addAttribute("thread", oldThread);
+			model.addAttribute("replies", threadAndReplies.getForumReplies());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "thread";

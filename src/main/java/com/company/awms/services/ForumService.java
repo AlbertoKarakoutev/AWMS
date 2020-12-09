@@ -78,12 +78,12 @@ public class ForumService {
         this.forumThreadRepo.save(forumThread);
     }
 
-    public ForumThread editThread(ForumThread newForumThread, ForumThread oldThread) {
+    public ForumThread editThread(String body, String title, ForumThread oldThread) {
         //TODO:
         //Validation? from Validator Class
         //We don't update the issuerID, time and isAnswered because they are presumed to be the same.
-        oldThread.setBody(newForumThread.getBody());
-        oldThread.setTitle(newForumThread.getTitle());
+        oldThread.setBody(body);
+        oldThread.setTitle(title);
 
         this.forumThreadRepo.save(oldThread);
 
