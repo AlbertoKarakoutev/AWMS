@@ -69,7 +69,7 @@ public class ForumController {
 			model.addAttribute("threads", threads);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
-			return "threadsFromEmployee";
+			return "forum";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "internalServerError";

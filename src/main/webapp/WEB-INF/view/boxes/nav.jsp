@@ -44,7 +44,7 @@
     </li>   
     </ul>
     <footer class="button">
-        <a href="/login" type="button" class="btn sign-out-btn" title="Sing out" >SING OUT</a>
+        <a href="/logout" type="button" class="btn sign-out-btn" title="Sing out" >SING OUT</a>
     </footer>
   </div>
 </nav>
