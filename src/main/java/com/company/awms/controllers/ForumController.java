@@ -104,10 +104,15 @@ public class ForumController {
 	@GetMapping("/thread/{threadID}/reply/new")
 	public String newReply(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
+			ForumThread thread = this.forumService.getThread(threadID);
+
 			model.addAttribute("threadID", threadID);
+			model.addAttribute("threadTitle", thread.getTitle());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "threadReply";
+		} catch (IOException e){
+			return "notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "internalServerError";
