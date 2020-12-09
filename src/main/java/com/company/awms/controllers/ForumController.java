@@ -200,7 +200,7 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/thread/{oldThreadID}/edit")
-	public String editThread(@PathVariable String title, @PathVariable String body, @PathVariable String oldThreadID,
+	public String editThread(@RequestParam String title, @RequestParam String body, @PathVariable String oldThreadID,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread oldThread = this.forumService.getThread(oldThreadID);
