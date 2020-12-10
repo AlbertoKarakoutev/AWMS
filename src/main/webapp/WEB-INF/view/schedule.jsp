@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%> 
-<%@page import="com.company.awms.data.employees.EmployeeDailyReference"%> 
+<%@page import="com.company.awms.data.employees.EmployeeDailyReference"%>
+<%@page import="com.company.awms.data.schedule.Task"%>  
 <%@page import="java.time.LocalDate"%> 
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -44,36 +45,47 @@
                     <div class="sunday">Sunday</div>
                     
                   <%List<EmployeeDailyReference>[] sle = (List<EmployeeDailyReference>[])request.getAttribute("sameLevelEmployees");
-                   	LocalDate thisMonth = LocalDate.now().withMonth((int)request.getAttribute("month"));
+                   	List<Task>[] tasks = (List<Task>[])request.getAttribute("tasks");
+                  	LocalDate thisMonth = LocalDate.now().withMonth((int)request.getAttribute("month"));
                     int offset = thisMonth.withDayOfMonth(1).getDayOfWeek().getValue()-1;
                    	for(int i = 0; i <= 34; i++){  
                    		if(i>=offset && i <= thisMonth.lengthOfMonth()){%>
                    	
-                    <button class='day-box'></button>				
-                    <div class='modal'>
-                    	<div class='modal-content'>
-                    		<span class='close'>&times;</span>
-                    		<div class='work-shifts'>
-                    			<p class="title">Employees</p>
-                    	  <%if(sle[i-offset] != null){
-                    			for(int j = 0; j < sle[i-offset].size(); j++){
-	                    			out.println(sle[i-offset].get(j).getRefFirstName() + " " + sle[i-offset].get(j).getRefLastName() + " " + sle[i-offset].get(j).getWorkTimeInfo());%>
-	                    	</br>
-	                    	
-	                      <%}
-                    	}%>
-                    		
-                    		</div>
-                    		<div class="tasks">
-                    			<p class="title">Tasks</p>
-                    		
-                    		</div>
-                    	</div>
-                    </div>
+		                    <button class='day-box'></button>				
+		                    <div class='modal'>
+		                    	<div class='modal-content'>
+		                    		<span class='close'>&times;</span>
+		                    		<div class='work-shifts'>
+		                    			<p class="title">Employees</p>
+				                    	  	<%
+				                    	  		if(sle[i-offset] != null){
+				                    	  			                    	  			                    			for(int j = 0; j < sle[i-offset].size(); j++){
+				                    	  			                    	  				                    			out.println(sle[i-offset].get(j).getFirstName() + " " + sle[i-offset].get(j).getLastName() + " " + sle[i-offset].get(j).getWorkTimeInfo());
+				                    	  	%>
+					                    	</br>
+			                    	
+			                    
+		                    	      			<%}
+		                    	      		}%>
+		                    		</div>
+		                      		  
+		                      	   	<%if(tasks[i-1] != null){%>
+		                    			<div class="tasks">
+			                    			<p class="title">Tasks</p>
+			                    			<c:set var="day" value="init"/>
+			                    		   	<%pageContext.setAttribute("day", i-1);%>
+			                    			<c:forEach items="${tasks[day]}" var="task">
+												<c:out value="${task.getTaskTitle()}"/>
+											</c:forEach>
+		                    			</div>
+		                      	  	<%}%>
+		                    	 	
+		                    	</div>
+		                    </div>
 					
 					  <%}else{%>
 						
-					<div class="empty-day"></div>		
+							<div class="empty-day"></div>		
 						
 					  <%}
                     }%>

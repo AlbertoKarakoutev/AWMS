@@ -1,10 +1,7 @@
 package com.company.awms.controllers;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-
-import javax.servlet.ServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
+import com.company.awms.data.schedule.Task;
 import com.company.awms.security.EmployeeDetails;
 import com.company.awms.services.EmployeeService;
 import com.company.awms.services.ScheduleService;
@@ -52,27 +50,31 @@ public class ScheduleController {
 	@ResponseBody
 	@GetMapping("/task/add")
 	public ResponseEntity<String> addTask(@RequestParam String taskDay, @RequestParam String receiverNationalID) {
-		boolean success = scheduleService.addTask(taskDay, receiverNationalID);
-		if (success) {
+		try {
+			scheduleService.addTask(taskDay, receiverNationalID);
 			return new ResponseEntity<>("Added task for " + receiverNationalID, HttpStatus.OK);
-		} else {
+		}catch(Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>("Error adding task for " + receiverNationalID, HttpStatus.BAD_REQUEST);
 		}
 	}
-
+	
 	@GetMapping("")
 	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam int month) {
 		
 		try {
 			
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
-			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee.getDepartment(), authenticatedEmployee.getLevel(),month);
+			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee,month);
+			List<Task>[] tasks = this.scheduleService.viewTasks(authenticatedEmployee, month);
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 			model.addAttribute("month", month);
+			model.addAttribute("tasks", tasks);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "schedule";
 		} catch (IOException e) {
+			e.printStackTrace();
 			return "badRequest";
 		} catch (Exception e){
 			e.printStackTrace();
