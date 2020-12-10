@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
 import com.company.awms.data.employees.EmployeeRepo;
+import com.company.awms.data.employees.Notification;
 import com.company.awms.data.schedule.Day;
 import com.company.awms.data.schedule.ScheduleRepo;
 import com.company.awms.data.schedule.Task;
@@ -123,33 +124,39 @@ public class ScheduleService {
 		return true;
 	}
 
-	public boolean swapEmployees(String requestorNationalID, String receiverNationalID, String requestorDate, String receiverDate) {
+	public void swapEmployees(String requesterNationalID, String receiverNationalID, String requesterDateParam, String receiverDateParam) {
 
-		EmployeeDailyReference requestor = null;
+		EmployeeDailyReference requester = null;
 		EmployeeDailyReference receiver = null;
-		LocalDate thisRequestorDate = LocalDate.parse(requestorDate);
-		LocalDate thisReceiverDate = LocalDate.parse(receiverDate);
-		Optional<Day> requestorDayOptional = scheduleRepo.findByDate(thisRequestorDate.withDayOfMonth(thisRequestorDate.getDayOfMonth() + 1));
-		Optional<Day> receiverDayOptional = scheduleRepo.findByDate(thisReceiverDate.withDayOfMonth(thisReceiverDate.getDayOfMonth() + 1));
+		LocalDate requesterDate, receiverDate;
+		try {
+			requesterDate = LocalDate.parse(requesterDateParam);
+			receiverDate = LocalDate.parse(receiverDateParam);
+		} catch (Exception e) {
+			System.err.println("Date ot recognised!");
+			return;
+		}
+		Optional<Day> requesterDayOptional = scheduleRepo.findByDate(requesterDate.withDayOfMonth(requesterDate.getDayOfMonth()));
+		Optional<Day> receiverDayOptional = scheduleRepo.findByDate(receiverDate.withDayOfMonth(receiverDate.getDayOfMonth()));
 
-		Day requestorDay;
+		Day requesterDay;
 		Day receiverDay;
 
-		if (requestorDayOptional.isEmpty()) {
+		if (requesterDayOptional.isEmpty()) {
 			System.err.println("Invalid date!");
-			return false;
+			return;
 		}
-		requestorDay = requestorDayOptional.get();
+		requesterDay = requesterDayOptional.get();
 
 		if (receiverDayOptional.isEmpty()) {
 			System.err.println("Invalid date!");
-			return false;
+			return;
 		}
 		receiverDay = receiverDayOptional.get();
 
-		for (EmployeeDailyReference edr : requestorDay.getEmployees()) {
-			if (edr.getNationalID().equals(requestorNationalID)) {
-				requestor = edr;
+		for (EmployeeDailyReference edr : requesterDay.getEmployees()) {
+			if (edr.getNationalID().equals(requesterNationalID)) {
+				requester = edr;
 			}
 		}
 		for (EmployeeDailyReference edr : receiverDay.getEmployees()) {
@@ -158,23 +165,56 @@ public class ScheduleService {
 			}
 		}
 
-		if (requestor != null && receiver != null) {
-			requestorDay.getEmployees().remove(requestor);
+		if (requester != null && receiver != null) {
+			requesterDay.getEmployees().remove(requester);
 			receiverDay.getEmployees().remove(receiver);
 
-			LocalTime[] workTimeTemp = requestor.getWorkTime();
-			requestor.setWorkTime(receiver.getWorkTime());
+			LocalTime[] workTimeTemp = requester.getWorkTime();
+			requester.setWorkTime(receiver.getWorkTime());
 			receiver.setWorkTime(workTimeTemp);
 
-			requestorDay.getEmployees().add(receiver);
-			receiverDay.getEmployees().add(requestor);
+			requesterDay.getEmployees().add(receiver);
+			receiverDay.getEmployees().add(requester);
 
-			scheduleRepo.save(requestorDay);
+			scheduleRepo.save(requesterDay);
 			scheduleRepo.save(receiverDay);
-			return true;
 		} else {
-			return false;
+			System.err.println("No such EDR in those days");
 		}
+	}
+
+	public void swapRequest(String requesterID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException {
+		List<Object> notificationData = new ArrayList<Object>();
+
+		LocalDate requesterDate, receiverDate;
+		try {
+			requesterDate = LocalDate.parse(requesterDateParam);
+			receiverDate = LocalDate.parse(receiverDateParam);
+		} catch (Exception e) {
+			System.err.println("Date ot recognised!");
+			return;
+		}
+
+		Optional<Employee> requesterOptional = employeeRepo.findById(requesterID);
+		if (requesterOptional.isEmpty()) {
+			throw new IOException("Requester not found!");
+		}
+		Employee requester = requesterOptional.get();
+
+		Optional<Employee> receiverOptional = employeeRepo.findByNationalID(receiverNationalID);
+		if (receiverOptional.isEmpty()) {
+			throw new IOException("Requester not found!");
+		}
+		Employee receiver = receiverOptional.get();
+
+		notificationData.add("swap-request");
+		notificationData.add(requesterID);
+		notificationData.add(requesterDate);
+		notificationData.add(receiverDate);
+		String message = "You have received a request from " + requester.getFirstName() + " " + requester.getLastName() + " to swap his/her " + requesterDate + " shift with your " + receiverDate + " shift.";
+		receiver.getNotifications().add(new Notification(message, notificationData));
+		employeeRepo.save(receiver);
+
 	}
 
 	public void addTask(String taskDay, String receiverNationalID) {
@@ -225,21 +265,28 @@ public class ScheduleService {
 			}
 
 			thisDay = thisDayOptional.get();
-			if(thisDay.getEmployees().isEmpty()) {
+			if (thisDay.getEmployees().isEmpty()) {
 				continue;
 			}
-			for (int j = 0; j < thisDay.getEmployees().size(); j++) {
-				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(j).getNationalID());
-				if (employeeOptional.isEmpty()) {
-					throw new IOException("Invalid nationalID");
-				} else if (employeeOptional.get().getDepartment().equals(viewer.getDepartment()) && employeeOptional.get().getLevel() == viewer.getLevel()) {
-					if (!employeeOptional.get().getNationalID().equals(viewer.getNationalID())) {
-						sameLevelEmployees[i] = thisDay.getEmployees();
-						continue;
+			if (viewer.getRole().equals("ADMIN")) {
+				sameLevelEmployees[i] = thisDay.getEmployees();
+				continue;
+			} else {
+				for (int j = 0; j < thisDay.getEmployees().size(); j++) {
+					Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(j).getNationalID());
+					if (employeeOptional.isEmpty()) {
+						throw new IOException("Invalid nationalID");
+					} else if (employeeOptional.get().getAccessLevel().equals(viewer.getAccessLevel())) {
+						if (!employeeOptional.get().getNationalID().equals(viewer.getNationalID())) {
+							if(sameLevelEmployees[i]!=null) {
+								sameLevelEmployees[i].add(thisDay.getEmployees().get(j));
+							}else {
+								List<EmployeeDailyReference> singleEDR = new ArrayList<EmployeeDailyReference>();
+								singleEDR.add(thisDay.getEmployees().get(j));
+								sameLevelEmployees[i] = singleEDR;
+							}
+						}
 					}
-				}
-				if(viewer.getRole().equals("ADMIN")){
-					sameLevelEmployees[i] = thisDay.getEmployees();
 				}
 			}
 		}
@@ -249,7 +296,6 @@ public class ScheduleService {
 	@SuppressWarnings("unchecked")
 	public List<Task>[] viewTasks(Employee employee, YearMonth month) throws IOException {
 		int monthLength = LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).lengthOfMonth();
-		System.out.println(month);
 		List<Task>[] tasks = new ArrayList[monthLength];
 		for (int i = 0; i < monthLength; i++) {
 			Day taskDay;

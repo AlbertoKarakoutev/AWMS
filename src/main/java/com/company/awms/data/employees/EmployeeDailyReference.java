@@ -12,7 +12,6 @@ import com.company.awms.data.schedule.Task;
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
 public class EmployeeDailyReference {
 
-	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
 	private LocalTime[] workTime;
 	private String firstName;
 	private String lastName;

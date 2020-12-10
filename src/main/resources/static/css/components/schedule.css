@@ -91,6 +91,18 @@
 	cursor: pointer;
 }
 
+.swap{
+	display:flex;
+	border:none;
+	background-color:var(--secondary-color);
+	transition:background-color 0.2s, scale 0.2s;
+}
+
+.swap:hover{
+	scale:1.05;
+	background-color:#aaaaaa;
+}
+
 .arrow{
 	position:relative;
 	text-align:center;
@@ -103,14 +115,14 @@
 	color:white;
 	width:100px;
 	height:60px;
+	transition:background 0.2s;
 }
 
 .arrow:hover{
 	text-decoration:none;
 	cursor:pointer;
 	color:white;
-	background:#555555;
-	transition-property:background;
+	background:#444444;
 }
 
 .monday {
