@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,42 +49,60 @@ public class AdminController {
     }
 
     //Employee methods
-    @GetMapping("/employee")
-    public ResponseEntity<Employee> getEmployee(@RequestParam String employeeId){
+    @GetMapping("/employee/all")
+    public String getEmployee(Model model){
         try {
-            Employee employee = this.employeeService.getEmployee(employeeId);
-
-            return new ResponseEntity<>(employee, HttpStatus.OK);
-        } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            List<Employee> employees = this.employeeService.getAllEmployees();
+            model.addAttribute("employees", employees);
+            
+            return "employees";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "internalServerError";
         }
     }
     @PostMapping(value = "/employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registerEmployee(@RequestBody Employee newEmployee){
+    public String registerEmployee(@RequestBody Employee newEmployee, Model model){
         try {
             this.employeeService.registerEmployee(newEmployee);
-
-            return new ResponseEntity<>("Registered Successfully", HttpStatus.OK);
+            List<Employee> employee = new ArrayList<>();
+            employee.add(newEmployee);
+            model.addAttribute("employee",employee);
+            return "employees";
         } catch(Exception e) {
-        	return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        	return "internalServerError";
         }
     }
-    @PutMapping(value = "/employee/edit", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> editEmployeeInfo(@RequestBody Employee newEmployee, @RequestParam String employeeId){
+    @GetMapping("/employee/edit")
+    public String editEmployee(@RequestBody Employee employee, Model model) {
+    	try {
+    		model.addAttribute(employee);
+    		return "editEmployee";
+    	}catch(Exception e) {
+    		return "internalServerError";
+    	}
+    }
+    @PutMapping("/employee/update")
+    public String updateEmployeeInfo(@RequestBody Employee newEmployee, @RequestParam String employeeId, Model model){
         try {
-            //TODO:
-            //Validate that the current user trying to edit employee info is the actual employee
-            this.employeeService.editEmployeeInfo(newEmployee, employeeId);
-
-            return new ResponseEntity<>("Edited Employee", HttpStatus.OK);
-        } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch(Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            this.employeeService.updateEmployeeInfo(newEmployee, employeeId);
+            
+            return "employees";
+        }catch(Exception e) {
+            return "internalServerError";
         }
+    }
+    @GetMapping("/search")
+    public String searchEmployees(@RequestParam String searchTerm, @RequestParam String type, Model model) {
+    	try {
+    		List<Employee> employees = this.employeeService.getAllEmployees();
+    		List<Employee> foundEmployees = this.employeeService.searchEmployees(employees, searchTerm, type);
+    		model.addAttribute(foundEmployees);
+    		return "employees";
+    				
+    	}catch(Exception e) {
+    		return "internalServerError";
+    	}
     }
     
     //Schedule methods
@@ -158,7 +179,6 @@ public class AdminController {
     	}
     	return new ResponseEntity<Map<String, Boolean>>(controllerConditions, HttpStatus.OK);	
     }
-    
     @PostMapping("/modules/set")
     public ResponseEntity<String> setActives(@RequestParam Map<String, Boolean> actives){
     	for(String key : actives.keySet()) { 		
