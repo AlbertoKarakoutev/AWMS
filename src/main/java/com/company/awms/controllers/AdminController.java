@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +26,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.company.awms.data.employees.Employee;
@@ -33,7 +34,7 @@ import com.company.awms.services.DocumentService;
 import com.company.awms.services.EmployeeService;
 import com.company.awms.services.ScheduleService;
 
-@RestController
+@Controller
 @RequestMapping("/admin")
 public class AdminController {
 	
@@ -50,7 +51,7 @@ public class AdminController {
 
     //Employee methods
     @GetMapping("/employee/all")
-    public String getEmployee(Model model){
+    public String getEmployees(Model model){
         try {
             List<Employee> employees = this.employeeService.getAllEmployees();
             model.addAttribute("employees", employees);
@@ -73,10 +74,11 @@ public class AdminController {
         	return "internalServerError";
         }
     }
-    @GetMapping("/employee/edit")
-    public String editEmployee(@RequestBody Employee employee, Model model) {
+    @GetMapping("/employee/edit/{employeeID}")
+    public String editEmployee(@PathVariable String employeeID, Model model) {
     	try {
-    		model.addAttribute(employee);
+    		Employee employee = employeeService.getEmployee(employeeID);
+    		model.addAttribute("employee", employee);
     		return "editEmployee";
     	}catch(Exception e) {
     		return "internalServerError";
@@ -86,7 +88,9 @@ public class AdminController {
     public String updateEmployeeInfo(@RequestBody Employee newEmployee, @RequestParam String employeeId, Model model){
         try {
             this.employeeService.updateEmployeeInfo(newEmployee, employeeId);
-            
+            List<Employee> employee = new ArrayList<>();
+            employee.add(newEmployee);
+            model.addAttribute("employee", employee);
             return "employees";
         }catch(Exception e) {
             return "internalServerError";
@@ -97,7 +101,7 @@ public class AdminController {
     	try {
     		List<Employee> employees = this.employeeService.getAllEmployees();
     		List<Employee> foundEmployees = this.employeeService.searchEmployees(employees, searchTerm, type);
-    		model.addAttribute(foundEmployees);
+    		model.addAttribute("foundEmployees", foundEmployees);
     		return "employees";
     				
     	}catch(Exception e) {
