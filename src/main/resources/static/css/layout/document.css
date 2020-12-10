@@ -1,0 +1,21 @@
+.document{
+    font-size: x-large;
+    font-style: italic;
+    font-family: sans-serif;
+       
+}
+.doc-container{
+    border-style: outset;
+    border-width: thin;
+    display: flex;
+    align-items: center; 
+}
+.download{
+    color: #fff;
+    background-color: #1d2124;
+    border-color: #171a1d;
+}
+.row {
+    margin-right: 15px;
+    margin-left: 15px;
+}

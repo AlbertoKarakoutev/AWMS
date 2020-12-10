@@ -42,7 +42,7 @@
         <a href="#" title="Documents">Documents Access</a>
     </li>   
     </ul>
-    <footer class="button">
+    <footer class="nav-footer button">
         <a href="/login" type="button" class="btn sign-out-btn" title="Sing out" >SING OUT</a>
     </footer>
   </div>
