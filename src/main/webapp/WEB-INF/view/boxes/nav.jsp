@@ -11,7 +11,7 @@
         <div class="small-avatar"></div>
     </div>
     <div class="user-info-container">
-        <div class="user-name">${employeeName}</div>
+         <div class="user-name">${employeeName}</div>
         <div class="user-email">${employeeEmail}</div>
     </div>
    </header>
