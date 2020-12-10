@@ -214,12 +214,12 @@ public class ScheduleService {
 	// Get all equivalent access level employees with their schedules, by iterating
 	// over dates up to a month ahead
 	@SuppressWarnings("unchecked")
-	public List<EmployeeDailyReference>[] viewSchedule(Employee viewer, int month) throws IOException {
-		int monthLength = LocalDate.now().withMonth(month).lengthOfMonth();
+	public List<EmployeeDailyReference>[] viewSchedule(Employee viewer, YearMonth month) throws IOException {
+		int monthLength = LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).lengthOfMonth();
 		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[monthLength];
 		for (int i = 1; i < monthLength; i++) {
 			Day thisDay;
-			Optional<Day> thisDayOptional = scheduleRepo.findByDate(LocalDate.now().withDayOfMonth(i));
+			Optional<Day> thisDayOptional = scheduleRepo.findByDate(LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).withDayOfMonth(i));
 			if (thisDayOptional.isEmpty()) {
 				throw new IOException("Invalid date!");
 			}
@@ -230,7 +230,6 @@ public class ScheduleService {
 			}
 			for (int j = 0; j < thisDay.getEmployees().size(); j++) {
 				Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(j).getNationalID());
-				System.out.println(thisDay.getEmployees().get(j).getNationalID());
 				if (employeeOptional.isEmpty()) {
 					throw new IOException("Invalid nationalID");
 				} else if (employeeOptional.get().getDepartment().equals(viewer.getDepartment()) && employeeOptional.get().getLevel() == viewer.getLevel()) {
@@ -248,13 +247,13 @@ public class ScheduleService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Task>[] viewTasks(Employee employee, int month) throws IOException {
-		int monthLength = LocalDate.now().withMonth(month).lengthOfMonth();
-
+	public List<Task>[] viewTasks(Employee employee, YearMonth month) throws IOException {
+		int monthLength = LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).lengthOfMonth();
+		System.out.println(month);
 		List<Task>[] tasks = new ArrayList[monthLength];
 		for (int i = 0; i < monthLength; i++) {
 			Day taskDay;
-			Optional<Day> taskDayOptional = scheduleRepo.findByDate(LocalDate.now().withMonth(month).withDayOfMonth(i + 1));
+			Optional<Day> taskDayOptional = scheduleRepo.findByDate(LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).withDayOfMonth(i + 1));
 			if (taskDayOptional.isEmpty()) {
 				throw new IOException("Invalid date!");
 			}

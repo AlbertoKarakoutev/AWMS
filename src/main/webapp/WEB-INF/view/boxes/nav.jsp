@@ -1,4 +1,4 @@
-<%@page import="java.time.LocalDate"%>
+<%@page import="java.time.YearMonth"%>
 <nav class="navbar navbar-expand-lg">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon">
@@ -23,7 +23,7 @@
         <a href="/contacts" title="Contacts">Contacts</a>
     </li>
     <li class="vertical-item">
-        <a href="/schedule/?month=<%=LocalDate.now().getMonthValue()%>" title="Working Shedule">Schedule</a>
+        <a href="/schedule/?month=<%=YearMonth.now().toString()%>" title="Working Shedule">Schedule</a>
     </li>
     <li class="vertical-item">
         <div class="dropdown">

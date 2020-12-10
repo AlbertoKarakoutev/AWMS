@@ -1,6 +1,8 @@
 package com.company.awms.controllers;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,22 +55,25 @@ public class ScheduleController {
 		try {
 			scheduleService.addTask(taskDay, receiverNationalID);
 			return new ResponseEntity<>("Added task for " + receiverNationalID, HttpStatus.OK);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>("Error adding task for " + receiverNationalID, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@GetMapping("")
-	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam int month) {
-		
+	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam YearMonth month) {
+		YearMonth monthChecked = month;
+		if(!monthChecked.equals(YearMonth.now().plusMonths(1)) && !monthChecked.equals(YearMonth.now())) {
+			monthChecked = YearMonth.of(YearMonth.now().getYear(), YearMonth.now().getMonthValue());
+		}
 		try {
-			
+
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
-			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee,month);
-			List<Task>[] tasks = this.scheduleService.viewTasks(authenticatedEmployee, month);
+			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee, monthChecked);
+			List<Task>[] tasks = this.scheduleService.viewTasks(authenticatedEmployee, monthChecked);
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
-			model.addAttribute("month", month);
+			model.addAttribute("month", monthChecked);
 			model.addAttribute("tasks", tasks);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
@@ -76,13 +81,13 @@ public class ScheduleController {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "badRequest";
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			return "internalServerError";
 		}
 	}
 
-	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
 		model.addAttribute("employeeID", employeeDetails.getID());
