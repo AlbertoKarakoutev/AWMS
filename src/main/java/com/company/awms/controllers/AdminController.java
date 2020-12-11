@@ -146,25 +146,29 @@ public class AdminController {
 
 	// Document methods
 	@PostMapping(value = "/document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<String> uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	public String uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID,
+		    @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
-			this.documentService.uploadPersonalDocument(file, employeeDetails.getID(), employeeID);
+			this.documentService.uploadPersonalDocument(file, employeeID);
 
-			return new ResponseEntity<>("Successfully uploaded document!", HttpStatus.OK);
+			List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeDetails.getID());
+
+			model.addAttribute("documents", documents);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+
+			return "documents";
 		} catch (IOException e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (IllegalAccessException e) {
-			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			return "badRequest";
 		} catch (Exception e) {
 			System.out.println(e);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return "internalServerError";
 		}
 	}
 
 	@DeleteMapping(value = "/document/personal/delete/{documentID}")
-	public String deletePrivateDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String deletePersonalDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try{
-			this.documentService.deletePersonalDocument(documentID, employeeDetails.getID(), ownerID);
+			this.documentService.deletePersonalDocument(documentID, ownerID);
 
 			List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
@@ -174,8 +178,6 @@ public class AdminController {
 			return "documents";
 		} catch (IllegalArgumentException e) {
 			return "notFound";
-		} catch (IllegalAccessException e) {
-			return "notAuthorized";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "internalServerError";
