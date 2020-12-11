@@ -26,9 +26,18 @@
 
       <section class="content">
         <div class="container text-center">
-          <h2 class="document mb-5 ">Documents</h2>
-          <div class="doc-container row row-cols-auto py-2">
+          <div class="row my-3">
             
+            <form class="form-inline md-form mr-auto">
+              <input class="form-control mr-sm-2" type="text" placeholder="Search document" aria-label="Search document">
+              <button class="btn btn-dark btn-rounded btn-sm my-0" type="submit">Search</button>
+            </form> 
+            
+            <button class="btn btn-dark all-doc-btn">Upload</button>
+
+          </div>
+          <div class="doc-container row row-cols-auto py-2">
+
             <c:forEach items="${documents}" var="document">
               <div class="col">
                 <div class="form-check">
@@ -45,6 +54,7 @@
                 <button class="btn btn-dark download py-1">Download</button>
               </div>
             </c:forEach>
+
           </div>
         </div>
       </section>

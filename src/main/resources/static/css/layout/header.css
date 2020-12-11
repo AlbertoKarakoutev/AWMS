@@ -11,3 +11,22 @@
 .logo h1 {
     color: var(--secondary-color);
 }
+.btn-notification {
+    background-color:var(--primary-color);
+    border: none;
+    color: white;
+    padding: 12px 16px;
+    font-size: 22px;
+    cursor: pointer;
+  }
+  .badge {
+    position: absolute;
+    top: 7px;
+    right: 24px;
+    padding: 0px 4px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+  }
+
+ 
