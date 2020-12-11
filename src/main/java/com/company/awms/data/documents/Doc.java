@@ -74,10 +74,6 @@ public class Doc {
 		return uploaderID;
 	}
 
-	public String getUploader() {
-		return this.uploaderID;
-	}
-
 	public List<String> getDownloaderIDs() {
 		return this.downloaderIDs;
 	}

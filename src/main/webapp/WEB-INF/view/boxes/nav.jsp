@@ -44,7 +44,8 @@
 					</div>
 				</div>
 			</li>
-			<li class="vertical-item"><a href="#" title="Documents">Documents</a></li>
+			<li class="vertical-item"><a href="/document/public" title="PublicDocuments">Public Documents</a></li>
+			<li class="vertical-item"><a href="/document/personal" title="PersonalDocuments">Personal Documents</a></li>
 			<%if(AdminController.getActivesMethod().get("Salary") == true){%>
 				<li class="vertical-item"><a href="#" title="Salary">Salary</a></li>
 			<%}%>

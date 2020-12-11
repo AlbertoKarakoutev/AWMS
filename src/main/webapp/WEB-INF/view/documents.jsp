@@ -29,17 +29,14 @@
             </header>
             <section class="p-4 content">
                 <header class="py-3">
-                    <h1 class="ty-page-title">Welcome, ${employee.getFirstName()} ${employee.getLastName()}!</h1>
+                    <h1 class="ty-page-title">Welcome, ${employeeName}!</h1>
                 </header>
                 <c:forEach items="${documents}" var="doc">
 					<tr>
 						<td>${doc.getName()}</td>
 					</tr>
-					<div align="center">
-						${System.out.println(repo.findById(doc.getID()).get().getData());}
-						<img src="data:image/jpg;base64,${repo.findById(doc.getID()).get().getData()}" width="300" height="300"/>
-						
-					</div>
+					<div align="center">Name: ${doc.getName()} Size: ${doc.getSize()} Type: ${doc.getType()} Owner: ${doc.getOwnerName()}
+                    <div align="center"><img src="data:image/jpg;base64,${repo.findById(doc.getID()).get().getData()}" width="300" height="300"/></div>
 				</c:forEach>
             </section>
             <footer>

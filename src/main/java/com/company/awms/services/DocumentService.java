@@ -54,7 +54,8 @@ public class DocumentService {
 
 		for (Doc document : departmentDocuments) {
 			if (employee.getLevel() >= document.getLevel()) {
-				DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(), document.getType(), document.getUploaderID());
+				DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(),
+						document.getType(), document.getUploaderID(), employee.getFirstName() + " " + employee.getLastName());
 				accessibleDocumentsInfo.add(documentInfo);
 			}
 		}
@@ -71,7 +72,8 @@ public class DocumentService {
 
 		for (int i = 0; i < personalDocuments.size(); i++) {
 			DocInfoDTO documentInfo = new DocInfoDTO(Integer.toString(i), personalDocuments.get(i).getName(),
-					personalDocuments.get(i).getSize(), personalDocuments.get(i).getType(), personalDocuments.get(i).getUploaderID());
+					personalDocuments.get(i).getSize(), personalDocuments.get(i).getType(), personalDocuments.get(i).getUploaderID(),
+					employee.getFirstName() + " " + employee.getLastName());
 			privateDocumentsInfo.add(documentInfo);
 		}
 

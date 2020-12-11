@@ -21,11 +21,6 @@ public class EmployeeDailyReference {
 
 	public EmployeeDailyReference() {}
 
-	/*@Autowired
-	public EmployeeDailyReference(EmployeeRepo employeeRepo) {
-		this.employeeRepo = employeeRepo;
-	}*/
-
 	public EmployeeDailyReference(EmployeeRepo employeeRepo, String nationalID) throws IOException {
 		this.nationalID = nationalID;
 

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.company.awms.data.documents.DocInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,10 +54,11 @@ public class AdminController {
 
 	// Employee methods
 	@GetMapping("/employee/all")
-	public String getEmployees(Model model) {
+	public String getEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<Employee> employees = this.employeeService.getAllEmployees();
 			model.addAttribute("employees", employees);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "employees";
 		} catch (Exception e) {
@@ -66,12 +68,13 @@ public class AdminController {
 	}
 
 	@PostMapping(value = "/employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String registerEmployee(@RequestBody Employee newEmployee, Model model) {
+	public String registerEmployee(@RequestBody Employee newEmployee, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.employeeService.registerEmployee(newEmployee);
 			List<Employee> employee = new ArrayList<>();
 			employee.add(newEmployee);
 			model.addAttribute("employee", employee);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
 		} catch (Exception e) {
 			return "internalServerError";
@@ -79,10 +82,11 @@ public class AdminController {
 	}
 
 	@GetMapping("/employee/edit/{employeeID}")
-	public String editEmployee(@PathVariable String employeeID, Model model) {
+	public String editEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			Employee employee = employeeService.getEmployee(employeeID);
 			model.addAttribute("employee", employee);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "editEmployee";
 		} catch (Exception e) {
 			return "internalServerError";
@@ -90,12 +94,13 @@ public class AdminController {
 	}
 
 	@PutMapping("/employee/update")
-	public String updateEmployeeInfo(@RequestBody Employee newEmployee, @RequestParam String employeeId, Model model) {
+	public String updateEmployeeInfo(@RequestBody Employee newEmployee, @RequestParam String employeeId, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.employeeService.updateEmployeeInfo(newEmployee, employeeId);
 			List<Employee> employee = new ArrayList<>();
 			employee.add(newEmployee);
 			model.addAttribute("employee", employee);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
 		} catch (Exception e) {
 			return "internalServerError";
@@ -103,11 +108,12 @@ public class AdminController {
 	}
 
 	@GetMapping("/search")
-	public String searchEmployees(@RequestParam String searchTerm, @RequestParam String type, Model model) {
+	public String searchEmployees(@RequestParam String searchTerm, @RequestParam String type, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<Employee> employees = this.employeeService.getAllEmployees();
 			List<Employee> foundEmployees = this.employeeService.searchEmployees(employees, searchTerm, type);
 			model.addAttribute("foundEmployees", foundEmployees);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
 
 		} catch (Exception e) {
@@ -156,17 +162,23 @@ public class AdminController {
 	}
 
 	@DeleteMapping(value = "/document/personal/delete/{documentID}")
-	public ResponseEntity<String> deletePrivateDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
-		try {
+	public String deletePrivateDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		try{
 			this.documentService.deletePersonalDocument(documentID, employeeDetails.getID(), ownerID);
 
-			return new ResponseEntity<>("Successfully deleted document!", HttpStatus.OK);
+			List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
+
+			model.addAttribute("documents", documents);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+
+			return "documents";
 		} catch (IllegalArgumentException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			return "notFound";
 		} catch (IllegalAccessException e) {
-			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			return "notAuthorized";
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 
@@ -190,10 +202,11 @@ public class AdminController {
 	}
 
 	@GetMapping("/modules/get")
-	public String getActives(Model model) {
+	public String getActives(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			Map<String, Boolean> controllerConditions = AdminController.getActivesMethod();
 			model.addAttribute("modules", controllerConditions);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
 		} catch (Exception e) {
 			return "internalServerError";
 		}
@@ -204,7 +217,7 @@ public class AdminController {
 
 	@SuppressWarnings("unchecked")
 	@PutMapping(value = "/modules/set", consumes = "application/json")
-	public String setActives(@RequestBody String updatedActives, Model model) throws JsonMappingException, JsonProcessingException {
+	public String setActives(@RequestBody String updatedActives, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws JsonMappingException, JsonProcessingException {
 		String updatedActivitiesFormatted = updatedActives.substring(19, updatedActives.length() - 2).replaceAll("\\\\", "");
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Boolean> actives = (Map<String, Boolean>) mapper.readValue(updatedActivitiesFormatted, HashMap.class);
@@ -218,7 +231,12 @@ public class AdminController {
 				continue;
 			}
 		}
-		return getActives(model);
+		return getActives(employeeDetails, model);
 	}
 
+	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeID", employeeDetails.getID());
+	}
 }

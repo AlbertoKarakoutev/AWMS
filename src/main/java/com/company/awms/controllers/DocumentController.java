@@ -100,24 +100,28 @@ public class DocumentController {
         }
     }
 
-    @ResponseBody
     @DeleteMapping(value = "/public/delete/{documentID}")
-    public ResponseEntity<String> deletePublicDocument(@PathVariable String documentID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
+    public String deletePublicDocument(@PathVariable String documentID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
         try{
             this.documentService.deletePublicDocument(documentID, employeeDetails.getID());
 
-            return new ResponseEntity<>("Successfully deleted document!", HttpStatus.OK);
+            List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
+
+            model.addAttribute("documents", documents);
+            injectLoggedInEmployeeInfo(model, employeeDetails);
+
+            return "documents";
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return "notFound";
         } catch (IllegalAccessException e) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return "notAuthorized";
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return "internalServerError";
         }
     }
 
-    @GetMapping(value = "/public/accessible")
+    @GetMapping(value = "/public")
     public String getAccessibleDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
         try {
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
@@ -125,7 +129,7 @@ public class DocumentController {
             model.addAttribute("documents", documents);
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
-            return "publicDocuments";
+            return "documents";
         } catch (IOException e) {
             return "notFound";
         } catch (Exception e) {
@@ -134,7 +138,7 @@ public class DocumentController {
         }
     }
 
-    @GetMapping(value = "/personal/all")
+    @GetMapping(value = "/personal")
     public String getAllPersonalDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
         try {
             //employeeID can be taken from the authentication
@@ -143,7 +147,7 @@ public class DocumentController {
             model.addAttribute("documents", documents);
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
-            return "personalDocuments";
+            return "documents";
         }  catch (Exception e) {
             e.printStackTrace();
             return "internalServerError";
@@ -151,18 +155,20 @@ public class DocumentController {
     }
 
     @GetMapping("/search")
-    @ResponseBody
-    public ResponseEntity<List<DocInfoDTO>> searchInDocuments(@RequestParam String name, @AuthenticationPrincipal EmployeeDetails employeeDetails){
+    public String searchInDocuments(@RequestParam String name, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
         try {
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
             List<DocInfoDTO> foundDocuments = this.documentService.searchInDocumentByName(documents, name);
 
-            return new ResponseEntity<>(foundDocuments, HttpStatus.OK);
+            model.addAttribute("documents", foundDocuments);
+            injectLoggedInEmployeeInfo(model, employeeDetails);
+
+            return "documents";
         } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return "notFound";
         } catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return "internalServerError";
         }
     }
 
