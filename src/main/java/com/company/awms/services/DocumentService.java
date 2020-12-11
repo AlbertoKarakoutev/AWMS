@@ -136,22 +136,16 @@ public class DocumentService {
 	}
 
 	//Both Employee and Admin can download a personal document
-	public Doc downloadPersonalDocument(int documentID, String downloaderID, String ownerID) throws IOException, IllegalAccessException {
-		Employee owner = getEmployee(ownerID);
+	public Doc downloadPersonalDocument(int documentID, String downloaderID) throws IOException {
+		Employee downloader = getEmployee(downloaderID);
 
-		List<Doc> personalDocuments = owner.getPersonalDocuments();
+		List<Doc> personalDocuments = downloader.getPersonalDocuments();
 
 		if(personalDocuments.size() <= documentID){
 			throw new IOException("Document with id " + documentID + " doesn't exists");
 		}
 
-		Doc document = personalDocuments.get(documentID);
-
-		if(!downloaderID.equals(ADMIN_ID) && !downloaderID.equals(document.getUploaderID())){
-			throw new IllegalAccessException("Document not accessible!");
-		}
-
-		return document;
+		return personalDocuments.get(documentID);
 	}
 
 	public void deletePublicDocument(String documentID, String employeeID) throws IOException, IllegalAccessException{
