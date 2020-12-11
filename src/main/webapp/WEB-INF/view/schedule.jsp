@@ -59,15 +59,15 @@
 		                    		<span class='close'>&times;</span>
 		                    		<div class='work-shifts'>
 		                    			<p class="title">Employees</p>
-		                    			<p>
 				                    	  	<%if(sle[i-offset] != null){
 				                    	  		for(int j = 0; j < sle[i-offset].size(); j++){
 				                    	  			EmployeeDailyReference thisEDR = sle[i-offset].get(j);
 				                    	  			String day = thisMonth.withDayOfMonth(i).toString();
       	  				                    		out.println(thisEDR.getFirstName() + " " + thisEDR.getLastName() + " " + thisEDR.getWorkTimeInfo());%>
-					                    	</p>
-					                    	<button class="swap" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
-					                    	</br>
+      	  				                    		
+					                    			<button class="swap" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
+					                    			
+					                    		</br>
 					                    	
 					                    	
 		                    	      			<%}

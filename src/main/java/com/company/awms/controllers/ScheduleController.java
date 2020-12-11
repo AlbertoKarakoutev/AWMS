@@ -1,7 +1,6 @@
 package com.company.awms.controllers;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -95,10 +94,12 @@ public class ScheduleController {
 		}
 	}
 
-	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) {
+	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
 		model.addAttribute("employeeID", employeeDetails.getID());
+		Employee user = employeeService.getEmployee(employeeDetails.getID());
+		model.addAttribute("level", user.getLevel());
 	}
 
 	public static boolean getActive() {

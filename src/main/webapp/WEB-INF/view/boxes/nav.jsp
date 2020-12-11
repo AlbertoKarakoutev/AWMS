@@ -1,4 +1,5 @@
 <%@	page import="java.time.YearMonth"%>
+<%@	page import="com.company.awms.controllers.AdminController"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@	taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -43,11 +44,15 @@
 					</div>
 				</div>
 			</li>
-		
 			<li class="vertical-item"><a href="#" title="Documents">Documents</a></li>
+			<%if(AdminController.getActivesMethod().get("Salary") == true){%>
+				<li class="vertical-item"><a href="#" title="Salary">Salary</a></li>
+			<%}%>
 			<sec:authentication property="principal.authorities" var="role"/>
 			<c:if test="${role == '[ADMIN]'}">
 				<li class="vertical-item"><a href="/admin/employee/all" title="Employees">Employees</a></li>
+				<li class="vertical-item"><a href="/admin/modules/get" title="Modules">Modules</a></li>
+				<li class="vertical-item"><a href="#" title="Departments">Departments</a></li>
 			</c:if>
 				
 

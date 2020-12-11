@@ -276,7 +276,7 @@ public class ScheduleService {
 					Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(j).getNationalID());
 					if (employeeOptional.isEmpty()) {
 						throw new IOException("Invalid nationalID");
-					} else if (employeeOptional.get().getAccessLevel().equals(viewer.getAccessLevel())) {
+					} else if (employeeOptional.get().getAccessLevel().equals(viewer.getAccessLevel()) || (employeeOptional.get().getDepartment().equals(viewer.getDepartment()) && employeeOptional.get().getLevel() <= viewer.getLevel())) {
 						if (!employeeOptional.get().getNationalID().equals(viewer.getNationalID())) {
 							if(sameLevelEmployees[i]!=null) {
 								sameLevelEmployees[i].add(thisDay.getEmployees().get(j));
