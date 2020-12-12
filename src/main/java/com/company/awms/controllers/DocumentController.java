@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.company.awms.data.documents.Doc;
@@ -49,7 +48,7 @@ public class DocumentController {
             model.addAttribute("documents", documents);
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
-            return "publicDocuments";
+            return "documents";
         } catch (IOException e){
             return "badRequest";
         } catch (Exception e){
@@ -142,7 +141,6 @@ public class DocumentController {
     @GetMapping(value = "/personal")
     public String getAllPersonalDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
         try {
-            //employeeID can be taken from the authentication
             List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeDetails.getID());
 
             model.addAttribute("documents", documents);
@@ -156,15 +154,11 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/search")
-    public String searchInDocuments(@RequestParam String name, @RequestParam String type, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
+    @GetMapping("/public/search")
+    public String searchInDocuments(@RequestParam String name, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
         try {
             List<DocInfoDTO> documents;
-            if(type.equals("public")){
-                documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
-            } else {
-                documents = this.documentService.getPersonalDocumentsInfo(employeeDetails.getID());
-            }
+            documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
             List<DocInfoDTO> foundDocuments = this.documentService.searchInDocumentByName(documents, name);
 
