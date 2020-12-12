@@ -29,6 +29,7 @@ import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
 import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.data.employees.Notification;
+import com.company.awms.data.forum.ForumThread;
 import com.company.awms.data.schedule.Day;
 import com.company.awms.data.schedule.ScheduleRepo;
 import com.company.awms.data.schedule.Task;
@@ -195,7 +196,7 @@ public class ScheduleService {
 			requesterDate = LocalDate.parse(requesterDateParam);
 			receiverDate = LocalDate.parse(receiverDateParam);
 		} catch (Exception e) {
-			System.err.println("Date ot recognised!");
+			System.err.println("Date not recognised!");
 			return;
 		}
 
@@ -388,6 +389,13 @@ public class ScheduleService {
 					}
 				}
 			}
+		}
+	    List<Employee> allEmployees = employeeRepo.findAll();
+        List<Object> notificationData = new ArrayList<Object>();
+        notificationData.add("schedule-update");
+		String message = "The schedule for " + YearMonth.from(LocalDate.now().plus(1, ChronoUnit.MONTHS)) + " has been updated.";
+		for(Employee issuer: allEmployees) {
+			issuer.getNotifications().add(new Notification(message, notificationData));
 		}
 	}
 

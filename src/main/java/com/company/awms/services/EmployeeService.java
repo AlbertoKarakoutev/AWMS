@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
 import com.company.awms.data.employees.EmployeeRepo;
+import com.company.awms.data.employees.Notification;
 
 @Service
 public class EmployeeService {
@@ -135,7 +136,12 @@ public class EmployeeService {
 		oldEmployee.setLastName(newEmployee.getLastName());
 		oldEmployee.setNationalID(newEmployee.getNationalID());
 		oldEmployee.setPhoneNumber(newEmployee.getPhoneNumber());
-
+		
+        List<Object> notificationData = new ArrayList<Object>();
+        notificationData.add("info-updated");
+		String message = "Your profile information has been updated by the Administrator.";
+		oldEmployee.getNotifications().add(new Notification(message, notificationData));
+        
 		this.employeeRepo.save(oldEmployee);
 	}
 
