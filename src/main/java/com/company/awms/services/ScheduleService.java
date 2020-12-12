@@ -10,9 +10,11 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -55,7 +57,7 @@ public class ScheduleService {
 		Day currentDay;
 		LocalTime[] workTime = new LocalTime[2];
 
-		JSONArray workTimeJSON;
+		int[] workTimeJSON;
 		JSONObject employeeLevel = null;
 
 		Optional<Employee> employeeOptional = this.employeeRepo.findById(employeeID);
@@ -67,19 +69,19 @@ public class ScheduleService {
 
 		JSONObject thisDepartment = getDepartment(employee.getDepartment());
 		int level = employee.getLevel();
-		if ((boolean) thisDepartment.get("universalSchedule")) {
-			workTimeJSON = (JSONArray) thisDepartment.get("dailyHours");
+		if (Boolean.parseBoolean((String)thisDepartment.get("universalSchedule"))) {
+			workTimeJSON = Stream.of(((String) thisDepartment.get("dailyHours")).split(",")).mapToInt(Integer::parseInt).toArray();
 			employeeLevel = thisDepartment;
 		} else {
 			JSONArray levels = (JSONArray) thisDepartment.get("levels");
 			JSONObject arrayElement = (JSONObject) levels.get(level);
 			employeeLevel = (JSONObject) arrayElement.get(Integer.toString(level));
-			workTimeJSON = (JSONArray) employeeLevel.get("dailyHours");
+			workTimeJSON = Stream.of(((String) thisDepartment.get("dailyHours")).split(",")).mapToInt(Integer::parseInt).toArray();
 		}
 
 		try {
 			if (!onCall) {
-				LocalTime start = LocalTime.of(Integer.parseInt(workTimeJSON.get(0).toString()), Integer.parseInt(workTimeJSON.get(1).toString()));
+				LocalTime start = LocalTime.of(workTimeJSON[0], workTimeJSON[1]);
 				workTime[0] = start;
 				LocalTime end = start.plus(Integer.parseInt(employeeLevel.get("shiftLength").toString()) + Integer.parseInt(employeeLevel.get("dailyBreakDurationTotal").toString()), ChronoUnit.HOURS);
 				workTime[1] = end;
@@ -344,7 +346,7 @@ public class ScheduleService {
 			if (department == null) {
 				continue;
 			}
-			if ((boolean) department.get("universalSchedule")) {
+			if (Boolean.parseBoolean((String)department.get("universalSchedule"))) {
 				switch ((String) department.get("scheduleType")) {
 				case "Regular":
 					System.out.println("regular");
@@ -387,7 +389,6 @@ public class ScheduleService {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean applyOnCallSchedule(String department, int level) {
 		System.out.println(" ");
 		JSONObject thisDepartment = getDepartmentAtLevel(department, level);
@@ -408,12 +409,12 @@ public class ScheduleService {
 		long employeesPerShift;
 		long monthlyWorkDays;
 		double lengthOfWorkDay;
-		ArrayList<Long> dailyHours;
+		int[] dailyHours;
 		try {
-			dailyHours = (ArrayList<Long>) thisDepartment.get("dailyHours");
+			dailyHours = Stream.of(((String) thisDepartment.get("dailyHours")).split(",")).mapToInt(Integer::parseInt).toArray();
 			shiftLength = (long) thisDepartment.get("shiftLength");
 			breakBetweenShiftsMin = (long) thisDepartment.get("breakBetweenShifts");
-			lengthOfWorkDay = ((double) dailyHours.get(2) + ((double) dailyHours.get(3) / 60)) - ((double) dailyHours.get(0) + ((double) dailyHours.get(1) / 60));
+			lengthOfWorkDay = ((double) dailyHours[2] + ((double) dailyHours[3] / 60)) - ((double) dailyHours[0] + ((double) dailyHours[1] / 60));
 			if (lengthOfWorkDay > 23.9) {
 				lengthOfWorkDay = 24;
 			}
@@ -452,8 +453,8 @@ public class ScheduleService {
 		}
 		ArrayList<Shift> shifts = new ArrayList<>();
 		for (Day day : workDays) {
-			LocalDateTime dayHour = LocalDateTime.of(day.getDate(), LocalTime.of(dailyHours.get(0).intValue(), dailyHours.get(1).intValue(), 0, 0));
-			LocalDateTime dayEnd = LocalDateTime.of(day.getDate(), LocalTime.of(dailyHours.get(2).intValue(), dailyHours.get(3).intValue(), 1, 0));
+			LocalDateTime dayHour = LocalDateTime.of(day.getDate(), LocalTime.of(dailyHours[0], dailyHours[1], 0, 0));
+			LocalDateTime dayEnd = LocalDateTime.of(day.getDate(), LocalTime.of(dailyHours[2], dailyHours[3], 1, 0));
 			do {
 				shifts.add(new Shift(LocalDateTime.of(day.getDate(), dayHour.toLocalTime()), LocalDateTime.of(day.getDate(), dayHour.plusHours(shiftLength).toLocalTime())));
 				dayHour = dayHour.plusHours(shiftLength);
@@ -641,7 +642,7 @@ public class ScheduleService {
 
 		JSONObject thisDepartment = getDepartment(department);
 
-		if (!(boolean) thisDepartment.get("universalSchedule")) {
+		if (!Boolean.parseBoolean((String)thisDepartment.get("universalSchedule"))) {
 			JSONArray levels = (JSONArray) thisDepartment.get("levels");
 			JSONObject thisLevel = (JSONObject) levels.get(level);
 			thisDepartment = (JSONObject) thisLevel.get(Integer.toString(level));
@@ -650,7 +651,7 @@ public class ScheduleService {
 		return thisDepartment;
 	}
 
-	private JSONObject getDepartment(String department) {
+	public JSONObject getDepartment(String department) {
 
 		JSONObject thisDepartment;
 		try {
@@ -664,14 +665,16 @@ public class ScheduleService {
 		return thisDepartment;
 	}
 
-	@SuppressWarnings({ "unchecked", "unused" })
-	private void setDepartmentField(String department, String field, String value) {
-
-		JSONObject thisDepartment = getDepartment(department);
-
-		thisDepartment.put(field, value);
-		departments.put(department, thisDepartment);
-
+	@SuppressWarnings({ "unchecked"})
+	public void setDepartment(String departmentCode, JSONObject department) {
+		JSONParser parser = new JSONParser();
+		String key = departmentCode.replace("\"", "");
+		try {
+			JSONObject departmentBody = (JSONObject)parser.parse((String)department.get(departmentCode));
+			departments.put(key, departmentBody);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 		try (FileWriter file = new FileWriter("src/main/resources/departments.json")) {
 			file.write(departments.toJSONString());
 		} catch (IOException e) {

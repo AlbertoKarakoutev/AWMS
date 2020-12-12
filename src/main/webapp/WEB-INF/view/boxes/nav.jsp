@@ -52,7 +52,7 @@
 			<sec:authentication property="principal.authorities" var="role"/>
 			<c:if test="${role == '[ADMIN]'}">
 				<li class="vertical-item"><a href="/admin/employee/all" title="Employees">Employees</a></li>
-				<li class="vertical-item"><a href="/admin/modules/get" title="Modules">Modules</a></li>
+				<li class="vertical-item"><a href="/admin/modules" title="Modules">Modules</a></li>
 				<li class="vertical-item"><a href="#" title="Departments">Departments</a></li>
 			</c:if>
 				
