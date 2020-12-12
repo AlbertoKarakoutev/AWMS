@@ -53,7 +53,7 @@
 			<c:if test="${role == '[ADMIN]'}">
 				<li class="vertical-item"><a href="/admin/employee/all" title="Employees">Employees</a></li>
 				<li class="vertical-item"><a href="/admin/modules" title="Modules">Modules</a></li>
-				<li class="vertical-item"><a href="#" title="Departments">Departments</a></li>
+				<li class="vertical-item"><a href="/admin/departments" title="Departments">Departments</a></li>
 			</c:if>
 				
 

@@ -1,1 +1,69 @@
-{"a":{"universalSchedule":"true","scheduleType":"Regular","dailyBreakDurationTotal":"1","name":"Accounting","dailyHours":"9,0,18,0","shiftLength":"8"},"b":{"universalSchedule":"false","name":"Storage","levels":[{"0":{"scheduleType":"Irregular","dailyBreakDurationTotal":"2","workOnWeekends":"true","dailyHours":"6,0,20,0","shiftLength":"12","breakBetweenShifts":"12"}},{"1":{"scheduleType":"Regular","dailyBreakDurationTotal":"2","dailyHours":"6,0,20,0","shiftLength":"8"}}]},"c":{"monthlyWorkDays":"15","universalSchedule":"true","scheduleType":"OnCall","dailyBreakDurationTotal":"3","name":"Security","workOnWeekends":"true","dailyHours":"8,0,16,0","shiftLength":"8","employeesPerShift":"1","breakBetweenShifts":"2"}}
+{
+	"a": {
+		"Daily break duration total": "1",
+		"Daily hours": "9,0,18,0",
+		"Shift length": "8",
+		"Schedule type": "Regular",
+		"Name": "Accounting",
+		"Universal schedule": "true"
+	},
+	"b": {
+		"levels": [
+			{
+				"0": {
+					"Break between shifts": "12",
+					"Daily break duration total": "2",
+					"Daily hours": "6,0,20,0",
+					"Shift length": "12",
+					"Schedule type": "Irregular",
+					"Work on weekends": "true"
+				}
+			},
+			{
+				"1": {
+					"Daily break duration total": "2",
+					"Daily hours": "6,0,20,0",
+					"Shift length": "8",
+					"Schedule type": "Regular"
+				}
+			}
+		],
+		"Name": "Storage",
+		"Universal schedule": "false"
+	},
+	"c": {
+		"Break between shifts": "2",
+		"Monthly work days": "15",
+		"Daily break duration total": "3",
+		"Daily hours": "8,0,16,0",
+		"Shift length": "8",
+		"Employees per shift": "1",
+		"Schedule type": "OnCall",
+		"Work on weekends": "true",
+		"Name": "Security",
+		"Universal schedule": "true"
+	},
+	"d": {
+		"levels": [
+			{
+				"0": {
+					"Daily break duration total": "aaa",
+					"Daily hours": "aaa",
+					"Shift length": "aaa",
+					"Schedule type": "aaa",
+					"Work on weekends": "aaa"
+				}
+			},
+			{
+				"1": {
+					"Daily break duration total": "zbb",
+					"Daily hours": "zzz",
+					"Shift length": "zzz",
+					"Schedule type": "zzz"
+				}
+			}
+		],
+		"Name": "ssss",
+		"Universal schedule": "false"
+	}
+}

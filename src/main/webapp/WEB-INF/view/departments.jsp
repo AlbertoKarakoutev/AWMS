@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <link href="/css/main.css" rel="stylesheet">
+    <link href="/css/components/departments.css" rel="stylesheet">
 
     <!--Add vendor's js files-->
     <script src="/webjars/jquery/3.5.1/jquery.js"></script>
@@ -40,10 +41,18 @@
 	                	<%}
 	                }%>
                 	</select>
-                	<button id="display">Display</button>
+                	<div id="button-content">
+                		<button id="add">ADD NEW</button>
+                		<button id="display">DISPLAY</button>
+                		<button id="addLevel" style="{display:none;}">ADD LEVEL</button>
+                		<button id="create" style="{display:none;}">CREATE DEPARTMENT</button>
+                		<button id="update" style="{display:none;}">UPDATE</button>
+                	</div>
+                	
                 	<div id="department-content"></div>
-                	<button id="update">Update</button>
-					<button id="add">Add</button>
+                	
+                	
+					
                 </div>
                 <footer>
                     <%@include file="boxes/footer.jsp" %>

@@ -250,7 +250,7 @@ public class AdminController {
 			if (department == null) {
 				continue;
 			}
-			departmentDTOs.put(departmentCode, (String)department.get("name"));
+			departmentDTOs.put(departmentCode, (String)department.get("Name"));
 		}
 		return departmentDTOs;
 	}
