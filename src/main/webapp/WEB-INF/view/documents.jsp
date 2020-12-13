@@ -24,56 +24,79 @@
 				<%@include file="boxes/header.jsp"%>
 			</header>
 
-			<section class="content-doc-file">
-				<div class="container text-center">
-					<div class="row my-3">
-
-						<form class="form-inline md-form mr-auto">
-							<input class="form-control mr-sm-2" type="text"
-								placeholder="Search document" aria-label="Search documents...">
-							<button class="btn btn-dark btn-rounded btn-sm my-0"
-								type="submit">Search</button>
-						</form>
-
-						<button class="btn btn-dark all-doc-btn">Upload</button>
-					</div>
-
-					<c:forEach items="${documents}" var="document">
-						<div class="doc-container row row-cols-auto py-2">
-							<div class="col">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value=""
-										id="defaultCheck1"> <label class="form-check-label"
-										for="defaultCheck1"> ${document.getName()} </label>
-								</div>
-							</div>
-
-							<div class="col-2">
-								<button id="${document.getId()}" class="btn btn-dark download py-1">Download</button>
-							</div>
+			<section class="content">
+                <div class="p-4">
+				    <header class="py-3">
+                        <h1 class="ty-page-title">Documents</h1>
+                    </header>
+					<div class="d-flex my-3">
+						<div class="flex-grow-1">
+							<form class="form-inline">
+								<input class="form-control" type="text"
+									placeholder="Search document" aria-label="Search documents...">
+								<button class="btn btn-dark ml-2"
+									type="submit">Search</button>
+							</form>
 						</div>
-					</c:forEach>
-
+						<div>
+							<form action="/document/public/upload" method="post">
+  								<div class="form-inline">
+    								<label for="exampleFormControlFile1">Upload file</label>
+    								<input type="file" name="file" class="form-control-file" id="exampleFormControlFile1">
+									<button class="btn btn-dark mt-2">Upload</button>
+  								</div>
+				
+							</form>
+						</div>
+					</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col"></th>
+                                <th scope="col">Download</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+					    <c:forEach items="${documents}" var="document" varStatus="loop">
+					       <tr>
+                                <th scope="row">${loop.index}</th>
+                                <td>
+						            <h4>${document.getName()}</h4>
+						        </td>
+                                <td></td>
+                                <td>
+							       <button id="${document.getId()}" class="btn btn-dark download">Download</button>
+								</td>
+                            </tr>
+				    	</c:forEach>
+                        </tbody>
+					</table>
 				</div>
+				<nav aria-label="Page navigation example">
+				    <ul class="pagination justify-content-center">
+  				    	<li class="page-item">
+						    <a class="page-link" href="#" title='previous page'>
+						        <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+							</a>
+						</li>
+    					<li class="page-item"><a class="page-link" href="#">1</a></li>
+    					<li class="page-item"><a class="page-link" href="#">2</a></li>
+    					<li class="page-item"><a class="page-link" href="#">3</a></li>
+   						<li class="page-item">
+						   <a class="page-link" href="#" title='next page'>
+						        <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+						   </a>
+						</li>
+  					</ul>
+				</nav>
+			    <footer>
+			    	<%@include file="boxes/footer.jsp"%>
+			   </footer>
 			</section>
-			<nav aria-label="Page navigation example">
-				<ul class="pagination justify-content-center">
-					<li class="page-item"><a class="page-link" href="#"
-						aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
-							<span class="sr-only">Previous</span>
-					</a></li>
-					<li class="page-item"><a class="page-link" href="#">1</a></li>
-					<li class="page-item"><a class="page-link" href="#">2</a></li>
-					<li class="page-item"><a class="page-link" href="#">3</a></li>
-					<li class="page-item"><a class="page-link" href="#"
-						aria-label="Next"> <span aria-hidden="true">&raquo;</span> <span
-							class="sr-only">Next</span>
-					</a></li>
-				</ul>
-			</nav>
-			<footer>
-				<%@include file="boxes/footer.jsp"%>
-			</footer>
 		</section>
 
 	</div>
