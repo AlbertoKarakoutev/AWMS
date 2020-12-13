@@ -1,71 +1,69 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="UTF-8">
-  <link href="/css/main.css" rel="stylesheet">
-
-  <!--Add vendor's js files-->
-  <script src="/webjars/jquery/3.5.1/jquery.js"></script>
-  <script src="/webjars/bootstrap/4.5.3/js/bootstrap.bundle.js"></script>
-  <script src="/webjars/font-awesome/5.15.1/js/fontawesome.js"></script>
-  <title>Documents</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<link href="/css/main.css" rel="stylesheet">
+<link href="/css/document.css" rel="stylesheet">
+<!--Add vendor's js files-->
+<script src="/webjars/jquery/3.5.1/jquery.js"></script>
+<script src="/webjars/bootstrap/4.5.3/js/bootstrap.bundle.js"></script>
+<script src="/webjars/font-awesome/5.15.1/js/fontawesome.js"></script>
+<title>Documents</title>
 </head>
 
 <body>
-  <div class="panel">
-    <%@include file="boxes/nav.jsp" %>
-    <section class="page">
-      <header class="header">
-        <%@include file="boxes/header.jsp" %>
-      </header>
+	<div class="panel">
+		<%@include file="boxes/nav.jsp"%>
+		<section class="page">
+			<header class="header">
+				<%@include file="boxes/header.jsp"%>
+			</header>
 
-      <section class="content">
-        <div class="container text-center">
-          <div class="row my-3">
-            
-            <form class="form-inline md-form mr-auto">
-              <input class="form-control mr-sm-2" type="text" placeholder="Search document" aria-label="Search document">
-              <button class="btn btn-dark btn-rounded btn-sm my-0" type="submit">Search</button>
-            </form> 
-            
-            <button class="btn btn-dark all-doc-btn">Upload</button>
+			<section class="content">
+				<div class="container text-center">
+					<div class="row my-3">
 
-          </div>
-          <div class="doc-container row row-cols-auto py-2">
+						<form class="form-inline md-form mr-auto">
+							<input class="form-control mr-sm-2" type="text"
+								placeholder="Search document" aria-label="Search documents...">
+							<button class="btn btn-dark btn-rounded btn-sm my-0"
+								type="submit">Search</button>
+						</form>
 
-            <c:forEach items="${documents}" var="document">
-              <div class="col">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                  <label class="form-check-label" for="defaultCheck1">
-                    ${document.getName()}
-                  </label>
-                </div>
-              </div>
-              <div class="col-3">
-                ${document.getData()}
-              </div>
-              <div class="col-2">
-                <button class="btn btn-dark download py-1">Download</button>
-              </div>
-            </c:forEach>
+						<button class="btn btn-dark all-doc-btn">Upload</button>
 
-          </div>
-        </div>
-      </section>
+					</div>
+					<div class="doc-container row row-cols-auto py-2">
 
-      <footer>
-        <%@include file="boxes/footer.jsp" %>
-      </footer>
-    </section>
-    </section>
-  </div>
-  <script type="module" src="/js/main.js"></script>
+						<c:forEach items="${documents}" var="document">
+							<div class="col">
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" value=""
+										id="defaultCheck1"> <label class="form-check-label"
+										for="defaultCheck1"> ${document.getName()} </label>
+								</div>
+							</div>
+							<div class="col-2">
+								<button class="btn btn-dark download py-1">Download</button>
+							</div>
+						</c:forEach>
+
+					</div>
+				</div>
+			</section>
+
+			<footer>
+				<%@include file="boxes/footer.jsp"%>
+			</footer>
+		</section>
+		</section>
+	</div>
+	<script type="module" src="/js/main.js"></script>
 </body>
 
 </html>

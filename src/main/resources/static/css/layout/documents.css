@@ -9,6 +9,7 @@
     border-width: thin;
     display: flex;
     align-items: center; 
+    
 }
 .download{
     color: #fff;
@@ -23,3 +24,12 @@
     border-radius: 12px;
    
 }
+
+.page .content-doc-file {
+    flex-grow: 1;
+    height: 100%;
+    overflow-y: scroll; 
+    display: flex;
+    flex-direction: column;
+}
+
