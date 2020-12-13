@@ -53,7 +53,7 @@
                   	<%for(int i = 0; i <= 34; i++){  
                    		if(i>=offset && i <= thisMonth.lengthOfMonth()){%>
                    	
-		                    <button class='day-box'></button>				
+		                    <Button class='day-box'></Button>				
 		                    <div class='modal'>
 		                    	<div class='modal-content'>
 		                    		<span class='close'>&times;</span>
@@ -109,6 +109,7 @@
         </section>
     </div>
 	
+    <script src="/js/main.js"></script>
     <script src="/js/schedule.js"></script>
 </body>
 </html>

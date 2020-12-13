@@ -12,6 +12,19 @@ button{
 	width:19.75%;
 	height:50px;
 	background:var(--secondary-color);
+	transition-property:opacity;
+	border:0;
+	outline:none;
+}
+
+button:hover{
+	transition-duration:0.2s;
+	opacity:80%;
+}
+button:focus{
+	border:0;
+	outline:none;
+	scale:1.1;
 }
 
 #update, #create{
@@ -29,10 +42,10 @@ b{
 #department-content{
 	display:none;
 	position:relative;
-	width:60%;
+	width:60.2%;
 	font-size:large;
 	text-align:right;
-	padding-right:15%;
+	padding-right:9%;
 	background-color:var(--primary-color);
 	color:var(--secondary-color);
 	border:1px solid black;

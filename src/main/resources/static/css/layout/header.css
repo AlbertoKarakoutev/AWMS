@@ -22,9 +22,10 @@
   .badge {
     position: absolute;
     top: 7px;
-    right: 24px;
+    right: 15px;
     padding: 0px 4px;
-    border-radius: 50%;
+	border-radius: 100%;
+	font-family: sans-serif;
     background: red;
     color: white;
   }

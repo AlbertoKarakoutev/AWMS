@@ -3,3 +3,5 @@
     <button class="btn-notification col-1">
     <i class="fas fa-bell"><span class="badge">3</span></i></button>
 </div>
+
+<script src="/js/schedule.js"></script>
