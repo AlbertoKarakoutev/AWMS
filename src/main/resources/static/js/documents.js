@@ -18,3 +18,12 @@ Array.from(downloadButtons).forEach(function(button){
 
     }
 });
+
+search.onclick = function(){
+	let key = searchTerm.value;
+	if(key!=""){
+		window.location.assign("/document/public/search/?name="+key);
+	}else{
+		window.location.assign("/document/public");
+	}
+}

@@ -23,19 +23,27 @@
 			<header class="header">
 				<%@include file="boxes/header.jsp"%>
 			</header>
-
 			<section class="content-doc-file">
+				<header class="py-3">
+					<h1 class="ty-page-title">
+						<c:if test='${type == "personal"}'>Personal Documents</c:if>
+						<c:if test='${type == "public"}'>Public Documents</c:if>
+						<c:if test='${type == "search"}'>Search</c:if>
+					</h1>
+
+				</header>
 				<div class="container text-center">
 					<div class="row my-3">
 
-						<form class="form-inline md-form mr-auto">
-							<input class="form-control mr-sm-2" type="text"
-								placeholder="Search document" aria-label="Search documents...">
-							<button class="btn btn-dark btn-rounded btn-sm my-0"
-								type="submit">Search</button>
+						<div class="form-inline md-form mr-auto">
+							<input id="searchTerm" class="form-control mr-sm-2" type="text"
+								placeholder="Search documents..." aria-label="Search document">
+							<button id="search" class="btn btn-dark btn-rounded btn-sm my-0">Search</button>
+						</div>
+						<form enctype="multipart/form-data" method="POST" action="/document/public/upload">
+							<button type="submit" id="upload" class="btn btn-dark all-doc-btn">Upload</button>
+							<input type="file" id="uploadFile" name="file">
 						</form>
-
-						<button class="btn btn-dark all-doc-btn">Upload</button>
 					</div>
 
 					<c:forEach items="${documents}" var="document">
@@ -49,7 +57,8 @@
 							</div>
 
 							<div class="col-2">
-								<button id="${document.getId()}" class="btn btn-dark download py-1">Download</button>
+								<button id="${document.getId()}"
+									class="btn btn-dark download py-1">Download</button>
 							</div>
 						</div>
 					</c:forEach>

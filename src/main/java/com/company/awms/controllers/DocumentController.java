@@ -23,8 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.company.awms.data.documents.Doc;
 import com.company.awms.data.documents.DocInfoDTO;
+import com.company.awms.data.employees.Employee;
 import com.company.awms.security.EmployeeDetails;
 import com.company.awms.services.DocumentService;
+import com.company.awms.services.EmployeeService;
 
 @Controller
 @RequestMapping("/document")
@@ -33,13 +35,15 @@ public class DocumentController {
 	private static final boolean active = true;
 	
     private DocumentService documentService;
+    private EmployeeService employeeService;
 	
     @Autowired
-    public DocumentController(DocumentService documentService) {
+    public DocumentController(DocumentService documentService, EmployeeService employeeService) {
         this.documentService = documentService;
+        this.employeeService = employeeService;
     }
     
-    @PostMapping(value = "/public/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/public/upload")
     public String uploadPublicDocument(@RequestParam MultipartFile file, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
         try{
             documentService.uploadPublicDocument(file, employeeDetails.getID());
@@ -161,7 +165,6 @@ public class DocumentController {
             documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
             List<DocInfoDTO> foundDocuments = this.documentService.searchInDocumentByName(documents, name);
-
             model.addAttribute("documents", foundDocuments);
             model.addAttribute("type", "search");
             injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -174,10 +177,12 @@ public class DocumentController {
         }
     }
 
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException{
         model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
         model.addAttribute("employeeEmail", employeeDetails.getUsername());
         model.addAttribute("employeeID", employeeDetails.getID());
+        Employee user = employeeService.getEmployee(employeeDetails.getID());
+        model.addAttribute("notifications", user.getNotifications());
     }
 
 	public static boolean getActive() {

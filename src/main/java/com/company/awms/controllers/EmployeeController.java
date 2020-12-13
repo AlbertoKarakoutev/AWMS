@@ -53,17 +53,19 @@ public class EmployeeController {
     }
 
     @GetMapping("/password/new")
-    public String getPasswordUpdate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
+    public String getPasswordUpdate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws IOException{
         injectLoggedInEmployeeInfo(model, employeeDetails);
         model.addAttribute("mismatch", false);
 
         return "newPassword";
     }
 
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException{
         model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
         model.addAttribute("employeeEmail", employeeDetails.getUsername());
         model.addAttribute("employeeID", employeeDetails.getID());
+        Employee user = employeeService.getEmployee(employeeDetails.getID());
+        model.addAttribute("notifications", user.getNotifications());
     }
 
     public static boolean getActive() {
