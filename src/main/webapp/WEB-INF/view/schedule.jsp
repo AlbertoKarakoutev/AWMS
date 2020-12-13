@@ -10,17 +10,12 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script
-        src="https://code.jquery.com/jquery-3.5.1.min.js"
-        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-        crossorigin="anonymous">
-    </script>  
-	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link href="/css/main.css" rel="stylesheet">
-    <link href="/css/components/schedule.css" rel="stylesheet">
-    <script src="/js/main.js"></script>
+	
+    <!--Add vendor's js files-->
+    <script src="/webjars/jquery/3.5.1/jquery.js"></script>
+    <script src="/webjars/bootstrap/4.5.3/js/bootstrap.bundle.js"></script>
+    <script src="/webjars/font-awesome/5.15.1/js/fontawesome.js"></script> 
 
 	<title>Calendar</title>
 </head>
@@ -39,73 +34,107 @@
             <header class="header">
                 <%@include file="boxes/header.jsp" %>
             </header>
-            <section class="p-4 content">
-                <div class="working-shedule"><b><%=yearMonth.getMonth()%> <%=yearMonth.getYear()%> </b></div>
-                <div class="parent">
-                    <div class="monday">Monday</div>
-                    <div class="tuesday">Tuesday</div>
-                    <div class="wednesday">Wednesday</div>
-                    <div class="thursday">Thursday</div>
-                    <div class="friday">Friday</div>
-                    <div class="saturday">Saturday</div>
-                    <div class="sunday">Sunday</div>
-                    
-                  	<%for(int i = 0; i <= 34; i++){  
-                   		if(i>=offset && i <= thisMonth.lengthOfMonth()){%>
-                   	
-		                    <Button class='day-box'></Button>				
-		                    <div class='modal'>
-		                    	<div class='modal-content'>
-		                    		<span class='close'>&times;</span>
-		                    		<div class='work-shifts'>
-		                    			<p class="title">Employees</p>
-				                    	  	<%if(sle[i-offset] != null){
-				                    	  		for(int j = 0; j < sle[i-offset].size(); j++){
-				                    	  			EmployeeDailyReference thisEDR = sle[i-offset].get(j);
-				                    	  			String day = thisMonth.withDayOfMonth(i).toString();
-      	  				                    		out.println(thisEDR.getFirstName() + " " + thisEDR.getLastName() + " " + thisEDR.getWorkTimeInfo());%>
-      	  				                    		
-					                    			<button class="swap" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
-					                    			
-					                    		</br>
-					                    	
-		                    	      			<%}
-		                    	      		}%>
-		                    		</div>
+            <section class="content">
+			    <div class="p-4">
+			        <header class="py-3">
+                        <h1 class="ty-page-title"><%=yearMonth.getMonth()%> <%=yearMonth.getYear()%></h1>
+                    </header>
+				    <div class="container-fluid">
+				    	<div class="row">
+				    		<div class="col">
+				    			<h3 class="text-center">Monday</h3>
+				    		</div>
+				    		<div class="col">
+			    				<h3 class="text-center">Tuesday</h3>
+			    			</div>
+	    					<div class="col">
+	    						<h3 class="text-center">Wednesday</h3>
+	    					</div>
+	    					<div class="col">
+		    					<h3 class="text-center">Thursday</h3>
+		    				</div>
+		    				<div class="col">
+		    					<h3 class="text-center">Friday</h3>
+		    				</div>
+		    				<div class="col">
+		    					<h3 class="text-center">Saturday</h3>
+		    				</div>
+		    				<div class="col">
+		    					<h3 class="text-center">Sunday</h3>
+		    				</div>
+		    			</div>
+						<div class="mt-2">
+						    <div class="row seven-cols">
+								<%for(int i = 0; i <= 34; i++){%>
+								    <c:set var="i" value="<%= i %>" />
+
+								    <div class="col-md-1">
+                   						<%if(i>=offset && i <= thisMonth.lengthOfMonth()){%>
+		             	     	 	        <button class='day-box' data-toggle="modal" data-target="#employeeModal${i}"></button>				
+		                 	  		    	<div class='modal fade' id="employeeModal${i}" tabindex="-1" role="dialog" aria-labelledby="EmployeeModal${i}" aria-hidden="true">
+		                         	  		    <div class='modal-dialog modal-dialog-centered modal-xl' role="document">
+												    <div class='modal-content'>
+												    	<div class='modal-header'>
+												            <h5 id='EmployeeModal${i}' class="modal-title">Employees</h5>
+												            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">
+												    	    	    <i class="fas fa-times"></i>
+												    	    	</span>
+                                                            </button>
+											    	    </div>
+											    		<div class="modal-body">
+		                         	  		 		        <div class='work-shifts'>
+				                    	    		          	<%if(sle[i-offset] != null){%>
+																  test2
+				                    	    		          		<%for(int j = 0; j < sle[i-offset].size(); j++){
+				                     		 	  	          			EmployeeDailyReference thisEDR = sle[i-offset].get(j);
+				                     		   		          			String day = thisMonth.withDayOfMonth(i).toString();
+      	  				             		  	                 		out.println(thisEDR.getFirstName() + " " + thisEDR.getLastName() + " " + thisEDR.getWorkTimeInfo());%>
+      	  				               		     	    	
+					                    	   	    	     			<button class="swap" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
+					                        	        				<br />
+		                    	          		        			<%}
+		                    	          		        		}%>
+		                    	   		     	        	</div>
 		                      		  
-		                      	   	<%if(tasks[i-1] != null){%>
-		                    			<div class="tasks">
-			                    			<p class="title">Tasks</p>
-			                    			<c:set var="day" value="init"/>
-			                    		   	<%pageContext.setAttribute("day", i-1);%>
-			                    			<c:forEach items="${tasks[day]}" var="task">
-												<c:out value="${task.getTaskTitle()}"/>
-											</c:forEach>
-		                    			</div>
-		                      	  	<%}%>
-		                    	 	
-		                    	</div>
-		                    </div>
-					
-					  <%}else{%>
-						
-							<div class="empty-day"></div>		
-						
-					  <%}
-                    }%>
-                    
-                </div>
+		                          	  	    	         	<%if(tasks[i-1] != null){%>
+		                    	    	 		        	   	<div class="tasks">
+			                            		        			<p class="title">Tasks</p>
+			                            		        			<c:set var="day" value="init"/>
+			                        	    	        		   	<%pageContext.setAttribute("day", i-1);%>
+			                        	    	        			<c:forEach items="${tasks[day]}" var="task">
+								    	    	        				<c:out value="${task.getTaskTitle()}"/>
+								    	    	        			</c:forEach>
+		                    	    	    	        		</div>
+		                          	  	            		<%}%> 	
+												    	</div>
+		                             			    </div>
+											    </div>
+		                           			</div>
+				             			<%}else{%>
+					    		    		<div class="empty-day"></div>		
+					            		<%}%>
+									</div>
+                           		<%}%>
+							</div>
+				   	 	</div>
+		    		</div>
+				</div>
+				<div class="my-2 text-center">
+					<%if(yearMonth.equals(YearMonth.now())){%>
+            			<a class="btn btn-dark btn-lg" href="/schedule/?month=<%=YearMonth.now().plusMonths(1)%>">
+					    	<i class="fas fa-chevron-right"></i>
+						</a>		
+         		   	<%}else{%>
+            			<a class="btn btn-dark btn-lg" href="/schedule/?month=<%=YearMonth.now()%>">
+						    <i class="fas fa-chevron-left"></i>
+						</a>
+            		<%}%>
+				</div>
+                <footer>
+                    <%@include file="boxes/footer.jsp" %>
+                </footer>
             </section>
-            
-            	<%if(yearMonth.equals(YearMonth.now())){
-            	%>
-            		<a class="arrow" href="/schedule/?month=<%=YearMonth.now().plusMonths(1)%>">&#8250;</a>		
-            	<%}else{%>
-            		<a class="arrow" href="/schedule/?month=<%=YearMonth.now()%>">&#8249;</a>
-            	<%}%>
-            <footer>
-                <%@include file="boxes/footer.jsp" %>
-            </footer>
         </section>
     </div>
 	

@@ -27,51 +27,70 @@
             <section class="content">
                 <div class="p-4">
                     <header class="py-3">
-                        <h1 class="ty-page-title font-italic">Contacts</h1>
+                        <h1 class="ty-page-title">Contacts</h1>
                     </header>
-                    <div class="container">
-                    <div class="row">
-                        <div class="visit-card col-md-4 mb-4 card-body">
-                            <div class="border rounded p-4 h-100">
-                                <div class="name-contact">
-                                    <i class="fas fa-signature"> Name: ${owner.getFirstName()} ${owner.getLastName()} </i>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="visit-card col-md-4 card-body">
+                                <div class="border rounded p-4">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-signature mr-1"></i> 
+                                        <p>
+                                            <b>Name:</b> 
+                                            ${owner.getFirstName()} ${owner.getLastName()}
+                                        </p>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-briefcase mr-1"></i> 
+                                        <p>
+                                            <b>Work position:</b> 
+                                            ${owner.getRole()}
+                                        </p>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-phone-alt mr-1"></i> 
+                                        <p>
+                                            <b>Telephone number:</b> 
+                                            ${owner.getPhoneNumber()}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div class="work-position-contact">
-                                    <i class="fas fa-briefcase"> Work position: ${owner.getRole()}</i>
+                            </div>
+                        
+                            <c:forEach items="${managers}" var="manager">
+                                <div class="visit-card col-md-4 card-body">
+                                    <div class="border rounded p-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-signature mr-1"></i> 
+                                            <p>
+                                                <b>Name:</b> 
+                                                ${manager.getFirstName()} ${manager.getLastName()}
+                                            </p>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-briefcase mr-1"></i> 
+                                            <p> 
+                                                <b>Work position:</b>
+                                                ${manager.getRole()}
+                                            </p>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-phone-alt mr-1"></i> 
+                                            <p>
+                                                <b>Telephone number: </b>
+                                                ${manager.getPhoneNumber()}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="telephone-num">
-                                    <i class="fas fa-phone-alt"> Telephone number: ${owner.getPhoneNumber()}</i>
-                                </div>
                             </div>
-                            </div>
-                        </div>
-                <c:forEach items="${managers}" var="manager">
-                    <div class="visit-card col-md-4 mb-4 card-body">
-                        <div class="border rounded p-4 h-100">
-                            <div class="name-contact">
-                                <i class="fas fa-signature"> Name: ${manager.getFirstName()} ${manager.getLastName()} </i>
-                            </div>
-                            <div class="work-position-contact">
-                                <i class="fas fa-briefcase"> Work position: ${manager.getRole()}</i>
-                            </div>
-                            <div class="telephone-num">
-                                <i class="fas fa-phone-alt"> Telephone number: ${manager.getPhoneNumber()}</i>
-                            </div>
-                            </div>
-                        </div>
+                        </c:forEach>
                     </div>
-                </c:forEach>
                 </div>
-
-            </div>
-
             </section>
-
-
             <footer>
                 <%@include file="boxes/footer.jsp" %>
             </footer>
-        </section>
         </section>
     </div>
     <script type="module" src="/js/main.js"></script>
