@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec"
+    uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 
@@ -31,6 +33,7 @@
 						    <c:if test='${type == "personal"}'>Personal Documents</c:if>
 						    <c:if test='${type == "public"}'>Public Documents</c:if>
 						    <c:if test='${type == "search"}'>Search</c:if>
+							<c:if test='${type == "admin-edit"}'>Editing ${name}'s personal documents:</c:if>
 					    </h1>
                     </header>
 					<div class="d-flex my-3">
@@ -64,7 +67,14 @@
                                 <td>
 						            <h4>${document.getName()}</h4>
 						        </td>
-                                <td></td>
+                                <td>
+								   <sec:authentication property="principal.authorities" var="role" />
+								   <c:if test="${(document.getOwnerID() == employeeID)||(role == '[ADMIN]')}">
+                                     <form action="/document/public/delete/${document.getId()}" method="POST">
+									     <button class="btn btn-dark">Delete</button>
+									 </form>
+								   </c:if>
+								</td>
                                 <td>
 							       <button id="${document.getId()}" class="btn btn-dark download">Download</button>
 								</td>

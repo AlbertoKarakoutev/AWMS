@@ -22,10 +22,46 @@
                 <%@include file="boxes/header.jsp" %>
             </header>
             <section class="content">
-                <header class="py-3">
-                    <h1 class="ty-page-title">Now editing ${employee.getFirstName()} ${employee.getLastName()}!</h1>
-                </header>
-                
+                <div class="p-4">
+                    <header class="py-3">   
+                        <h1 class="ty-page-title">Now editing ${employee.getFirstName()} ${employee.getLastName()}!</h1>
+                    </header>
+                    <form action="/admin/employee/update" method="POST">
+                        <div class="form-group">
+                            <label for="firstNameEmployee">First name</label>
+                            <input value="${employee.getFirstName()}" type="text" name="firstName" class="form-control" id="firstNameEmployee" aria-describedby="firstName" placeholder="First name" required>
+                            <small id="firstNameHelp" class="form-text text-muted">Employee's first name.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="familyNameEmployee">Family name</label>
+                            <input value="${employee.getLastName()}" type="text" name="familyName" class="form-control" id="familyNameEmployee" aria-describedby="familyName" placeholder="Family name">
+                            <small id="familyNameHelp" class="form-text text-muted">Employee's family name.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="emailEmployee">Email</label>
+                            <input value="${employee.getEmail()}" type="email" name="email" class="form-control" id="emailEmployee" aria-describedby="emailName" placeholder="Email" required>
+                            <small id="emailHelp" class="form-text text-muted">Employee's email.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="phoneNumberEmployee">Phone number</label>
+                            <input value="${employee.getPhoneNumber()}" type="tel" name="phoneNumber" class="form-control" id="phoneNumberEmployee" aria-describedby="phoneNumberEmployee" placeholder="Password" required>
+                            <small id="phoneNumberHelp" class="form-text text-muted">Employee's phone number.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="departmentEmployee">Department</label>
+                            <select class="form-control" name="department" id="departmentEmployee">
+                                <c:forEach items="${departments.keySet()}" var="key">
+                                    <option selected="${key == employee.getDepartment()}">${departments.get(key)}</option>
+                                </c:forEach>
+                            </select>
+                            <small id="departmentHelp" class="form-text text-muted">Employee's department.</small>
+                        </div>
+                        <div class="form-group">
+                            <a class="btn btn-primary btn-sm" href="/admin/personal/${employee.getID()}" title="Edit employee's files">Edit Files</a>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Редактирай</button>
+                    </form>
+                </div>
                 <footer>
                     <%@include file="boxes/footer.jsp" %>
                 </footer>

@@ -32,20 +32,21 @@ import com.company.awms.services.EmployeeService;
 @RequestMapping("/document")
 public class DocumentController {
 
-	private static final boolean active = true;
-	
+    private static final boolean active = true;
+
     private DocumentService documentService;
     private EmployeeService employeeService;
-	
+
     @Autowired
     public DocumentController(DocumentService documentService, EmployeeService employeeService) {
         this.documentService = documentService;
         this.employeeService = employeeService;
     }
-    
+
     @PostMapping(value = "/public/upload")
-    public String uploadPublicDocument(@RequestParam MultipartFile file, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
-        try{
+    public String uploadPublicDocument(@RequestParam MultipartFile file,
+            @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+        try {
             documentService.uploadPublicDocument(file, employeeDetails.getID());
 
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
@@ -53,26 +54,25 @@ public class DocumentController {
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "documents";
-        } catch (IOException e){
+        } catch (IOException e) {
             return "badRequest";
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return "internalServerError";
         }
     }
 
     @GetMapping(value = "/public/download/{documentID}")
-    public ResponseEntity<Resource> downloadPublicDocument(@PathVariable String documentID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
+    public ResponseEntity<Resource> downloadPublicDocument(@PathVariable String documentID,
+            @AuthenticationPrincipal EmployeeDetails employeeDetails) {
         try {
             Doc document = this.documentService.downloadPublicDocument(documentID, employeeDetails.getID());
 
             ByteArrayResource byteArrayResource = new ByteArrayResource(document.getData().getData());
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
-                    .header("fileName", document.getName())
-                    .contentLength(document.getData().length())
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(byteArrayResource);
+                    .header("fileName", document.getName()).contentLength(document.getData().length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(byteArrayResource);
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (IllegalAccessException e) {
@@ -84,28 +84,28 @@ public class DocumentController {
     }
 
     @GetMapping(value = "/personal/download/{documentID}")
-    public ResponseEntity<Resource> downloadPersonalDocument(@PathVariable int documentID, @AuthenticationPrincipal EmployeeDetails employeeDetails){
+    public ResponseEntity<Resource> downloadPersonalDocument(@PathVariable int documentID,
+            @AuthenticationPrincipal EmployeeDetails employeeDetails) {
         try {
-        	Doc document = documentService.downloadPersonalDocument(documentID, employeeDetails.getID());
+            Doc document = documentService.downloadPersonalDocument(documentID, employeeDetails.getID());
 
             ByteArrayResource byteArrayResource = new ByteArrayResource(document.getData().getData());
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
-                    .header("fileName", document.getName())
-                    .contentLength(document.getData().length())
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(byteArrayResource);
+                    .header("fileName", document.getName()).contentLength(document.getData().length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM).body(byteArrayResource);
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping(value = "/public/delete/{documentID}")
-    public String deletePublicDocument(@PathVariable String documentID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
-        try{
+    @PostMapping(value = "/public/delete/{documentID}")
+    public String deletePublicDocument(@PathVariable String documentID,
+            @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+        try {
             this.documentService.deletePublicDocument(documentID, employeeDetails.getID());
 
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
@@ -125,7 +125,7 @@ public class DocumentController {
     }
 
     @GetMapping(value = "/public")
-    public String getAccessibleDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
+    public String getAccessibleDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
         try {
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
@@ -143,7 +143,7 @@ public class DocumentController {
     }
 
     @GetMapping(value = "/personal")
-    public String getAllPersonalDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
+    public String getAllPersonalDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
         try {
             List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeDetails.getID());
 
@@ -152,14 +152,15 @@ public class DocumentController {
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "documents";
-        }  catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return "internalServerError";
         }
     }
 
     @GetMapping("/public/search")
-    public String searchInDocuments(@RequestParam String name, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
+    public String searchInDocuments(@RequestParam String name, @AuthenticationPrincipal EmployeeDetails employeeDetails,
+            Model model) {
         try {
             List<DocInfoDTO> documents;
             documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
@@ -172,12 +173,12 @@ public class DocumentController {
             return "documents";
         } catch (IOException e) {
             return "notFound";
-        } catch (Exception e){
+        } catch (Exception e) {
             return "internalServerError";
         }
     }
 
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException{
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
         model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
         model.addAttribute("employeeEmail", employeeDetails.getUsername());
         model.addAttribute("employeeID", employeeDetails.getID());
@@ -185,7 +186,7 @@ public class DocumentController {
         model.addAttribute("notifications", user.getNotifications());
     }
 
-	public static boolean getActive() {
-		return active;
-	}
+    public static boolean getActive() {
+        return active;
+    }
 }

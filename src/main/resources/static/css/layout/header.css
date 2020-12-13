@@ -29,6 +29,10 @@
     white-space: unset;
 }
 
+.logo .dropdown-item a:hover {
+    color: var(--primary-color);
+}
+
 /* width */
 .logo .dropdown-menu::-webkit-scrollbar {
     width: 5px;

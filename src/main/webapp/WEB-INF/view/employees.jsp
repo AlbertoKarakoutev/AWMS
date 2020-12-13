@@ -21,12 +21,47 @@
 			<header class="header">
 				<%@include file="boxes/header.jsp"%>
 			</header>
-			<c:forEach items="${employees}" var="employee">
-				${employee.getFirstName()} ${employee.getLastName()}
-			</c:forEach>
-			<footer>
-				<%@include file="boxes/footer.jsp"%>
-			</footer>
+			<section class="content">
+                <div class="p-4">
+			    	<header class="py-3">
+                        <h1 class="ty-page-title">Employees List</h1>
+                    </header>
+				    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">First Name</th>
+                                <th scope="col">Family Name</th>
+                                <th scope="col">Department</th>
+								<th scope="col">Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${employees}" var="employee" varStatus="loop">
+							    <tr>
+                                <th scope="row">${loop.index}</th>
+                                <td>
+						            <h4>${employee.getFirstName()}</h4>
+						        </td>
+                                <td>
+								    <h4>${employee.getLastName()}</h4>
+								</td>
+                                <td>
+							        <h4>${departments.get(employee.getDepartment())}</h4>
+								</td>
+								<td>
+								    <a class="btn btn-dark" href="/admin/employee/edit/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
+									    Edit
+									</a>
+								</td>
+                                </tr>
+			                </c:forEach>
+					    </tbody>
+					</table>
+				</div>
+			    <footer>
+			    	<%@include file="boxes/footer.jsp"%>
+		    	</footer>
 		</section>
 	</div>
 	<script type="module" src="/js/main.js"></script>

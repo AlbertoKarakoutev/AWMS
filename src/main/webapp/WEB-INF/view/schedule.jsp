@@ -68,7 +68,7 @@
 								<%for(int i = 0; i <= 34; i++){%>
 								    <c:set var="i" value="<%= i %>" />
 
-								    <div class="col-md-1">
+								    <div class="col-md-1 p-0">
                    						<%if(i>=offset && i <= thisMonth.lengthOfMonth()){%>
 		             	     	 	        <button class='day-box' data-toggle="modal" data-target="#employeeModal${i}"></button>				
 		                 	  		    	<div class='modal fade' id="employeeModal${i}" tabindex="-1" role="dialog" aria-labelledby="EmployeeModal${i}" aria-hidden="true">
