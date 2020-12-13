@@ -8,4 +8,6 @@
     --quaternary-color: #7D7D7D;
 
     --primary-transition: 0.2s;
+
+    --primary-zIndex: 50;
 }
