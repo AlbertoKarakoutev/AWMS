@@ -12,7 +12,7 @@
 		aria-expanded="false">
 		<i class="fas fa-bell"></i>
 		<div class="ap-badge-position">
-			<span class="badge badge-danger">3</span>
+			<span class="badge badge-danger">${unread}</span>
 		</div>
 	</button>
 	<div class="dropdown-menu" aria-labelledby="dropdownNotification">
@@ -25,7 +25,6 @@
 				if(notification.getRead()==false){
 					allRead = false;
 					if(!notification.getRead()){
-						System.out.println(notification.getMessage());
 						switch (notification.getData().get(0).toString()) {
 						case "swap-request":
 							LocalDate requesterDate = LocalDate.ofInstant(((Date)notification.getData().get(2)).toInstant(), ZoneId.systemDefault());

@@ -148,25 +148,36 @@ public class EmployeeService {
 		return employee;
 	}
 
-	public void updateEmployeeInfo(Employee newEmployee, String oldEmployeeID) throws IOException {
-		Employee oldEmployee = getEmployee(oldEmployeeID);
+	public void updateEmployeeInfo(String employeeID, String data) throws IOException {
+		Employee employee = getEmployee(employeeID);
 		// TODO:
 		// Validation? from Validator Class
-		oldEmployee.setEmail(newEmployee.getEmail());
-		oldEmployee.setFirstName(newEmployee.getFirstName());
-		oldEmployee.setIBAN(newEmployee.getIBAN());
-		oldEmployee.setLastName(newEmployee.getLastName());
-		oldEmployee.setNationalID(newEmployee.getNationalID());
-		oldEmployee.setPhoneNumber(newEmployee.getPhoneNumber());
+		String[] dataValues = data.split("\\n");
+		Map<String, String> newInfo = new HashMap<String, String>();
+		for(String field : dataValues) {
+			newInfo.put(field.split("=")[0], field.split("=")[1]);
+		}
+		employee.setFirstName(newInfo.get("firstName"));
+		employee.setLastName(newInfo.get("familyName"));
+		employee.setNationalID(newInfo.get("nationalID"));
+		employee.setEmail(newInfo.get("email"));
+		employee.setIBAN(newInfo.get("iban"));
+		employee.setPhoneNumber(newInfo.get("phoneNumber"));
+		employee.setDepartment(newInfo.get("department").split(":")[0]);
+		try {
+			employee.setLevel(Integer.parseInt(newInfo.get("level")));
+		}catch(Exception e) {
+			System.out.println("Level is 0");
+			employee.setLevel(0);
+		}
 		
         List<Object> notificationData = new ArrayList<Object>();
         notificationData.add("info-updated");
 		String message = "Your profile information has been updated by the Administrator.";
-		oldEmployee.getNotifications().add(new Notification(message, notificationData));
+		employee.getNotifications().add(new Notification(message, notificationData));
         
-		this.employeeRepo.save(oldEmployee);
+		this.employeeRepo.save(employee);
 	}
-
 
 	public void addLeave(String employeeID, LocalDate start, LocalDate end, boolean paid) throws IOException {
 		Map<String, Object> leave = new HashMap<>();

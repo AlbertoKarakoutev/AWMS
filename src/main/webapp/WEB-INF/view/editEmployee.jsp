@@ -26,7 +26,7 @@
                     <header class="py-3">   
                         <h1 class="ty-page-title">Now editing ${employee.getFirstName()} ${employee.getLastName()}!</h1>
                     </header>
-                    <form action="/admin/employee/update" method="POST">
+                    <form action="/admin/employee/update/?employeeId=${employee.getID()}" method="POST" enctype="text/plain">
                         <div class="form-group">
                             <label for="firstNameEmployee">First name</label>
                             <input value="${employee.getFirstName()}" type="text" name="firstName" class="form-control" id="firstNameEmployee" aria-describedby="firstName" placeholder="First name" required>
@@ -36,6 +36,11 @@
                             <label for="familyNameEmployee">Family name</label>
                             <input value="${employee.getLastName()}" type="text" name="familyName" class="form-control" id="familyNameEmployee" aria-describedby="familyName" placeholder="Family name">
                             <small id="familyNameHelp" class="form-text text-muted">Employee's family name.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="nationalID">National ID</label>
+                            <input value="${employee.getNationalID()}" type="text" name="nationalID" class="form-control" id="nationalIDnationalID" aria-describedby="firstName" placeholder="National ID" required>
+                            <small id="nationalIDhelp" class="form-text text-muted">Employee's national ID number.</small>
                         </div>
                         <div class="form-group">
                             <label for="emailEmployee">Email</label>
@@ -48,18 +53,28 @@
                             <small id="phoneNumberHelp" class="form-text text-muted">Employee's phone number.</small>
                         </div>
                         <div class="form-group">
+                            <label for="ibanEmployee">Phone number</label>
+                            <input value="${employee.getIBAN()}" type="tel" name="iban" class="form-control" id="ibanEmployee" aria-describedby="ibanEmployee" placeholder="Password" required>
+                            <small id="ibanHelp" class="form-text text-muted">Employee's IBAN.</small>
+                        </div>
+                        <div class="form-group">
                             <label for="departmentEmployee">Department</label>
                             <select class="form-control" name="department" id="departmentEmployee">
                                 <c:forEach items="${departments.keySet()}" var="key">
-                                    <option selected="${key == employee.getDepartment()}">${departments.get(key)}</option>
+                                    <option selected="${key == employee.getDepartment()}">${key}:${departments.get(key)}</option>
                                 </c:forEach>
                             </select>
                             <small id="departmentHelp" class="form-text text-muted">Employee's department.</small>
                         </div>
                         <div class="form-group">
-                            <a class="btn btn-primary btn-sm" href="/admin/personal/${employee.getID()}" title="Edit employee's files">Edit Files</a>
+                            <label for="levelEmployee">Level</label>
+                            <input value="${employee.getLevel()}" type="number" name="level" class="form-control" id="levelEmployee" aria-describedby="levelEmployee" placeholder="Password" required>
+                            <small id="levelHelp" class="form-text text-muted">Employee's phone number.</small>
                         </div>
-                        <button type="submit" class="btn btn-dark">Редактирай</button>
+                        <div class="form-group">
+                            <a class="btn btn-primary" href="/admin/personal/${employee.getID()}" title="Edit employee's files">Edit Files</a>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Update</button>
                     </form>
                 </div>
                 <footer>

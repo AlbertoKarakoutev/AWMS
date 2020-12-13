@@ -60,13 +60,20 @@ public class EmployeeController {
         return "newPassword";
     }
 
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException{
-        model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-        model.addAttribute("employeeEmail", employeeDetails.getUsername());
-        model.addAttribute("employeeID", employeeDetails.getID());
-        Employee user = employeeService.getEmployee(employeeDetails.getID());
-        model.addAttribute("notifications", user.getNotifications());
-    }
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeID", employeeDetails.getID());
+		Employee user = employeeService.getEmployee(employeeDetails.getID());
+		int unread = 0;
+		for(int i = 0; i < user.getNotifications().size(); i++) {
+			if(!user.getNotifications().get(i).getRead()) {
+				unread++;
+			}
+		}
+		model.addAttribute("notifications", user.getNotifications());
+		model.addAttribute("unread", unread);
+	}
 
     @GetMapping("/dismiss")
 	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
