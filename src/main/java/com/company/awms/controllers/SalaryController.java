@@ -55,7 +55,7 @@ public class SalaryController {
 		return active;
 	}
 	
-	public void setActive(boolean newActive) {
+	public static void setActive(boolean newActive) {
 		active = newActive;
 	}
 }

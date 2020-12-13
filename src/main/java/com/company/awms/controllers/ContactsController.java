@@ -16,6 +16,8 @@ import java.util.List;
 public class ContactsController {
     private EmployeeService employeeService;
 
+    private static final boolean active = true;
+    
     @Autowired
     public ContactsController(EmployeeService employeeService) {
         this.employeeService = employeeService;
@@ -39,4 +41,8 @@ public class ContactsController {
             return "internalServerError";
         }
     }
+    
+    public static boolean getActive() {
+		return active;
+	}
 }

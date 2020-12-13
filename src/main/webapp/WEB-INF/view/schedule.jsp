@@ -25,6 +25,12 @@
 	<title>Calendar</title>
 </head>
 <body>
+	<%List<EmployeeDailyReference>[] sle = (List<EmployeeDailyReference>[])request.getAttribute("sameLevelEmployees");
+	List<Task>[] tasks = (List<Task>[])request.getAttribute("tasks");
+	YearMonth yearMonth = (YearMonth)request.getAttribute("month");
+	LocalDate thisMonth = LocalDate.now().withYear(yearMonth.getYear()).withMonth(yearMonth.getMonthValue());
+	int offset = thisMonth.withDayOfMonth(1).getDayOfWeek().getValue()-1; %>
+    
     <div class="panel">
         <nav class="navigation">
             <%@include file="boxes/nav.jsp" %>
@@ -34,7 +40,7 @@
                 <%@include file="boxes/header.jsp" %>
             </header>
             <section class="p-4 content">
-                <div class="working-shedule">Schedule</div>
+                <div class="working-shedule"><b><%=yearMonth.getMonth()%> <%=yearMonth.getYear()%> </b></div>
                 <div class="parent">
                     <div class="monday">Monday</div>
                     <div class="tuesday">Tuesday</div>
@@ -44,11 +50,7 @@
                     <div class="saturday">Saturday</div>
                     <div class="sunday">Sunday</div>
                     
-                  <%List<EmployeeDailyReference>[] sle = (List<EmployeeDailyReference>[])request.getAttribute("sameLevelEmployees");
-                   	List<Task>[] tasks = (List<Task>[])request.getAttribute("tasks");
-                  	LocalDate thisMonth = LocalDate.now().withMonth((int)request.getAttribute("month"));
-                    int offset = thisMonth.withDayOfMonth(1).getDayOfWeek().getValue()-1;
-                   	for(int i = 0; i <= 34; i++){  
+                  	<%for(int i = 0; i <= 34; i++){  
                    		if(i>=offset && i <= thisMonth.lengthOfMonth()){%>
                    	
 		                    <button class='day-box'></button>				
@@ -57,14 +59,16 @@
 		                    		<span class='close'>&times;</span>
 		                    		<div class='work-shifts'>
 		                    			<p class="title">Employees</p>
-				                    	  	<%
-				                    	  		if(sle[i-offset] != null){
-				                    	  			                    	  			                    			for(int j = 0; j < sle[i-offset].size(); j++){
-				                    	  			                    	  				                    			out.println(sle[i-offset].get(j).getFirstName() + " " + sle[i-offset].get(j).getLastName() + " " + sle[i-offset].get(j).getWorkTimeInfo());
-				                    	  	%>
-					                    	</br>
-			                    	
-			                    
+				                    	  	<%if(sle[i-offset] != null){
+				                    	  		for(int j = 0; j < sle[i-offset].size(); j++){
+				                    	  			EmployeeDailyReference thisEDR = sle[i-offset].get(j);
+				                    	  			String day = thisMonth.withDayOfMonth(i).toString();
+      	  				                    		out.println(thisEDR.getFirstName() + " " + thisEDR.getLastName() + " " + thisEDR.getWorkTimeInfo());%>
+      	  				                    		
+					                    			<button class="swap" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
+					                    			
+					                    		</br>
+					                    	
 		                    	      			<%}
 		                    	      		}%>
 		                    		</div>
@@ -92,6 +96,13 @@
                     
                 </div>
             </section>
+            
+            	<%if(yearMonth.equals(YearMonth.now())){
+            	%>
+            		<a class="arrow" href="/schedule/?month=<%=YearMonth.now().plusMonths(1)%>">&#8250;</a>		
+            	<%}else{%>
+            		<a class="arrow" href="/schedule/?month=<%=YearMonth.now()%>">&#8249;</a>
+            	<%}%>
             <footer>
                 <%@include file="boxes/footer.jsp" %>
             </footer>
