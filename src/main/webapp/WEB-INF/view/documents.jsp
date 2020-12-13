@@ -31,22 +31,17 @@
                     </header>
 					<div class="d-flex my-3">
 						<div class="flex-grow-1">
-							<form class="form-inline">
-								<input class="form-control" type="text"
+							<form class="form-inline" method='get' action='/document/public/search/'>
+								<input class="form-control" type="text" name='name'
 									placeholder="Search document" aria-label="Search documents...">
-								<button class="btn btn-dark ml-2"
-									type="submit">Search</button>
+								<button class="btn btn-dark ml-2" type="submit">Search</button>
 							</form>
 						</div>
 						<div>
-							<form action="/document/public/upload" method="post">
-  								<div class="form-inline">
-    								<label for="exampleFormControlFile1">Upload file</label>
-    								<input type="file" name="file" class="form-control-file" id="exampleFormControlFile1">
-									<button class="btn btn-dark mt-2">Upload</button>
-  								</div>
-				
-							</form>
+							<form enctype="multipart/form-data" method="POST" action="/document/public/upload">
+							    <button type="submit" id="upload" class="btn btn-dark">Upload</button>
+							    <input type="file" id="uploadFile" name="file">
+						    </form>
 						</div>
 					</div>
                     <table class="table">
