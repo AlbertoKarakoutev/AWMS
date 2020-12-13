@@ -17,12 +17,12 @@
 </head>
 
 <body>
-    <div class="panel">
-        <%@include file="boxes/nav.jsp" %>
-        <section class="page">
-            <header class="header">
-                <%@include file="boxes/header.jsp" %>
-            </header>
+<div class="panel">
+    <%@include file="boxes/nav.jsp" %>
+    <section class="page">
+        <header class="header">
+            <%@include file="boxes/header.jsp" %>
+        </header>
 
             <section class="content">
                 <div class="p-4">

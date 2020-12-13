@@ -28,7 +28,7 @@ public class ContactsController {
         try {
             Employee owner = this.employeeService.getOwner();
             List<Employee> managers = this.employeeService.getManagers();
-
+            injectLoggedInEmployeeInfo(model, employeeDetails);
             model.addAttribute("owner", owner);
             model.addAttribute("managers", managers);
 
@@ -40,6 +40,12 @@ public class ContactsController {
             e.printStackTrace();
             return "internalServerError";
         }
+    }
+
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+        model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+        model.addAttribute("employeeEmail", employeeDetails.getUsername());
+        model.addAttribute("employeeID", employeeDetails.getID());
     }
     
     public static boolean getActive() {

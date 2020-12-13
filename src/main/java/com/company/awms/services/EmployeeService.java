@@ -111,7 +111,7 @@ public class EmployeeService {
 		return owner.get();
 	}
 
-	public List<Employee> getManagers() throws IOException {
+	public List<Employee> getManagers() {
 		return this.employeeRepo.findAllByRole("MANAGER");
 	}
 
@@ -124,6 +124,17 @@ public class EmployeeService {
 		newEmployee.setRole("EMPLOYEE");
 
 		this.employeeRepo.save(newEmployee);
+	}
+
+	public Employee updatePassword(String newPassword, String employeeID) throws IOException {
+		Employee employee = getEmployee(employeeID);
+
+		String encodedPassword = this.passwordEncoder.encode(newPassword);
+		employee.setPassword(encodedPassword);
+
+		this.employeeRepo.save(employee);
+
+		return employee;
 	}
 
 	public void updateEmployeeInfo(Employee newEmployee, String oldEmployeeID) throws IOException {
