@@ -68,6 +68,19 @@ public class EmployeeController {
         model.addAttribute("notifications", user.getNotifications());
     }
 
+    @GetMapping("/dismiss")
+	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
+		try{
+			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
+            model.addAttribute("employee", employee);
+            return "redirect:/";
+		}catch(Exception e) {
+			return "internalServerError";
+		}
+	}
+    
     public static boolean getActive() {
         return active;
     }

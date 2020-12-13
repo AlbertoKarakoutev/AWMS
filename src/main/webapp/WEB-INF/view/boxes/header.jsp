@@ -1,5 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page import="com.company.awms.data.employees.Notification"%>
+<%@page import="com.company.awms.data.forum.ForumThread"%>
+<%@page import="com.company.awms.data.forum.ForumReply"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.time.*"%>
@@ -14,10 +16,14 @@
 		</div>
 	</button>
 	<div class="dropdown-menu" aria-labelledby="dropdownNotification">
-		<c:if test="${notifications.size()>0}">
-			<%for(int i = 0; i < ((List<Notification>)request.getAttribute("notifications")).size(); i++){ 
-				Notification notification = ((List<Notification>)request.getAttribute("notifications")).get(i);
+		<%
+		List<Notification> notifications = (List<Notification>)request.getAttribute("notifications");
+		boolean allRead = true;
+		if(notifications.size()>0){
+			for(int i = 0; i < notifications.size(); i++){ 
+				Notification notification = notifications.get(i);
 				if(notification.getRead()==false){
+					allRead = false;
 					if(!notification.getRead()){
 						System.out.println(notification.getMessage());
 						switch (notification.getData().get(0).toString()) {
@@ -25,28 +31,62 @@
 							LocalDate requesterDate = LocalDate.ofInstant(((Date)notification.getData().get(2)).toInstant(), ZoneId.systemDefault());
 							LocalDate receiverDate = LocalDate.ofInstant(((Date)notification.getData().get(3)).toInstant(), ZoneId.systemDefault());%>
 						
-							<a class="dropdown-item" href="/schedule/?month=<%=YearMonth.now()%>"> 
+							<a style="word-wrap:break-word"class="dropdown-item" href="/schedule/?month=<%=YearMonth.now()%>"> 
 								<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
-								</br>
+								<br>
 								<%=notification.getMessage()%>
 							</a>
-							<form action="/schedule/swap/?noteNum=<%=Integer.toString(i)%>&requesterNationalID=<%=notification.getData().get(1)%>&requesterDate=<%=requesterDate.toString()%>&receiverDate=<%=receiverDate.toString()%>" method="POST">
-								<input type="submit" class="btn" id="accept" value="Accept"/>
+							<form style="float:left;" action="/schedule/swap/?noteNum=<%=Integer.toString(i)%>&requesterNationalID=<%=notification.getData().get(1)%>&requesterDate=<%=requesterDate.toString()%>&receiverDate=<%=receiverDate.toString()%>" method="POST">
+								<input  type="submit" class="btn btn-dark btn-sm" id="accept" value="Accept"/>
 							</form>
-							<form action="/schedule/decline/?noteNum=<%=Integer.toString(i)%>" method="GET">
-								<input type="submit" class="btn" id="decline" value="Decline"/>
+							<form style="float:right;" action="/schedule/decline">
+								<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
+								<input style="display:inline-block" type="submit" class="btn-dark btn btn-sm" id="decline" value="Decline"/>
 							</form>
-						<%}
+							<%break;
+						case "new-reply":
+							ForumReply newReply = (ForumReply)notification.getData().get(2);%>
+							<a style="word-wrap:break-word"class="dropdown-item" href="/forum/thread/<%=newReply.getThreadID()%>"> 
+								<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
+								<br>
+								<%=notification.getMessage()%>
+							</a>
+							<form style="float:right;" action="/forum/dismiss">
+								<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
+								<input style="display:inline-block" type="submit" class="btn-dark btn btn-sm" id="dismiss" value="Dismiss"/>
+							</form>
+							<%break; 
+						case "new-thread":
+							ForumThread newThread = (ForumThread)notification.getData().get(2);%>
+							<a style="word-wrap:break-word"class="dropdown-item" href="/forum/thread/<%=newThread.getID()%>"> 
+								<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
+								<br>
+								<%=notification.getMessage()%>
+							</a>
+							<form style="float:right;" action="/forum/dismiss">
+								<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
+								<input style="display:inline-block" type="submit" class="btn-dark btn btn-sm" id="dismiss" value="Dismiss"/>
+							</form>
+							<%break; 
+						case "info-updated":%>
+							<a style="word-wrap:break-word"class="dropdown-item" href="/"> 
+								<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
+								<br>
+								<%=notification.getMessage()%>
+							</a>
+							<form style="float:right;" action="/dismiss">
+								<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
+								<input style="display:inline-block" type="submit" class="btn-dark btn btn-sm" id="dismiss" value="Dismiss"/>
+							</form>
+							<%break;
+						}
 					}
             	}
-			}%>
-		</c:if>
-		<c:if test="${notifications.size()<=0}">
+			}
+		}
+		if(notifications.size()<=0 || allRead == true){%>
 			<a class="dropdown-item" href="#"> No new notifications! </a>
-            	update info
-            	enw schedule
-            	forum
-		</c:if>
+		<%}%>
 	</div>
 </div>
 

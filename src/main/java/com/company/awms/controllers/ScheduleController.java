@@ -48,10 +48,13 @@ public class ScheduleController {
 	}
 
 	@GetMapping("/decline")
-	public String declineSwap(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum) {
+	public String declineSwap(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
 		try{
 			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
-			return viewSchedule(employeeDetails, model, YearMonth.now());
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
+            model.addAttribute("employee", employee);
+            return "redirect:/";
 		}catch(Exception e) {
 			return "internalServerError";
 		}
