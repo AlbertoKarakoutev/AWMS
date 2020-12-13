@@ -13,13 +13,7 @@ public interface EmployeeRepo extends MongoRepository<Employee, String> {
 
 	Optional<Employee> findByEmail(String email);
 
-	List<Employee> findByFirstName(String firstName);
-
-	List<Employee> findByLastName(String lastName);
-
 	List<Employee> findByAccessLevel(String accessLevel);
-	
-	List<Employee> findByLevel(String level);
 
 	List<Employee> findAllByRole(String role);
 

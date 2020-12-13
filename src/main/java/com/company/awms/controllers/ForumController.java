@@ -60,6 +60,34 @@ public class ForumController {
 		}
 	}
 
+	@GetMapping("answered")
+	public String getAllAnsweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		try {
+			List<ForumThread> threads = this.forumService.getAllAnsweredThreads();
+			model.addAttribute("threads", threads);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+
+			return "forum";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+
+	@GetMapping("unanswered")
+	public String getAllUnansweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		try {
+			List<ForumThread> threads = this.forumService.getAllUnansweredThreads();
+			model.addAttribute("threads", threads);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+
+			return "forum";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/threads/{employeeID}")
 	public String getAllThreadsFromEmployee(@PathVariable String employeeID,
@@ -69,7 +97,7 @@ public class ForumController {
 			model.addAttribute("threads", threads);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
-			return "threadsFromEmployee";
+			return "forum";
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "internalServerError";
@@ -176,7 +204,7 @@ public class ForumController {
 		}
 	}
 
-	@PutMapping(value = "/thread/{threadID}/answered")
+	@PostMapping(value = "/thread/{threadID}/answered")
 	public String markThreadAsAnswered(@PathVariable String threadID,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {

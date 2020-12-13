@@ -12,7 +12,6 @@ import com.company.awms.data.schedule.Task;
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
 public class EmployeeDailyReference {
 
-	// Work time should be in the {startHour, startMinutes, endHour, endMinutes} format
 	private LocalTime[] workTime;
 	private String firstName;
 	private String lastName;
@@ -21,11 +20,6 @@ public class EmployeeDailyReference {
 	private LocalDate date;
 
 	public EmployeeDailyReference() {}
-
-	/*@Autowired
-	public EmployeeDailyReference(EmployeeRepo employeeRepo) {
-		this.employeeRepo = employeeRepo;
-	}*/
 
 	public EmployeeDailyReference(EmployeeRepo employeeRepo, String nationalID) throws IOException {
 		this.nationalID = nationalID;

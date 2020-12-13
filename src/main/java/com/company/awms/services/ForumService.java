@@ -3,11 +3,13 @@ package com.company.awms.services;
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.forum.*;
 import com.company.awms.security.EmployeeDetails;
+import com.company.awms.util.ForumComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,11 +43,31 @@ public class ForumService {
     }
 
     public List<ForumThread> getAllThreads() {
-        return this.forumThreadRepo.findAll();
+        List<ForumThread> allThreads = this.forumThreadRepo.findAll();
+        allThreads.sort(new ForumComparator());
+
+        return allThreads;
+    }
+
+    public List<ForumThread> getAllAnsweredThreads() {
+        List<ForumThread> allThreads = getAllThreads();
+        allThreads.removeIf(t -> !t.getAnswered());
+
+        return allThreads;
+    }
+
+    public List<ForumThread> getAllUnansweredThreads() {
+        List<ForumThread> allThreads = getAllThreads();
+        allThreads.removeIf(ForumThread::getAnswered);
+
+        return allThreads;
     }
 
     public List<ForumThread> getAllThreadsFromEmployee(String issuerID) {
-        return this.forumThreadRepo.findByIssuerID(issuerID);
+        List<ForumThread> employeeThreads = this.forumThreadRepo.findByIssuerID(issuerID);
+        employeeThreads.sort(new ForumComparator());
+
+        return employeeThreads;
     }
 
     public List<ForumReply> getAllRepliesFromEmployee(String issuerID) {
@@ -84,6 +106,7 @@ public class ForumService {
         //We don't update the issuerID, time and isAnswered because they are presumed to be the same.
         oldThread.setBody(body);
         oldThread.setTitle(title);
+        oldThread.setDateTime(LocalDateTime.now());
 
         this.forumThreadRepo.save(oldThread);
 

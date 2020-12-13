@@ -2,7 +2,6 @@ var parent = document.getElementsByClassName("parent")[0];
 
 var now = new Date();
 var numberOfDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-console.log(numberOfDays);
 var modals = document.getElementsByClassName("modal");
 var btns = document.getElementsByClassName("day-box");
 var spans = document.getElementsByClassName("close");
@@ -18,3 +17,13 @@ for(let i = 0; i <= numberOfDays; i++){
 		modals[i].style.display = "none";
 	}
 }
+
+function datePrompt(nationalID, receiverDate){
+	let requesterDate = prompt("Enter date for the shift you wish to swap in the format /YYYY-MM-DD/", "2020-12-10");
+	if(requesterDate!=null){
+		let req = new XMLHttpRequest();
+		req.open("GET", "/schedule/swapRequest/?receiverNationalID="+nationalID+"&requesterDate="+requesterDate+"&receiverDate="+receiverDate, true);
+		req.send();
+	}
+}
+

@@ -54,7 +54,8 @@ public class DocumentService {
 
 		for (Doc document : departmentDocuments) {
 			if (employee.getLevel() >= document.getLevel()) {
-				DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(), document.getType(), document.getUploaderID());
+				DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(),
+						document.getType(), document.getUploaderID(), employee.getFirstName() + " " + employee.getLastName());
 				accessibleDocumentsInfo.add(documentInfo);
 			}
 		}
@@ -71,46 +72,42 @@ public class DocumentService {
 
 		for (int i = 0; i < personalDocuments.size(); i++) {
 			DocInfoDTO documentInfo = new DocInfoDTO(Integer.toString(i), personalDocuments.get(i).getName(),
-					personalDocuments.get(i).getSize(), personalDocuments.get(i).getType(), personalDocuments.get(i).getUploaderID());
+					personalDocuments.get(i).getSize(), personalDocuments.get(i).getType(), personalDocuments.get(i).getUploaderID(),
+					employee.getFirstName() + " " + employee.getLastName());
 			privateDocumentsInfo.add(documentInfo);
 		}
 
 		return privateDocumentsInfo;
 	}
 
-	public void uploadPublicDocument(MultipartFile file, String uploaderID) throws IOException {
-		Employee uploader = getEmployee(uploaderID);
-
+	private Doc createNewDoc(MultipartFile file, String ownerID, Employee owner) throws IOException{
 		Binary data = new Binary(BsonBinarySubType.BINARY, file.getBytes());
 		String fileName = file.getOriginalFilename();
 		String fileType = file.getContentType();
-		String department = uploader.getDepartment();
-		int level = uploader.getLevel();
+		String department = owner.getDepartment();
+		int level = owner.getLevel();
+		long fileSize = file.getSize();
 		LocalDateTime dateTime = LocalDateTime.now();
-		long size = file.getSize();
 
-		Doc document = new Doc(data, level, department, fileName, fileType, uploaderID, dateTime, size);
+		return new Doc(data, level, department, fileName, fileType, ownerID, dateTime, fileSize);
+	}
+
+	public void uploadPublicDocument(MultipartFile file, String uploaderID) throws IOException {
+		Employee uploader = getEmployee(uploaderID);
+
+		Doc document = createNewDoc(file, uploaderID, uploader);
 
 		this.documentRepo.save(document);
 	}
 
 	//only the admin can upload the private Docs
-	public void uploadPersonalDocument(MultipartFile file, String uploaderID, String ownerID) throws IOException, IllegalAccessException {
+	public void uploadPersonalDocument(MultipartFile file, String ownerID) throws IOException {
 		Employee owner = getEmployee(ownerID);
 
-		if(uploaderID.equals(ADMIN_ID)){
-			Binary data = new Binary(BsonBinarySubType.BINARY, file.getBytes());
-			String fileName = file.getOriginalFilename();
-			String fileType = file.getContentType();
-			LocalDateTime dateTime = LocalDateTime.now();
+		Doc document = createNewDoc(file, ownerID, owner);
 
-			Doc document = new Doc(data, owner.getLevel(), owner.getDepartment(), fileName, fileType, ownerID, dateTime, file.getSize());
-
-			owner.getPersonalDocuments().add(document);
-			this.employeeRepo.save(owner);
-		} else {
-			throw new IllegalAccessException("You don't have permission to upload!");
-		}
+		owner.getPersonalDocuments().add(document);
+		this.employeeRepo.save(owner);
 	}
 
 	public Doc downloadPublicDocument(String documentID, String downloaderID) throws IOException, IllegalAccessException {
@@ -122,8 +119,7 @@ public class DocumentService {
 
 		Doc documentToDownload = documentToDownloadOptional.get();
 
-		if(!isAccessible(documentToDownload.getDepartment(), documentToDownload.getLevel(), downloaderID)
-				&& !downloaderID.equals(ADMIN_ID)){
+		if(!isAccessible(documentToDownload.getDepartment(), documentToDownload.getLevel(), downloaderID)){
 			throw new IllegalAccessException("Document not accessible!");
 		}
 
@@ -134,22 +130,16 @@ public class DocumentService {
 	}
 
 	//Both Employee and Admin can download a personal document
-	public Doc downloadPersonalDocument(int documentID, String downloaderID, String ownerID) throws IOException, IllegalAccessException {
-		Employee owner = getEmployee(ownerID);
+	public Doc downloadPersonalDocument(int documentID, String downloaderID) throws IOException {
+		Employee downloader = getEmployee(downloaderID);
 
-		List<Doc> personalDocuments = owner.getPersonalDocuments();
+		List<Doc> personalDocuments = downloader.getPersonalDocuments();
 
 		if(personalDocuments.size() <= documentID){
 			throw new IOException("Document with id " + documentID + " doesn't exists");
 		}
 
-		Doc document = personalDocuments.get(documentID);
-
-		if(!downloaderID.equals(ADMIN_ID) && !downloaderID.equals(document.getUploaderID())){
-			throw new IllegalAccessException("Document not accessible!");
-		}
-
-		return document;
+		return personalDocuments.get(documentID);
 	}
 
 	public void deletePublicDocument(String documentID, String employeeID) throws IOException, IllegalAccessException{
@@ -167,22 +157,18 @@ public class DocumentService {
 	}
 
 	//only admin can delete private documents
-	public void deletePersonalDocument(int documentID, String employeeID, String ownerID) throws IOException, IllegalAccessException{
+	public void deletePersonalDocument(int documentID, String ownerID) throws IOException{
 		Employee owner = getEmployee(ownerID);
 
-		if(employeeID.equals(ADMIN_ID)){
-			List<Doc> personalDocuments = owner.getPersonalDocuments();
+		List<Doc> personalDocuments = owner.getPersonalDocuments();
 
-			if(personalDocuments.size() <= documentID){
-				throw new IllegalArgumentException("Document with id " + documentID + " doesn't exists");
-			}
-
-			personalDocuments.remove(documentID);
-
-			this.employeeRepo.save(owner);
-		} else {
-			throw new IllegalAccessException("You don't have permission to delete document");
+		if(personalDocuments.size() <= documentID){
+			throw new IllegalArgumentException("Document with id " + documentID + " doesn't exists");
 		}
+
+		personalDocuments.remove(documentID);
+
+		this.employeeRepo.save(owner);
 	}
 
 	public List<DocInfoDTO> searchInDocumentByName(List<DocInfoDTO> documents, String name){

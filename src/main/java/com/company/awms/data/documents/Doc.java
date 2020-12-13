@@ -21,13 +21,13 @@ public class Doc {
 	private String uploaderID;
 	private LocalDateTime uploadDateTime;
 	private List<String> downloaderIDs = new ArrayList<>();
-	private double size;
+	private long size;
 	
 	public Doc() {
 	}
 
 	public Doc(Binary data, int level, String department, String name, String type, String uploaderID,
-			   LocalDateTime uploadDateTime, double size) {
+			   LocalDateTime uploadDateTime, long size) {
 		this.data = data;
 		this.level = level;
 		this.department = department;
@@ -54,7 +54,7 @@ public class Doc {
 		return level;
 	}
 
-	public double getSize() {
+	public long getSize() {
 		return size;
 	}
 
@@ -72,10 +72,6 @@ public class Doc {
 
 	public String getUploaderID() {
 		return uploaderID;
-	}
-
-	public String getUploader() {
-		return this.uploaderID;
 	}
 
 	public List<String> getDownloaderIDs() {
@@ -118,7 +114,7 @@ public class Doc {
 		this.downloaderIDs = downloaderIDs;
 	}
 
-	public void setSize(double size) {
+	public void setSize(long size) {
 		this.size = size;
 	}
 }
