@@ -42,8 +42,8 @@
 	                }%>
                 	</select>
                 	<div id="button-content">
-                		<button id="add">ADD NEW</button>
                 		<button id="display">DISPLAY</button>
+                		<button id="add">ADD NEW</button>
                 		<button id="addLevel" style="{display:none;}">ADD LEVEL</button>
                 		<button id="create" style="{display:none;}">CREATE DEPARTMENT</button>
                 		<button id="update" style="{display:none;}">UPDATE</button>

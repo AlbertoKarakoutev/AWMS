@@ -79,6 +79,7 @@ public class ScheduleController {
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
 			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee, monthChecked);
 			List<Task>[] tasks = this.scheduleService.viewTasks(authenticatedEmployee, monthChecked);
+
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 			model.addAttribute("month", monthChecked);
 			model.addAttribute("tasks", tasks);

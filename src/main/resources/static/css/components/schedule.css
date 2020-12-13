@@ -10,19 +10,71 @@
 	font-size: x-large;
 	font-style: bold;
 	font-family: sans-serif;
-	height:0;
+	height: 0;
 }
 
 .day-box {
-	border: 1px solid black;
+	border: 0;
+	outline: none;
 	width: 150px;
 	height: 95px;
-	font-size: xx-large
+	font-size: xx-large;
+	text-transform: capitalize;
+	transition:0s border;
+	overflow: hidden;
+	position: relative;
 }
 
-.day-box:hover {
-	transform: scale(0.95);
-	transition-duration: 0.2s;
+.day-box:hover{
+	border: 2px solid rgb(200, 200, 200);
+	transition-delay:1s;
+}
+.day-box::before,
+.day-box::after {
+	content: '';
+	box-sizing: border-box;
+	position: absolute;
+	border: 2px solid transparent;
+	width: 0;
+	height: 0;
+}
+
+.day-box:hover::before {
+	top: 0;
+	left: 0;
+	border-top-color: rgb(200, 200, 200);
+	border-right-color: rgb(200, 200, 200);
+	animation: border 1s 1;
+}
+
+.day-box:hover::after {
+	bottom: 0;
+	right: 0;
+	border-bottom-color: rgb(200, 200, 200);
+	border-left-color: rgb(200, 200, 200);
+	animation: border 1s 1;
+}
+
+@keyframes border {
+	0% {
+		width: 0;
+		height: 0;
+	}
+
+	25% {
+		width: 100%;
+		height: 0;
+	}
+
+	50% {
+		width: 100%;
+		height: 100%;
+	}
+
+	100% {
+		width: 100%;
+		height: 100%;
+	}
 }
 
 .empty-day {
@@ -46,8 +98,8 @@
 }
 
 .modal-content {
-	display:flex;
-	flex-wrap:nowrap;
+	display: flex;
+	flex-wrap: nowrap;
 	background-color: #fefefe;
 	margin: 15% auto;
 	padding: 20px;
@@ -57,23 +109,24 @@
 
 .work-shifts {
 	background-color: gray;
-	margin:5px;
-	border:2px solid dark-gray;
+	margin: 5px;
+	border: 2px solid dark-gray;
 	border-radius: 2px;
-	flex-grow:1;
+	flex-grow: 1;
 }
 
 .tasks {
 	background-color: gray;
-	margin:5px;
-	border:2px solid dark-gray;
-	border-radius:2px;
-	flex-grow:1;
+	margin: 5px;
+	border: 2px solid dark-gray;
+	border-radius: 2px;
+	flex-grow: 1;
 }
-.title{
-	text-align:center;
-	font-size:x-large;
-	font-family:sans-serif;
+
+.title {
+	text-align: center;
+	font-size: x-large;
+	font-family: sans-serif;
 }
 
 .close {
@@ -81,7 +134,7 @@
 	float: right;
 	font-size: 28px;
 	font-weight: bold;
-	vertical-align:top;
+	vertical-align: top;
 }
 
 .close:hover,
@@ -91,38 +144,38 @@
 	cursor: pointer;
 }
 
-.swap{
-	display:flex;
-	border:none;
-	background-color:var(--secondary-color);
-	transition:background-color 0.2s, scale 0.2s;
+.swap {
+	display: flex;
+	border: none;
+	background-color: var(--secondary-color);
+	transition: background-color 0.2s, scale 0.2s;
 }
 
-.swap:hover{
-	scale:1.05;
-	background-color:#aaaaaa;
+.swap:hover {
+	scale: 1.05;
+	background-color: #aaaaaa;
 }
 
-.arrow{
-	position:relative;
-	text-align:center;
+.arrow {
+	position: relative;
+	text-align: center;
 	font-size: 40px;
-	margin:auto;
-	margin-bottom:10px;
-	margin-top:10px;
+	margin: auto;
+	margin-bottom: 10px;
+	margin-top: 10px;
 	border-radius: 3px;
 	background: var(--primary-color);
-	color:white;
-	width:100px;
-	height:60px;
-	transition:background 0.2s;
+	color: white;
+	width: 100px;
+	height: 60px;
+	transition: background 0.2s;
 }
 
-.arrow:hover{
-	text-decoration:none;
-	cursor:pointer;
-	color:white;
-	background:#444444;
+.arrow:hover {
+	text-decoration: none;
+	cursor: pointer;
+	color: white;
+	background: #444444;
 }
 
 .monday {

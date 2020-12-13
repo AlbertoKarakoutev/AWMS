@@ -31,100 +31,40 @@
                     </header>
                     <div class="container">
                     <div class="row">
-                        <div class="col-md-4">
-                        <div class="card-body">
+                        <div class="visit-card col-md-4 mb-4 card-body">
                             <div class="border rounded p-4 h-100">
                                 <div class="name-contact">
-                                    <i class="fas fa-signature"> Name:</i>
+                                    <i class="fas fa-signature"> Name: ${owner.getFirstName()} ${owner.getLastName()} </i>
                                 </div>
                                 <div class="work-position-contact">
-                                    <i class="fas fa-briefcase"> Work position:</i>
+                                    <i class="fas fa-briefcase"> Work position: ${owner.getRole()}</i>
                                 </div>
                                 <div class="telephone-num">
-                                    <i class="fas fa-phone-alt"> Telephone number:</i>
+                                    <i class="fas fa-phone-alt"> Telephone number: ${owner.getPhoneNumber()}</i>
                                 </div>
                             </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                           <div class="card-body">
-                            <div class="border rounded p-4 h-100">
-                                <div class="name-contact">
-                                    <i class="fas fa-signature"> Name:</i>
-                                </div>
-                                <div class="work-position-contact">
-                                    <i class="fas fa-briefcase"> Work position:</i>
-                                </div>
-                                <div class="telephone-num">
-                                    <i class="fas fa-phone-alt"> Telephone number:</i>
-                                </div>
+                <c:forEach items="${managers}" var="manager">
+                    <div class="visit-card col-md-4 mb-4 card-body">
+                        <div class="border rounded p-4 h-100">
+                            <div class="name-contact">
+                                <i class="fas fa-signature"> Name: ${manager.getFirstName()} ${manager.getLastName()} </i>
+                            </div>
+                            <div class="work-position-contact">
+                                <i class="fas fa-briefcase"> Work position: ${manager.getRole()}</i>
+                            </div>
+                            <div class="telephone-num">
+                                <i class="fas fa-phone-alt"> Telephone number: ${manager.getPhoneNumber()}</i>
                             </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                          <div class="card-body">
-                            <div class="border rounded p-4 h-100">
-                                <div class="name-contact">
-                                    <i class="fas fa-signature"> Name:</i>
-                                </div>
-                                <div class="work-position-contact">
-                                    <i class="fas fa-briefcase"> Work position:</i>
-                                </div>
-                                <div class="telephone-num">
-                                    <i class="fas fa-phone-alt"> Telephone number:</i>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card-body">
-                            <div class="border rounded p-4 h-100">
-                                <div class="name-contact">
-                                    <i class="fas fa-signature"> Name:</i>
-                                </div>
-                                <div class="work-position-contact">
-                                    <i class="fas fa-briefcase"> Work position:</i>
-                                </div>
-                                <div class="telephone-num">
-                                    <i class="fas fa-phone-alt"> Telephone number:</i>
-                                </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card-body">
-                            <div class="border rounded p-4 h-100">
-                                <div class="name-contact">
-                                    <i class="fas fa-signature"> Name:</i>
-                                </div>
-                                <div class="work-position-contact">
-                                    <i class="fas fa-briefcase"> Work position:</i>
-                                </div>
-                                <div class="telephone-num">
-                                    <i class="fas fa-phone-alt"> Telephone number:</i>
-                                </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-4">
-                          <div class="card-body">
-                            <div class="border rounded p-4 h-100">
-                                <div class="name-contact">
-                                    <i class="fas fa-signature"> Name:</i>
-                                </div>
-                                <div class="work-position-contact">
-                                    <i class="fas fa-briefcase"> Work position:</i>
-                                </div>
-                                <div class="telephone-num">
-                                    <i class="fas fa-phone-alt"> Telephone number:</i>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-
                     </div>
+                </c:forEach>
                 </div>
-                </div>
+
+            </div>
+
             </section>
 
 

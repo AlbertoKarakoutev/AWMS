@@ -158,7 +158,6 @@ public class ScheduleService {
 			return;
 		}
 		receiverDay = receiverDayOptional.get();
-
 		for (EmployeeDailyReference edr : requesterDay.getEmployees()) {
 			if (edr.getNationalID().equals(requesterNationalID)) {
 				requester = edr;

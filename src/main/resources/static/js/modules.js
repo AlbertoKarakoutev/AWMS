@@ -14,7 +14,7 @@ $(".actives").click(function(){
 	jsonProto.updatedActives = JSON.stringify(updatedActives);
 	let json = JSON.stringify(jsonProto);
 	let  req = new XMLHttpRequest();
-	req.open("PUT", "/admin/modules/set/", false);
+	req.open("PUT", "/admin/modules/set/", true);
 	req.setRequestHeader("Content-Type", "application/json");
 	req.send(json);
 });
