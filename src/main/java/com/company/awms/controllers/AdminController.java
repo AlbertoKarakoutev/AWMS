@@ -7,10 +7,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.company.awms.data.documents.DocInfoDTO;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.company.awms.data.documents.DocInfoDTO;
 import com.company.awms.data.employees.Employee;
 import com.company.awms.security.EmployeeDetails;
 import com.company.awms.services.DocumentService;
@@ -203,10 +207,10 @@ public class AdminController {
 		return controllerConditions;
 	}
 
-	@GetMapping("/modules/get")
+	@GetMapping("/modules")
 	public String getActives(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
-			Map<String, Boolean> controllerConditions = AdminController.getActivesMethod();
+			Map<String, Boolean> controllerConditions = getActivesMethod();
 			model.addAttribute("modules", controllerConditions);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 		} catch (Exception e) {
@@ -236,6 +240,63 @@ public class AdminController {
 		return getActives(employeeDetails, model);
 	}
 
+	// Department methods
+	public Map<String, String> getDepartmentDTOs() {
+		Map<String, String> departmentDTOs = new HashMap<>();
+		for (int i = 97; i < 123; i++) {
+			String departmentCode = Character.toString((char) i);
+			JSONObject department = scheduleService.getDepartment(departmentCode);
+			if (department == null) {
+				continue;
+			}
+			departmentDTOs.put(departmentCode, (String)department.get("Name"));
+		}
+		return departmentDTOs;
+	}
+	
+	@GetMapping("/departments")
+	public String getDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		try {
+			Map<String, String> departmentDTOs = getDepartmentDTOs();
+			model.addAttribute("departments", departmentDTOs);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+		} catch (Exception e) {
+			return "internalServerError";
+		}
+
+		return "departments";
+
+	}
+	
+	@GetMapping("/departments/view")
+	public ResponseEntity<JSONObject> getDepartment(@RequestParam String departmentCode, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+		try {
+			JSONObject department = scheduleService.getDepartment(departmentCode);
+			return new ResponseEntity<JSONObject>(department, HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping(value="/departments/set", consumes="application/json")
+	public String setDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestBody Object departmentObj) throws ParseException {
+		
+		JSONObject departmentBody =  new JSONObject((Map)departmentObj);
+		String key = null;
+		Set<String> keys = departmentBody.keySet();
+		Iterator<String> keyIterator = keys.iterator();
+		while(keyIterator.hasNext()) {
+		    key = keyIterator.next();
+		    break;
+		}
+		try {
+			scheduleService.setDepartment(key , departmentBody);
+		}catch(Exception e) {
+			return "internalServerError";
+		}
+		return getDepartments(employeeDetails, model);
+	}
+	
 	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
