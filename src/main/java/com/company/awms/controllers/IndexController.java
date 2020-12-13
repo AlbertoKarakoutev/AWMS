@@ -37,9 +37,11 @@ public class IndexController {
         }
     }
 
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
-        model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-        model.addAttribute("employeeEmail", employeeDetails.getUsername());
-        model.addAttribute("employeeID", employeeDetails.getID());
-    }
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeID", employeeDetails.getID());
+		Employee user = employeeService.getEmployee(employeeDetails.getID());
+		model.addAttribute("notifications", user.getNotifications());
+	}
 }

@@ -53,19 +53,34 @@ public class EmployeeController {
     }
 
     @GetMapping("/password/new")
-    public String getPasswordUpdate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
+    public String getPasswordUpdate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws IOException{
         injectLoggedInEmployeeInfo(model, employeeDetails);
         model.addAttribute("mismatch", false);
 
         return "newPassword";
     }
 
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException{
         model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
         model.addAttribute("employeeEmail", employeeDetails.getUsername());
         model.addAttribute("employeeID", employeeDetails.getID());
+        Employee user = employeeService.getEmployee(employeeDetails.getID());
+        model.addAttribute("notifications", user.getNotifications());
     }
 
+    @GetMapping("/dismiss")
+	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
+		try{
+			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
+            model.addAttribute("employee", employee);
+            return "redirect:/";
+		}catch(Exception e) {
+			return "internalServerError";
+		}
+	}
+    
     public static boolean getActive() {
         return active;
     }

@@ -39,20 +39,36 @@ public class ScheduleController {
 	}
 
 	@GetMapping("/swapRequest")
-	public void swapRequest(@AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String receiverNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
+	public void swapRequest(@RequestParam String requesterNationalID, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterDate, @RequestParam String receiverDate) {
 		try {
-			scheduleService.swapRequest(employeeDetails.getID(), receiverNationalID, requesterDate, receiverDate);
+			scheduleService.swapRequest(requesterNationalID, employeeDetails.getID(), requesterDate, receiverDate);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	@GetMapping("/decline")
+	public String declineSwap(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
+		try{
+			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
+            model.addAttribute("employee", employee);
+            return "redirect:/";
+		}catch(Exception e) {
+			return "internalServerError";
+		}
+	}
+	
 	@PostMapping(value = "/swap")
-	public void swapEmployees(@RequestParam String requesterNationalID, @RequestParam String receiverNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
+	public String swapEmployees(Model model, @RequestParam String noteNum, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
 		try {
-			scheduleService.swapEmployees(requesterNationalID, receiverNationalID, requesterDate, receiverDate);
+			String receiverNationalID = employeeService.getEmployee(employeeDetails.getID()).getNationalID();
+			scheduleService.swapEmployees(Integer.parseInt(noteNum), requesterNationalID, receiverNationalID, requesterDate, receiverDate);
+			return viewSchedule(employeeDetails, model, YearMonth.now());
 		} catch (Exception e) {
 			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
 
@@ -100,7 +116,7 @@ public class ScheduleController {
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
 		model.addAttribute("employeeID", employeeDetails.getID());
 		Employee user = employeeService.getEmployee(employeeDetails.getID());
-		model.addAttribute("level", user.getLevel());
+		model.addAttribute("notifications", user.getNotifications());
 	}
 
 	public static boolean getActive() {

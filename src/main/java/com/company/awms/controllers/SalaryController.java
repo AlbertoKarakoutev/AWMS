@@ -1,13 +1,19 @@
 package com.company.awms.controllers;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.company.awms.data.employees.Employee;
+import com.company.awms.security.EmployeeDetails;
+import com.company.awms.services.EmployeeService;
 import com.company.awms.services.SalaryService;
 
 @RestController
@@ -17,10 +23,12 @@ public class SalaryController {
 	private static boolean active = true;
 
 	private SalaryService salaryService;
+	private EmployeeService employeeService;
 
 	@Autowired
-	public SalaryController(SalaryService salaryService) {
+	public SalaryController(SalaryService salaryService, EmployeeService employeeService) {
 		this.salaryService = salaryService;
+		this.employeeService = employeeService;
 	}
 
 	@GetMapping("/workHours/{nationalID}")
@@ -57,5 +65,13 @@ public class SalaryController {
 	
 	public static void setActive(boolean newActive) {
 		active = newActive;
+	}
+	
+	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeID", employeeDetails.getID());
+		Employee user = employeeService.getEmployee(employeeDetails.getID());
+		model.addAttribute("notifications", user.getNotifications());
 	}
 }

@@ -31,7 +31,8 @@ public class ContactsController {
             injectLoggedInEmployeeInfo(model, employeeDetails);
             model.addAttribute("owner", owner);
             model.addAttribute("managers", managers);
-
+            injectLoggedInEmployeeInfo(model, employeeDetails);
+            
             return "contacts";
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,10 +43,12 @@ public class ContactsController {
         }
     }
 
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException{
         model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
         model.addAttribute("employeeEmail", employeeDetails.getUsername());
         model.addAttribute("employeeID", employeeDetails.getID());
+        Employee user = employeeService.getEmployee(employeeDetails.getID());
+        model.addAttribute("notifications", user.getNotifications());
     }
     
     public static boolean getActive() {

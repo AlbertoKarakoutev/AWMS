@@ -115,7 +115,18 @@ public class EmployeeService {
 		return this.employeeRepo.findAllByRole("MANAGER");
 	}
 
-	public void registerEmployee(Employee newEmployee) {
+	public void setNotificationRead(String employeeID, int notificationNumber) throws IOException {
+		Optional<Employee> employee = employeeRepo.findById(employeeID);
+		if(employee.isEmpty()) {
+			throw new IOException("Employee not found!");
+		}else {
+			employee.get().getNotifications().get(notificationNumber).setRead(true);
+			employeeRepo.save(employee.get());
+		}
+		
+	}
+	
+ 	public void registerEmployee(Employee newEmployee) {
 		// TODO:
 		// Validation? from Validator Class
 		// Add salt to password
@@ -156,14 +167,6 @@ public class EmployeeService {
 		this.employeeRepo.save(oldEmployee);
 	}
 
-	// Create a reference for this employee with information about his work hours
-	// and date
-	public EmployeeDailyReference createEmployeeDailyReference(Employee employee, LocalDate date, LocalTime[] workTime) throws IOException {
-		EmployeeDailyReference empDayRef = new EmployeeDailyReference(employeeRepo, employee.getNationalID());
-		empDayRef.setDate(date);
-		empDayRef.setWorkTime(workTime);
-		return empDayRef;
-	}
 
 	public void addLeave(String employeeID, LocalDate start, LocalDate end, boolean paid) throws IOException {
 		Map<String, Object> leave = new HashMap<>();

@@ -97,9 +97,10 @@ public class ForumService {
         notificationData.add("new-thread");
 		notificationData.add(uploader.getID());
 		notificationData.add(newThread);
-		String message = uploader.getFirstName() + " " + uploader.getLastName() + " has uploaded a new topic in the Forum.";
+		String message = uploader.getFirstName() + " " + uploader.getLastName() + " has uploaded a new topic in the Forum, called \""+newThread.getTitle() + "\"." ;
 		for(Employee notified : sameDepartmentEmployees) {
 			notified.getNotifications().add(new Notification(message, notificationData));
+			employeeRepo.save(notified);
 		}
 		
 		this.forumThreadRepo.save(newThread);
@@ -122,6 +123,9 @@ public class ForumService {
 		String message = replier.getFirstName() + " " + replier.getLastName() + " has added a reply on the thread \""+answered.getTitle()+"\" you uploaded.";
 		Employee issuer = employeeRepo.findById(answered.getIssuerID()).get();
 		issuer.getNotifications().add(new Notification(message, notificationData));
+		employeeRepo.save(issuer);
+		System.out.println("Reply added by " + replier.getFirstName() + " to " + issuer.getFirstName());
+		
         
         this.forumReplyRepo.save(newReply);
     }

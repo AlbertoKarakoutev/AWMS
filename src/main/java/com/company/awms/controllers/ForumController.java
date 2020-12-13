@@ -1,9 +1,11 @@
 package com.company.awms.controllers;
 
+import com.company.awms.data.employees.Employee;
 import com.company.awms.data.forum.ForumReply;
 import com.company.awms.data.forum.ForumThread;
 import com.company.awms.data.forum.ThreadReplyDTO;
 import com.company.awms.security.EmployeeDetails;
+import com.company.awms.services.EmployeeService;
 import com.company.awms.services.ForumService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,10 +24,12 @@ public class ForumController {
 	private static final boolean active = true;
 
 	private ForumService forumService;
+	private EmployeeService employeeService;
 
 	@Autowired
-	public ForumController(ForumService forumService) {
+	public ForumController(ForumService forumService, EmployeeService employeeService) {
 		this.forumService = forumService;
+		this.employeeService = employeeService;
 	}
 
 	@GetMapping("")
@@ -43,8 +47,7 @@ public class ForumController {
 	}
 
 	@GetMapping("/thread/{threadID}")
-	public String getThreadWithReplies(@PathVariable String threadID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getThreadWithReplies(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
 			model.addAttribute("thread", threadAndReplies.getForumThread());
@@ -90,8 +93,7 @@ public class ForumController {
 
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/threads/{employeeID}")
-	public String getAllThreadsFromEmployee(@PathVariable String employeeID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getAllThreadsFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreadsFromEmployee(employeeID);
 			model.addAttribute("threads", threads);
@@ -118,8 +120,7 @@ public class ForumController {
 
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/replies/{employeeID}")
-	public String getAllRepliesFromEmployee(@PathVariable String employeeID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getAllRepliesFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<ForumReply> replies = this.forumService.getAllRepliesFromEmployee(employeeID);
 			model.addAttribute("replies", replies);
@@ -134,8 +135,7 @@ public class ForumController {
 
 	// Forum edit thread
 	@GetMapping("/thread/{threadID}/edit")
-	public String getThreadEdit(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails,
-			Model model) {
+	public String getThreadEdit(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread thread = this.forumService.getThread(threadID);
 
@@ -153,8 +153,7 @@ public class ForumController {
 	}
 
 	@GetMapping("/thread/{threadID}/reply/new")
-	public String newReply(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails,
-			Model model) {
+	public String newReply(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread thread = this.forumService.getThread(threadID);
 
@@ -172,8 +171,7 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/add")
-	public String addThread(@RequestParam String title, @RequestParam String body,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String addThread(@RequestParam String title, @RequestParam String body, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.addNewThread(employeeDetails, title, body);
 
@@ -188,8 +186,7 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/thread/{threadID}/add")
-	public String addReply(@RequestParam String body, @PathVariable String threadID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String addReply(@RequestParam String body, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.forumService.addNewReply(employeeDetails, body, threadID);
 			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID);
@@ -205,8 +202,7 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/thread/{threadID}/answered")
-	public String markThreadAsAnswered(@PathVariable String threadID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String markThreadAsAnswered(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
 
@@ -228,8 +224,7 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/thread/{oldThreadID}/edit")
-	public String editThread(@RequestParam String title, @RequestParam String body, @PathVariable String oldThreadID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String editThread(@RequestParam String title, @RequestParam String body, @PathVariable String oldThreadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			ForumThread oldThread = this.forumService.getThread(oldThreadID);
 
@@ -253,12 +248,27 @@ public class ForumController {
 		}
 	}
 
-	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) {
+	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
 		model.addAttribute("employeeID", employeeDetails.getID());
+		Employee user = employeeService.getEmployee(employeeDetails.getID());
+		model.addAttribute("notifications", user.getNotifications());
 	}
 
+	@GetMapping("/dismiss")
+	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
+		try{
+			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
+            model.addAttribute("employee", employee);
+            return "redirect:/forum";
+		}catch(Exception e) {
+			return "internalServerError";
+		}
+	}
+	
 	public static boolean getActive() {
 		return active;
 	}

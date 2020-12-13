@@ -17,7 +17,6 @@ public class EmployeeDailyReference {
 	private String lastName;
 	private String nationalID;
 	private List<Task> tasks = new ArrayList<>();
-	private LocalDate date;
 
 	public EmployeeDailyReference() {}
 
@@ -59,10 +58,6 @@ public class EmployeeDailyReference {
 		return lastName;
 	}
 
-	public LocalDate getDate() {
-		return date;
-	}
-
 	public List<Task> getTasks() {
 		return tasks;
 	}
@@ -77,10 +72,6 @@ public class EmployeeDailyReference {
 	
 	public void setWorkTime(LocalTime[] workTime) {
 		this.workTime = workTime;
-	}
-
-	public void setDate(LocalDate date) {
-		this.date = date;
 	}
 
 	public void setTasks(List<Task> tasks) {

@@ -27,7 +27,11 @@
 			<section class="content">
                 <div class="p-4">
 				    <header class="py-3">
-                        <h1 class="ty-page-title">Documents</h1>
+                        <h1 class="ty-page-title">
+						    <c:if test='${type == "personal"}'>Personal Documents</c:if>
+						    <c:if test='${type == "public"}'>Public Documents</c:if>
+						    <c:if test='${type == "search"}'>Search</c:if>
+					    </h1>
                     </header>
 					<div class="d-flex my-3">
 						<div class="flex-grow-1">
