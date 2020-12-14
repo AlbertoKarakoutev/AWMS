@@ -6,7 +6,7 @@ display.onclick = function () {
 	create.style.display = "none";
 	add.style.display = "inline-block";
 	update.style.display = "inline-block";
-	content.style.display = "inline-block";
+	content.style.display = "block";
 	let departments = document.getElementById("departments");
 	let option = departments.options[departments.selectedIndex].value;
 	dptCode = String(option);
@@ -17,17 +17,17 @@ display.onclick = function () {
 		currentData = data;
 		if (data["Universal schedule"] == "true") {
 			for (var key in data) {
-				content.innerHTML += "<label for='" + key + "'>" + key + "</label><input class='field' type='text' id='" + key + "' value='" + data[key] + "'/></br>";
+				content.innerHTML += "<div class='form-group'><label for='" + key + "'>" + key + "</label><input class='form-control field' type='text' id='" + key + "' value='" + data[key] + "'/></div>";
 			}
 		} else {
-			content.innerHTML += "<label for='Name'>Name: </label><input class='field' type='text' id='Name' value='" + data["Name"] + "'/></br>";
-			content.innerHTML += "<label for='universalSchedule'>Universal schedule: </label><input class='field' type='text' id='Universal schedule' value='" + data["Universal schedule"] + "' readonly/></br>";
+			content.innerHTML += "<div class='form-group'><label for='Name'>Name: </label><input class='form-control field' type='text' id='Name' value='" + data["Name"] + "'/></div>";
+			content.innerHTML += "<div class='form-group'><label for='universalSchedule'>Universal schedule: </label><input class='form-control field' type='text' id='Universal schedule' value='" + data["Universal schedule"] + "' readonly/></div>";
 			let levels = data["levels"];
 			for (let i = 0; i < levels.length; i++) {
 				let level = levels[i][String(i)];
 				content.innerHTML += "<h2><b>Level " + i + "</b></h2></br>";
 				for (var key in level) {
-					content.innerHTML += "<label for='" + key + String(i) + "'>" + key + "</label><input class='field-" + String(i) + "' type='text' id='" + key + String(i) + "' value='" + level[key] + "'/></br>";
+					content.innerHTML += "<div class='form-group'><label for='" + key + String(i) + "'>" + key + "</label><input class='form-control field-" + String(i) + "' type='text' id='" + key + String(i) + "' value='" + level[key] + "'/></div>";
 
 				}
 			}
@@ -68,9 +68,9 @@ var levelCounter = 0;
 add.onclick = function () {
 	update.style.display = "none";
 	add.style.display = "none";
-	content.style.display = "inline-block";
 	let multilevel = confirm("Do you want to create a multi-level department");
 	content.innerHTML = "";
+	
 	if (multilevel) {
 		addLevel.style.display = "inline-block";
 		content.innerHTML += "<label for='Name'>Name: </label><input class='data-field form-control' type='text' id='Name'/></br>"

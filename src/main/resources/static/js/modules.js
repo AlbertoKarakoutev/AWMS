@@ -17,4 +17,5 @@ $(".module-update").click(function(){
 	req.open("POST", "/admin/modules/set/", true);
 	req.setRequestHeader("Content-Type", "application/json");
 	req.send(json);
+	window.location
 });

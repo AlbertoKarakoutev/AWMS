@@ -79,7 +79,7 @@ public class AdminController {
 		try {
 			List<Employee> employee = new ArrayList<>();
 			employee.add(employeeService.registerEmployee(data));
-			model.addAttribute("employee", employee);
+			model.addAttribute("employees", employee);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
 		} catch (Exception e) {
@@ -126,7 +126,7 @@ public class AdminController {
 		try {
 			List<Employee> employee = new ArrayList<>();
 			employee.add(employeeService.updateEmployeeInfo(employeeId, data));
-			model.addAttribute("employee", employee);
+			model.addAttribute("employees", employee);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
 		} catch (Exception e) {
@@ -141,8 +141,7 @@ public class AdminController {
 		try {
 			List<Employee> employees = this.employeeService.getAllEmployees();
 			List<Employee> foundEmployees = this.employeeService.searchEmployees(employees, searchTerm, type);
-			System.out.println(foundEmployees.size());
-			model.addAttribute("foundEmployees", foundEmployees);
+			model.addAttribute("employees", foundEmployees);
 			model.addAttribute("departments", getDepartmentDTOs());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
@@ -273,7 +272,7 @@ public class AdminController {
 				continue;
 			}
 		}
-		return getActives(employeeDetails, model);
+		return "redirect:/";
 	}
 
 	// Department methods
