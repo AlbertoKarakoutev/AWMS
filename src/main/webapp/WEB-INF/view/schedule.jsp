@@ -92,7 +92,7 @@
                                                                         <th scope="col">First Name</th>
                                                                         <th scope="col">Family Name</th>
                                                                         <th scope="col">Working Hours</th>
-                                                                        <c:if test="${role == '[ADMIN]'}">
+                                                                        <c:if test="${role != '[ADMIN]'}">
 								                                        	<th scope="col">Swap</th>
 								                                        </c:if>
                                                                     </tr>
@@ -104,15 +104,12 @@
 				                     		   		          	    		String day = thisMonth.withDayOfMonth(i).toString();%>
 																    				<tr>
                                                                                     <th scope="row">
-																					    <h4><%= thisEDR.getFirstName() %></h4>
+																					    <h4><%= thisEDR.getFirstName() %> <%=thisEDR.getLastName() %></h4>
 																					</th>
-                                                                                    <td>
-						                                                                <h4><%= thisEDR.getLastName() %></h4>
-						                                                            </td>
                                                                                     <td>
 								                                                        <h4><%= thisEDR.getWorkTimeInfo() %></h4>
 								                                                    </td>
-																					<c:if test="${role == '[ADMIN]'}">
+																					<c:if test="${role != '[ADMIN]'}">
 	                                                                                    <td>
 								                                                            <button class="btn btn-dark" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
 									                                                    </td>
