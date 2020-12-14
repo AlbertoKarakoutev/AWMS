@@ -315,14 +315,14 @@ public class ForumController {
 		model.addAttribute("unread", unread);
 	}
 
-	@GetMapping("/dismiss")
-	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
+	@GetMapping("/dismiss/{threadID}")
+	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @PathVariable String threadID) {
 		try{
 			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
             model.addAttribute("employee", employee);
-            return "redirect:/forum";
+            return "redirect:/forum/thread/"+threadID;
 		}catch(Exception e) {
 			return "internalServerError";
 		}

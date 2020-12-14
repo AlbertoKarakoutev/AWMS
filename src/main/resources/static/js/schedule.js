@@ -9,7 +9,7 @@ function datePrompt(nationalID, receiverDate){
 	let requesterDate = prompt("Enter date for the shift you wish to swap in the format /YYYY-MM-DD/", "2020-12-10");
 	if(requesterDate!=null){
 		let req = new XMLHttpRequest();
-		req.open("GET", "/schedule/swapRequest/?receiverNationalID="+nationalID+"&requesterDate="+requesterDate+"&receiverDate="+receiverDate, true);
+		req.open("GET", "/schedule/swapRequest/?receiverNationalID="+String(nationalID)+"&requesterDate="+requesterDate+"&receiverDate="+receiverDate, true);
 		req.send();
 	}
 }
