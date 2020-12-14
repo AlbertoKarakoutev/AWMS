@@ -93,7 +93,21 @@ public class AdminController {
 		try {
 			Employee employee = employeeService.getEmployee(employeeID);
 			model.addAttribute("employee", employee);
+			model.addAttribute("new", true);
 			model.addAttribute("departments", getDepartmentDTOs());
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			return "editEmployee";
+		} catch (Exception e) {
+			return "internalServerError";
+		}
+	}
+	
+	@GetMapping("/employee/register")
+	public String registerEmployee(
+			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		try {
+			model.addAttribute("departments", getDepartmentDTOs());
+			model.addAttribute("new", true);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "editEmployee";
 		} catch (Exception e) {
@@ -126,6 +140,7 @@ public class AdminController {
 		try {
 			List<Employee> employee = new ArrayList<>();
 			employee.add(employeeService.updateEmployeeInfo(employeeId, data));
+			model.addAttribute("departments", getDepartmentDTOs());
 			model.addAttribute("employees", employee);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";

@@ -71,10 +71,15 @@
                             <input value="${employee.getLevel()}" type="number" name="level" class="form-control" id="levelEmployee" aria-describedby="levelEmployee" placeholder="Password" required>
                             <small id="levelHelp" class="form-text text-muted">Employee's phone number.</small>
                         </div>
-                        <div class="form-group">
-                            <a class="btn btn-primary" href="/admin/personal/${employee.getID()}" title="Edit employee's files">Edit Files</a>
-                        </div>
-                        <button type="submit" class="btn btn-dark">Update</button>
+						<c:if test="${new == false}">
+	                        <div class="form-group">
+	                            <a class="btn btn-primary" href="/admin/personal/${employee.getID()}" title="Edit employee's files">Edit Files</a>
+	                        </div>
+	                        <button type="submit" class="btn btn-dark">Update</button>
+                        </c:if>
+                        <c:if test="${new == true}">
+	                        <button type="submit" class="btn btn-dark">Register</button>
+                        </c:if>
                     </form>
                 </div>
                 <footer>

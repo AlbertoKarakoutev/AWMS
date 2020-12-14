@@ -350,6 +350,16 @@ public class ScheduleService {
 	@Scheduled(cron = "1 0 0 1 * *")
 	public void applySchedule() {
 
+		List<Employee> employees = employeeRepo.findAll();
+		for(Employee employee : employees) {
+			for(Notification notification : employee.getNotifications()) {
+				if(notification.getRead()) {
+					employee.getNotifications().remove(notification);
+				}
+			}
+			employeeRepo.save(employee);
+		}
+		
 		// Clear next month's dates
 		for (int date = 1; date <= LocalDate.now().plus(1, ChronoUnit.MONTHS).lengthOfMonth(); date++) {
 			Optional<Day> day = scheduleRepo.findByDate(LocalDate.now().plus(1, ChronoUnit.MONTHS).withDayOfMonth(date));
