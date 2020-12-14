@@ -48,6 +48,7 @@
 							<button class="btn btn-dark ml-2" type="submit">Search</button>
 						</form>
 					</div>
+					<div class="table-responsive">
 				    <table class="table">
                         <thead>
                             <tr>
@@ -81,6 +82,7 @@
 			                </c:forEach>
 					    </tbody>
 					</table>
+					</div>
 				</div>
 			    <footer>
 			    	<%@include file="boxes/footer.jsp"%>
