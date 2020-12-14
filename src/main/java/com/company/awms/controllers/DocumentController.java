@@ -46,6 +46,10 @@ public class DocumentController {
     @PostMapping(value = "/public/upload")
     public String uploadPublicDocument(@RequestParam MultipartFile file,
             @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+        if (!active) {
+            return "notFound";
+        }
+
         try {
             documentService.uploadPublicDocument(file, employeeDetails.getID());
 
@@ -105,6 +109,10 @@ public class DocumentController {
     @PostMapping(value = "/public/delete/{documentID}")
     public String deletePublicDocument(@PathVariable String documentID,
             @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+        if (!active) {
+            return "notFound";
+        }
+
         try {
             this.documentService.deletePublicDocument(documentID, employeeDetails.getID());
 
@@ -126,6 +134,10 @@ public class DocumentController {
 
     @GetMapping(value = "/public")
     public String getAccessibleDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+        if (!active) {
+            return "notFound";
+        }
+
         try {
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
@@ -144,6 +156,10 @@ public class DocumentController {
 
     @GetMapping(value = "/personal")
     public String getAllPersonalDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+        if (!active) {
+            return "notFound";
+        }
+
         try {
             List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeDetails.getID());
 
@@ -161,6 +177,10 @@ public class DocumentController {
     @GetMapping("/public/search")
     public String searchInDocuments(@RequestParam String name, @AuthenticationPrincipal EmployeeDetails employeeDetails,
             Model model) {
+        if (!active) {
+            return "notFound";
+        }
+
         try {
             List<DocInfoDTO> documents;
             documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());

@@ -60,9 +60,9 @@
 				</div>
 			</li>
 			<%
-				if (AdminController.getActivesMethod().get("Salary") == true) {
+				if (AdminController.getActivesMethod().get("Salary")) {
 			%>
-			<li class="vertical-item"><a href="#" title="Salary">Salary</a></li>
+			<li class="vertical-item"><a href="/salary" title="Salary">Salary</a></li>
 			<%
 				}
 			%>

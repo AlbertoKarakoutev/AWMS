@@ -146,6 +146,11 @@ public class EmployeeService {
 		return employee;
 	}
 
+	public void updateSalary(double newSalary, Employee employee) {
+		employee.setSalary(newSalary);
+		this.employeeRepo.save(employee);
+	}
+
 	public void updateEmployeeInfo(String employeeID, String data) throws IOException {
 		Employee employee = getEmployee(employeeID);
 		// TODO:

@@ -50,6 +50,10 @@ public class ScheduleController {
 
 	@GetMapping("/decline")
 	public String declineSwap(Model model, @RequestParam String receiverNationalID, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String date) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try{
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
@@ -57,13 +61,17 @@ public class ScheduleController {
 			scheduleService.declineSwap(receiverNationalID, LocalDate.parse(date));
             model.addAttribute("employee", employee);
             return "redirect:/";
-		}catch(Exception e) {
+		} catch(Exception e) {
 			return "internalServerError";
 		}
 	}
 	
 	@PostMapping(value = "/swap")
 	public String swapEmployees(Model model, @RequestParam String noteNum, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			String receiverNationalID = employeeService.getEmployee(employeeDetails.getID()).getNationalID();
 			scheduleService.swapEmployees(requesterNationalID, receiverNationalID, requesterDate, receiverDate);
@@ -89,6 +97,10 @@ public class ScheduleController {
 
 	@GetMapping("")
 	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam YearMonth month) {
+		if (!active) {
+			return "notFound";
+		}
+
 		YearMonth monthChecked = month;
 		if (!monthChecked.equals(YearMonth.now().plusMonths(1)) && !monthChecked.equals(YearMonth.now())) {
 			monthChecked = YearMonth.of(YearMonth.now().getYear(), YearMonth.now().getMonthValue());
