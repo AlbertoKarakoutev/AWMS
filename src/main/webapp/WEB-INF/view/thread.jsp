@@ -57,9 +57,11 @@
                                 <a href="/forum/thread/${thread.getID()}/edit" class="btn btn-dark btn-md">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <form action="${thread.getID()}/answered" method="post">
-                                    <input type="submit" class="btn btn-dark btn-md" value="Mark as answered" />
-                                </form>
+                                <c:if test="${thread.getAnswered() == false}">
+                                    <form action="${thread.getID()}/answered" method="post">
+                                        <input type="submit" class="btn btn-dark btn-md" value="Mark as answered" />
+                                    </form>
+                                </c:if>
                             </c:if>
                             <a class="btn btn-dark btn-md" href="/forum/thread/${thread.getID()}/reply/new" title="reply">
                                 <i class="fas fa-reply"></i> Add Reply
