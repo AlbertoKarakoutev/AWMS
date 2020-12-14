@@ -24,8 +24,30 @@
 			<section class="content">
                 <div class="p-4">
 			    	<header class="py-3">
-                        <h1 class="ty-page-title">Employees List</h1>
+                        <h1 class="ty-page-title">Employees</h1>
                     </header>
+                    <div class="flex-grow-1">
+						<form class="form-inline" method='get' action='/admin/employee/search'>
+							<input class="form-control" type="text" name='searchTerm'
+								placeholder="Search employees..." aria-label="Search mployees...">
+								<div class="form-group">
+                            	<label for="departmentEmployee">Search by: </label>
+                            	<select class="form-control" name="type" id="departmentEmployee">
+                                    <option selected="NATIONAL ID">NATIONAL ID</option>
+                                    <option selected="FIRST NAME">FIRST NAME</option>
+                                    <option selected="LAST NAME">LAST NAME</option>
+                                    <option selected="ROLE">ROLE</option>
+                                    <option selected="E-MAIL">E-MAIL</option>
+                                    <option selected="IBAN">IBAN</option>
+                                    <option selected="LEVEL">LEVEL</option>
+                                    <option selected="DEPARTMENT">DEPARTMENT</option>
+                                    <option selected="ACCESS LEVEL">ACCESS LEVEL</option>
+                                
+                            	</select>
+                           </div>
+							<button class="btn btn-dark ml-2" type="submit">Search</button>
+						</form>
+					</div>
 				    <table class="table">
                         <thead>
                             <tr>
@@ -37,6 +59,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                        
                             <c:forEach items="${employees}" var="employee" varStatus="loop">
 							    <tr>
                                 <th scope="row">${loop.index}</th>

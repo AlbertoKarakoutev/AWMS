@@ -73,13 +73,12 @@ public class AdminController {
 		}
 	}
 
-	@PostMapping(value = "/employee/register", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String registerEmployee(@RequestBody Employee newEmployee,
+	@PostMapping(value = "/employee/register", consumes ="text/plain")
+	public String registerEmployee(@RequestBody String data,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
-			this.employeeService.registerEmployee(newEmployee);
 			List<Employee> employee = new ArrayList<>();
-			employee.add(newEmployee);
+			employee.add(employeeService.registerEmployee(data));
 			model.addAttribute("employee", employee);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
@@ -125,9 +124,8 @@ public class AdminController {
 	public String updateEmployeeInfo(@RequestBody String data, @RequestParam String employeeId,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
-			this.employeeService.updateEmployeeInfo(employeeId, data);
 			List<Employee> employee = new ArrayList<>();
-			employee.add(employeeService.getEmployee(employeeId));
+			employee.add(employeeService.updateEmployeeInfo(employeeId, data));
 			model.addAttribute("employee", employee);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
@@ -137,13 +135,15 @@ public class AdminController {
 		}
 	}
 
-	@GetMapping("/search")
+	@GetMapping("/employee/search")
 	public String searchEmployees(@RequestParam String searchTerm, @RequestParam String type,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<Employee> employees = this.employeeService.getAllEmployees();
 			List<Employee> foundEmployees = this.employeeService.searchEmployees(employees, searchTerm, type);
+			System.out.println(foundEmployees.size());
 			model.addAttribute("foundEmployees", foundEmployees);
+			model.addAttribute("departments", getDepartmentDTOs());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
 
@@ -245,11 +245,11 @@ public class AdminController {
 			Map<String, Boolean> controllerConditions = getActivesMethod();
 			model.addAttribute("modules", controllerConditions);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
+
+			return "modules";
 		} catch (Exception e) {
 			return "internalServerError";
 		}
-
-		return "modules";
 
 	}
 
@@ -289,7 +289,7 @@ public class AdminController {
 		}
 		return departmentDTOs;
 	}
-
+						
 	@GetMapping("/departments")
 	public String getDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {

@@ -53,49 +53,73 @@ public class EmployeeService {
 		List<Employee> foundEmployees = new ArrayList<>();
 
 		Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
-
+		Matcher matcher;
 		employeeLoop: for (Employee employee : employees) {
-			Matcher matcher;
 			switch (type) {
 			case "ID":
 				matcher = pattern.matcher(employee.getID());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "nationalID":
+			case "NATIONAL ID":
 				matcher = pattern.matcher(employee.getNationalID());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "firstName":
+			case "FIRST NAME":
 				matcher = pattern.matcher(employee.getFirstName());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "lastName":
+			case "LAST NAME":
 				matcher = pattern.matcher(employee.getLastName());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "role":
+			case "ROLE":
 				matcher = pattern.matcher(employee.getRole());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "email":
+			case "E-MAIL":
 				matcher = pattern.matcher(employee.getEmail());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "iban":
+			case "IBAN":
 				matcher = pattern.matcher(employee.getIBAN());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "level":
+			case "LEVEL":
 				matcher = pattern.matcher(Integer.toString(employee.getLevel()));
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "department":
+			case "DEPARTMENT":
 				matcher = pattern.matcher(employee.getDepartment());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
-			case "accessLevel":
+			case "ACCESS LEVEL":
 				matcher = pattern.matcher(employee.getAccessLevel());
+				if(matcher.find()) {
+					foundEmployees.add(employee);
+				}
 				break;
 			default:
 				continue employeeLoop;
 			}
-			boolean matchFound = matcher.find();
-			if(matchFound) {
-				foundEmployees.add(employee);
-			}
 		}
-
 		return foundEmployees;
 	}
 
@@ -124,15 +148,39 @@ public class EmployeeService {
 		
 	}
 
- 	public void registerEmployee(Employee newEmployee) {
-		// TODO:
-		// Validation? from Validator Class
-		// Add salt to password
-		String encodedPassword = this.passwordEncoder.encode(newEmployee.getPassword());
-		newEmployee.setPassword(encodedPassword);
-		newEmployee.setRole("EMPLOYEE");
-
-		this.employeeRepo.save(newEmployee);
+ 	public Employee registerEmployee(String data) {
+ 		
+ 		String[] dataValues = data.split("\\n");
+		Map<String, String> newInfo = new HashMap<String, String>();
+		for(String field : dataValues) {
+			field = field.substring(0, field.length()-1);
+			newInfo.put(field.split("=")[0], field.split("=")[1]);
+		}
+		Employee employee = new Employee();
+		employee.setFirstName(newInfo.get("firstName"));
+		employee.setLastName(newInfo.get("familyName"));
+		employee.setNationalID(newInfo.get("nationalID"));
+		employee.setEmail(newInfo.get("email"));
+		employee.setIBAN(newInfo.get("iban"));
+		employee.setPhoneNumber(newInfo.get("phoneNumber"));
+		employee.setDepartment(newInfo.get("department").split(":")[0]);
+		String encodedPassword = this.passwordEncoder.encode(employee.getNationalID());
+		employee.setPassword(encodedPassword);
+		employee.setRole("EMPLOYEE");
+		try {
+			employee.setLevel(Integer.parseInt(newInfo.get("level")));
+		}catch(Exception e) {
+			System.out.println("Level is 0");
+			employee.setLevel(0);
+		}
+		
+        List<Object> notificationData = new ArrayList<Object>();
+        notificationData.add("info-updated");
+		String message = "Your profile information has been updated by the Administrator.";
+		employee.getNotifications().add(new Notification(message, notificationData));
+        
+		this.employeeRepo.save(employee);
+		return employee;
 	}
 
 	public Employee updatePassword(String newPassword, String employeeID) throws IOException {
@@ -151,7 +199,7 @@ public class EmployeeService {
 		this.employeeRepo.save(employee);
 	}
 
-	public void updateEmployeeInfo(String employeeID, String data) throws IOException {
+	public Employee updateEmployeeInfo(String employeeID, String data) throws IOException {
 		Employee employee = getEmployee(employeeID);
 		// TODO:
 		// Validation? from Validator Class
@@ -181,6 +229,7 @@ public class EmployeeService {
 		employee.getNotifications().add(new Notification(message, notificationData));
         
 		this.employeeRepo.save(employee);
+		return employee;
 	}
 
 	public void addLeave(String employeeID, LocalDate start, LocalDate end, boolean paid) throws IOException {

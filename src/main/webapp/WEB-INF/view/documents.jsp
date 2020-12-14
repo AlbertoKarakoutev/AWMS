@@ -40,7 +40,7 @@
 						<div class="flex-grow-1">
 							<form class="form-inline" method='get' action='/document/public/search/'>
 								<input class="form-control" type="text" name='name'
-									placeholder="Search document" aria-label="Search documents...">
+									placeholder="Search documents..." aria-label="Search documents...">
 								<button class="btn btn-dark ml-2" type="submit">Search</button>
 							</form>
 						</div>
