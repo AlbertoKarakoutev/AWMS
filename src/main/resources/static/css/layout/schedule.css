@@ -47,6 +47,10 @@
 	overflow: hidden;
 	position: relative;
 }
+.day-box:focus{
+	outline:none;
+	border:0;
+}
 
 .day-box:hover{
 	border: 2px solid rgb(200, 200, 200);
