@@ -35,7 +35,7 @@
                 <div class="my-3">
                 <c:forEach items="${threads}" var="thread">
                     <div class="forum-questions d-flex align-items-center my-2">
-                        <h3 class="text-light">${thread.getTitle()}</h3>
+                        <h3 class="text-light">${thread.getTitle()}<c:if test="${thread.getAnswered() == true}"> - Answered</c:if></h3>
                         <a class="btn btn-dark ml-auto" href="/forum/thread/${thread.getID()}" title="${thread.getTitle()}">
                             <i class="fas fa-arrow-right"></i>
                         </a>
