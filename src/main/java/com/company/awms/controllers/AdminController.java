@@ -120,7 +120,7 @@ public class AdminController {
 		}
 	}
 
-	@PostMapping(value="/employee/update", consumes="text/plain")
+	@PostMapping(value = "/employee/update", consumes = "text/plain")
 	public String updateEmployeeInfo(@RequestBody String data, @RequestParam String employeeId,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
@@ -254,7 +254,7 @@ public class AdminController {
 	}
 
 	@SuppressWarnings("unchecked")
-	@PutMapping(value = "/modules/set", consumes = "application/json")
+	@PostMapping(value = "/modules/set", consumes = "application/json")
 	public String setActives(@RequestBody String updatedActives,
 			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model)
 			throws JsonMappingException, JsonProcessingException {
@@ -341,8 +341,8 @@ public class AdminController {
 		model.addAttribute("employeeID", employeeDetails.getID());
 		Employee user = employeeService.getEmployee(employeeDetails.getID());
 		int unread = 0;
-		for(int i = 0; i < user.getNotifications().size(); i++) {
-			if(!user.getNotifications().get(i).getRead()) {
+		for (int i = 0; i < user.getNotifications().size(); i++) {
+			if (!user.getNotifications().get(i).getRead()) {
 				unread++;
 			}
 		}

@@ -5,7 +5,7 @@ for(let i=0;i< moduleNamesElements.length; i++){
 	moduleNames[i] = moduleNamesElements[i].innerHTML;
 }
 
-$(".actives").click(function(){
+$(".module-update").click(function(){
 	for(let i = 0; i < moduleNames.length; i++){
 		let name = moduleNames[i];
 		updatedActives[moduleNames[i]] = document.getElementById(name).checked;
@@ -14,7 +14,7 @@ $(".actives").click(function(){
 	jsonProto.updatedActives = JSON.stringify(updatedActives);
 	let json = JSON.stringify(jsonProto);
 	let  req = new XMLHttpRequest();
-	req.open("PUT", "/admin/modules/set/", true);
+	req.open("POST", "/admin/modules/set/", true);
 	req.setRequestHeader("Content-Type", "application/json");
 	req.send(json);
 });
