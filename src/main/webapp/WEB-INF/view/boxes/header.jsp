@@ -11,9 +11,11 @@
 		id="dropdownNotification" data-toggle="dropdown" aria-haspopup="true"
 		aria-expanded="false">
 		<i class="fas fa-bell"></i>
-		<div class="ap-badge-position">
-			<span class="badge badge-danger">${unread}</span>
-		</div>
+		<c:if test="${unread>0}">
+			<div class="ap-badge-position">
+				<span class="badge badge-danger">${unread}</span>
+			</div>
+		</c:if>
 	</button>
 	<div class="dropdown-menu" aria-labelledby="dropdownNotification">
 		<%

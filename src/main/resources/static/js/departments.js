@@ -73,43 +73,43 @@ add.onclick = function () {
 	content.innerHTML = "";
 	if (multilevel) {
 		addLevel.style.display = "inline-block";
-		content.innerHTML += "<label for='Name'>Name: </label><input class='data-field' type='text' id='Name'/></br>"
-		+ "<label for='Universal schedule'>Universal schedule: </label><input class='data-field' type='text' id='Universal schedule' value='false' readonly/></br>"
-		+ "<h2><b>Level " + levelCounter + "</b></h2></br><label for='Daily break duration total"+levelCounter+"'>Daily break duration total: </label><input class='data-field' type='text' id='Daily break duration total"+levelCounter+"'/></br>"
-		+ "<label for='Schedule type"+levelCounter+"'>Schedule type: </label><input class='data-field' type='text' id='Schedule type"+levelCounter+"'/></br>"
-		+ "<label for='Daily hours"+levelCounter+"'>Daily hours:</label><input class='data-field' type='text' id='Daily hours"+levelCounter+"'/></br>"
-		+ "<label for='Shift length"+levelCounter+"'>Shift length: </label><input class='data-field' type='text' id='Shift length"+levelCounter+"'/></br>"
-		+ "<label for='Work on weekends"+levelCounter+"'>Work on weekends: </label><input class='data-field' type='text' id='Work on weekends"+levelCounter+"'/></br>"
-		+ "<label for='Monhtly work days"+levelCounter+"'>Monthly work days: </label><input class='data-field' type='text' id='Monhtly work days"+levelCounter+"'/></br>"
-		+ "<label for='Employees per shift"+levelCounter+"'>Employees per shift: </label><input class='data-field' type='text' id='Employees per shift"+levelCounter+"'/></br>"
-		+ "<label for='Break between shifts"+levelCounter+"'>Break between shifts: </label><input class='data-field' type='text' id='Break between shifts"+levelCounter+"'/>";
+		content.innerHTML += "<label for='Name'>Name: </label><input class='data-field form-control' type='text' id='Name'/></br>"
+		+ "<label for='Universal schedule'>Universal schedule: </label><input class='data-field form-control' type='text' id='Universal schedule' value='false' readonly/></br>"
+		+ "<h2><b>Level " + levelCounter + "</b></h2></br><label for='Daily break duration total"+levelCounter+"'>Daily break duration total: </label><input class='data-field form-control' type='text' id='Daily break duration total"+levelCounter+"'/></br>"
+		+ "<label for='Schedule type"+levelCounter+"'>Schedule type: </label><input class='data-field form-control' type='text' id='Schedule type"+levelCounter+"'/></br>"
+		+ "<label for='Daily hours"+levelCounter+"'>Daily hours:</label><input class='data-field form-control' type='text' id='Daily hours"+levelCounter+"'/></br>"
+		+ "<label for='Shift length"+levelCounter+"'>Shift length: </label><input class='data-field form-control' type='text' id='Shift length"+levelCounter+"'/></br>"
+		+ "<label for='Work on weekends"+levelCounter+"'>Work on weekends: </label><input class='data-field form-control' type='text' id='Work on weekends"+levelCounter+"'/></br>"
+		+ "<label for='Monhtly work days"+levelCounter+"'>Monthly work days: </label><input class='data-field form-control' type='text' id='Monhtly work days"+levelCounter+"'/></br>"
+		+ "<label for='Employees per shift"+levelCounter+"'>Employees per shift: </label><input class='data-field form-control' type='text' id='Employees per shift"+levelCounter+"'/></br>"
+		+ "<label for='Break between shifts"+levelCounter+"'>Break between shifts: </label><input class='data-field form-control' type='text' id='Break between shifts"+levelCounter+"'/>";
 
 	} else {
 		create.style.display = "inline-block";
-		content.innerHTML += "<label for='Name'>Name: </label><input class='data-field' type='text' id='Name'/></br>";
-		content.innerHTML += "<label for='Universal schedule'>Universal schedule: </label><input class='data-field' type='text' id='Universal schedule' value='true' readonly/></br>";
-		content.innerHTML += "<label for='Daily break duration total'>Daily break duration total: </label><input class='data-field' type='text' id='Daily break duration total'/></br>";
-		content.innerHTML += "<label for='Schedule type'>Schedule type: </label><input class='data-field' type='text' id='Schedule type'/></br>";
-		content.innerHTML += "<label for='Daily hours'>Daily hours:</label><input class='data-field' type='text' id='Daily hours'/></br>";
-		content.innerHTML += "<label for='Shift length'>Shift length: </label><input class='data-field' type='text' id='Shift length'/></br>";
-		content.innerHTML += "<label for='Work on weekends'>Work on weekends: </label><input class='data-field' type='text' id='Work on weekends'/></br>";
-		content.innerHTML += "<label for='Monhtly work days'>Monthly work days: </label><input class='data-field' type='text' id='Monhtly work days'/></br>";
-		content.innerHTML += "<label for='Employees per shift'>Employees per shift: </label><input class='data-field' type='text' id='Employees per shift'/></br>";
-		content.innerHTML += "<label for='Break between shifts'>Break between shifts: </label><input class='data-field' type='text' id='Break between shifts'/></br>";
+		content.innerHTML += "<label for='Name'>Name: </label><input class='data-field form-control' type='text' id='Name'/></br>";
+		content.innerHTML += "<label for='Universal schedule'>Universal schedule: </label><input class='data-field form-control' type='text' id='Universal schedule' value='true' readonly/></br>";
+		content.innerHTML += "<label for='Daily break duration total'>Daily break duration total: </label><input class='data-field form-control' type='text' id='Daily break duration total'/></br>";
+		content.innerHTML += "<label for='Schedule type'>Schedule type: </label><input class='data-field form-control' type='text' id='Schedule type'/></br>";
+		content.innerHTML += "<label for='Daily hours'>Daily hours:</label><input class='data-field form-control' type='text' id='Daily hours'/></br>";
+		content.innerHTML += "<label for='Shift length'>Shift length: </label><input class='data-field form-control' type='text' id='Shift length'/></br>";
+		content.innerHTML += "<label for='Work on weekends'>Work on weekends: </label><input class='data-field form-control' type='text' id='Work on weekends'/></br>";
+		content.innerHTML += "<label for='Monhtly work days'>Monthly work days: </label><input class='data-field form-control' type='text' id='Monhtly work days'/></br>";
+		content.innerHTML += "<label for='Employees per shift'>Employees per shift: </label><input class='data-field form-control' type='text' id='Employees per shift'/></br>";
+		content.innerHTML += "<label for='Break between shifts'>Break between shifts: </label><input class='data-field form-control' type='text' id='Break between shifts'/></br>";
 	}
 }
 
 addLevel.onclick = function () {
 	levelCounter++;
 	create.style.display = "inline-block";
-	let newFields = "<h2><b>Level " + levelCounter + "</b></h2></br><label for='Daily break duration total"+levelCounter+"'>Daily break duration total: </label><input class='data-field' type='text' id='Daily break duration total"+levelCounter+"'/></br>"
-		+ "<label for='Schedule type"+levelCounter+"'>Schedule type: </label><input class='data-field' type='text' id='Schedule type"+levelCounter+"'/></br>"
-		+ "<label for='Daily hours"+levelCounter+"'>Daily hours:</label><input class='data-field' type='text' id='Daily hours"+levelCounter+"'/></br>"
-		+ "<label for='Shift length"+levelCounter+"'>Shift length: </label><input class='data-field' type='text' id='Shift length"+levelCounter+"'/></br>"
-		+ "<label for='Work on weekends"+levelCounter+"'>Work on weekends: </label><input class='data-field' type='text' id='Work on weekends"+levelCounter+"'/></br>"
-		+ "<label for='Monhtly work days"+levelCounter+"'>Monthly work days: </label><input class='data-field' type='text' id='Monhtly work days"+levelCounter+"'/></br>"
-		+ "<label for='Employees per shift"+levelCounter+"'>Employees per shift: </label><input class='data-field' type='text' id='Employees per shift"+levelCounter+"'/></br>"
-		+ "<label for='Break between shifts"+levelCounter+"'>Break between shifts: </label><input class='data-field' type='text' id='Break between shifts"+levelCounter+"'/>";
+	let newFields = "<h2><b>Level " + levelCounter + "</b></h2></br><label for='Daily break duration total"+levelCounter+"'>Daily break duration total: </label><input class='data-field form-control' type='text' id='Daily break duration total"+levelCounter+"'/></br>"
+		+ "<label for='Schedule type"+levelCounter+"'>Schedule type: </label><input class='data-field form-control' type='text' id='Schedule type"+levelCounter+"'/></br>"
+		+ "<label for='Daily hours"+levelCounter+"'>Daily hours:</label><input class='data-field form-control' type='text' id='Daily hours"+levelCounter+"'/></br>"
+		+ "<label for='Shift length"+levelCounter+"'>Shift length: </label><input class='data-field form-control' type='text' id='Shift length"+levelCounter+"'/></br>"
+		+ "<label for='Work on weekends"+levelCounter+"'>Work on weekends: </label><input class='data-field form-control' type='text' id='Work on weekends"+levelCounter+"'/></br>"
+		+ "<label for='Monhtly work days"+levelCounter+"'>Monthly work days: </label><input class='data-field form-control' type='text' id='Monhtly work days"+levelCounter+"'/></br>"
+		+ "<label for='Employees per shift"+levelCounter+"'>Employees per shift: </label><input class='data-field form-control' type='text' id='Employees per shift"+levelCounter+"'/></br>"
+		+ "<label for='Break between shifts"+levelCounter+"'>Break between shifts: </label><input class='data-field form-control' type='text' id='Break between shifts"+levelCounter+"'/>";
 	let last = document.getElementById("Break between shifts"+String(levelCounter-1));
 	last.insertAdjacentHTML('afterEnd' , newFields);
 }

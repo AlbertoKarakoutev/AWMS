@@ -42,11 +42,11 @@
 	                }%>
                 	</select>
                 	<div id="button-content">
-                		<button id="display">DISPLAY</button>
-                		<button id="add">ADD NEW</button>
-                		<button id="addLevel" style="{display:none;}">ADD LEVEL</button>
-                		<button id="create" style="{display:none;}">CREATE DEPARTMENT</button>
-                		<button id="update" style="{display:none;}">UPDATE</button>
+                		<button id="display" class="btn btn-lg btn-dark">DISPLAY</button>
+                		<button id="add" class="btn btn-lg btn-dark">ADD NEW</button>
+                		<button id="addLevel" class="btn btn-lg btn-dark" style="{display:none;}">ADD LEVEL</button>
+                		<button id="create" class="btn btn-lg btn-danger" style="{display:none;}">CREATE DEPARTMENT</button>
+                		<button id="update" class="btn btn-lg btn-danger" style="{display:none;}">UPDATE</button>
                 	</div>
                 	
                 	<div id="department-content"></div>

@@ -16,6 +16,8 @@ public class EmployeeDailyReference {
 	private String firstName;
 	private String lastName;
 	private String nationalID;
+	private String department;
+	private int level;
 	private List<Task> tasks = new ArrayList<>();
 
 	public EmployeeDailyReference() {}
@@ -30,6 +32,8 @@ public class EmployeeDailyReference {
 		} else {
 			this.firstName = employee.get().getFirstName();
 			this.lastName = employee.get().getLastName();
+			this.department = employee.get().getDepartment();
+			this.level = employee.get().getLevel();
 			this.workTime = new LocalTime[2];
 		}
 	}
@@ -61,6 +65,14 @@ public class EmployeeDailyReference {
 	public List<Task> getTasks() {
 		return tasks;
 	}
+	
+	public String getDepartment() {
+		return this.department;
+	}
+	
+	public int getLevel() {
+		return this.level;
+	}
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -76,5 +88,13 @@ public class EmployeeDailyReference {
 
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
+	}
+	
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+	
+	public void setLevel(int level) {
+		this.level = level;
 	}
 }
