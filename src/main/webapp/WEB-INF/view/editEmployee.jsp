@@ -56,7 +56,7 @@
                         </div>
                         <div class="form-group">
                             <label for="phoneNumberEmployee">Phone number</label>
-                            <input value="${employee.getPhoneNumber()}" type="tel" name="phoneNumber" class="form-control" id="phoneNumberEmployee" aria-describedby="phoneNumberEmployee" placeholder="Password" required>
+                            <input value="${employee.getPhoneNumber()}" type="tel" name="phoneNumber" class="form-control" id="phoneNumberEmployee" aria-describedby="phoneNumberEmployee" placeholder="Phone number" required>
                             <small id="phoneNumberHelp" class="form-text text-muted">Employee's phone number.</small>
                         </div>
                         <div class="form-group">
@@ -76,7 +76,7 @@
                         <div class="form-group">
                             <label for="levelEmployee">Level</label>
                             <input value="${employee.getLevel()}" type="number" name="level" class="form-control" id="levelEmployee" aria-describedby="levelEmployee" placeholder="Level" required>
-                            <small id="levelHelp" class="form-text text-muted">Employee's phone number.</small>
+                            <small id="levelHelp" class="form-text text-muted">Employee's department level.</small>
                         </div>
 						<c:if test="${newEmployee == false}">
 	                        <div class="form-group">

@@ -4,7 +4,7 @@
 <%@page import="com.company.awms.data.employees.EmployeeDailyReference"%>
 <%@page import="com.company.awms.data.schedule.Task"%>  
 <%@page import="java.time.LocalDate"%> 
-
+<%@	taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
@@ -20,6 +20,8 @@
 	<title>Calendar</title>
 </head>
 <body>
+	<sec:authentication property="principal.authorities" var="role" />
+	
 	<%List<EmployeeDailyReference>[] sle = (List<EmployeeDailyReference>[])request.getAttribute("sameLevelEmployees");
 	List<Task>[] tasks = (List<Task>[])request.getAttribute("tasks");
 	YearMonth yearMonth = (YearMonth)request.getAttribute("month");
@@ -90,7 +92,9 @@
                                                                         <th scope="col">First Name</th>
                                                                         <th scope="col">Family Name</th>
                                                                         <th scope="col">Working Hours</th>
-								                                        <th scope="col">Swap</th>
+                                                                        <c:if test="${role == '[ADMIN]'}">
+								                                        	<th scope="col">Swap</th>
+								                                        </c:if>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -108,9 +112,11 @@
                                                                                     <td>
 								                                                        <h4><%= thisEDR.getWorkTimeInfo() %></h4>
 								                                                    </td>
-                                                                                    <td>
-							                                                            <button class="btn btn-dark" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
-								                                                    </td>
+																					<c:if test="${role == '[ADMIN]'}">
+	                                                                                    <td>
+								                                                            <button class="btn btn-dark" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
+									                                                    </td>
+								                                                    </c:if>
                                                                                 </tr>
 		                    	          		        			<%}
 		                    	          		        		}%>
