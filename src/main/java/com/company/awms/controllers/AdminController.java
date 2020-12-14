@@ -73,9 +73,9 @@ public class AdminController {
 		}
 	}
 
-	@PostMapping(value = "/employee/register", consumes ="text/plain")
-	public String registerEmployee(@RequestBody String data,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	@PostMapping(value = "/employee/register", consumes = "text/plain")
+	public String registerEmployee(@RequestBody String data, @AuthenticationPrincipal EmployeeDetails employeeDetails,
+			Model model) {
 		try {
 			List<Employee> employee = new ArrayList<>();
 			employee.add(employeeService.registerEmployee(data));
@@ -126,6 +126,7 @@ public class AdminController {
 		try {
 			List<Employee> employee = new ArrayList<>();
 			employee.add(employeeService.updateEmployeeInfo(employeeId, data));
+			model.addAttribute("departments", getDepartmentDTOs());
 			model.addAttribute("employees", employee);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "employees";
@@ -288,7 +289,7 @@ public class AdminController {
 		}
 		return departmentDTOs;
 	}
-						
+
 	@GetMapping("/departments")
 	public String getDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {

@@ -27,26 +27,25 @@
                     <h1 class="ty-page-title">Salary Info</h1>
                 </header>
                 <div class="py-3">
-                    <div class="row">
-                        <div class="col-12 col-lg-6">
-                            <div class="row">
-                                <div class="col-12 col-md-6">
-                                    Total Salary: <span class="font-weight-bold">${salary}</span>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    Work Hours: <span class="font-weight-bold">${workHours}</span>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    Pay Per Hour: <span class="font-weight-bold">${payPerHour}</span>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    Task Rewards: <span class="font-weight-bold">${taskRewards}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6">
-                            <div class="row"></div>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Total Salary</th>
+                                    <th scope="col">Work Hours</th>
+                                    <th scope="col">Pay Per Hour</th>
+                                    <th scope="col">Task Rewards</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">${salary}</th>
+                                    <td>${workHours}</td>
+                                    <td>${payPerHour}</td>
+                                    <td>${taskRewards}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
