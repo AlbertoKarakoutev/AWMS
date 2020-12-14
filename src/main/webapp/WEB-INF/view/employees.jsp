@@ -52,7 +52,7 @@
 							</div>
 						</form>
 						<div class="w-100 text-right">
-						    <a class="btn btn-dark" href="/admin/employee/editEmployee" title="Add employee">Add</a>
+						    <a class="btn btn-dark" href="/admin/employee/register" title="Add employee">Add</a>
 						</div>
 					</div>
 					<div class="table-responsive">

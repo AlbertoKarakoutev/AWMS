@@ -93,7 +93,7 @@ public class AdminController {
 		try {
 			Employee employee = employeeService.getEmployee(employeeID);
 			model.addAttribute("employee", employee);
-			model.addAttribute("new", true);
+			model.addAttribute("newEmployee", false);
 			model.addAttribute("departments", getDepartmentDTOs());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "editEmployee";
@@ -101,13 +101,12 @@ public class AdminController {
 			return "internalServerError";
 		}
 	}
-	
+
 	@GetMapping("/employee/register")
-	public String registerEmployee(
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String registerEmployee(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			model.addAttribute("departments", getDepartmentDTOs());
-			model.addAttribute("new", true);
+			model.addAttribute("newEmployee", true);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "editEmployee";
 		} catch (Exception e) {

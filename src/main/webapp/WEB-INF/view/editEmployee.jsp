@@ -24,9 +24,16 @@
             <section class="content">
                 <div class="p-4">
                     <header class="py-3">   
-                        <h1 class="ty-page-title">Now editing ${employee.getFirstName()} ${employee.getLastName()}!</h1>
+                        <h1 class="ty-page-title">
+                            <c:if test="${newEmployee == true}">
+                                Add new employee   
+                            </c:if>
+                            <c:if test="${!newEmployee == true}">
+                                Now editing ${employee.getFirstName()} ${employee.getLastName()}!
+                            </c:if>
+                        </h1>
                     </header>
-                    <form action="/admin/employee/update/?employeeId=${employee.getID()}" method="POST" enctype="text/plain">
+                    <form action="${newEmployee == true ? '/admin/employee/register' : '/admin/employee/update/?employeeId=${employee.getID()}'}" method="POST" enctype="text/plain">
                         <div class="form-group">
                             <label for="firstNameEmployee">First name</label>
                             <input value="${employee.getFirstName()}" type="text" name="firstName" class="form-control" id="firstNameEmployee" aria-describedby="firstName" placeholder="First name" required>
@@ -53,7 +60,7 @@
                             <small id="phoneNumberHelp" class="form-text text-muted">Employee's phone number.</small>
                         </div>
                         <div class="form-group">
-                            <label for="ibanEmployee">Phone number</label>
+                            <label for="ibanEmployee">IBAN</label>
                             <input value="${employee.getIBAN()}" type="tel" name="iban" class="form-control" id="ibanEmployee" aria-describedby="ibanEmployee" placeholder="Password" required>
                             <small id="ibanHelp" class="form-text text-muted">Employee's IBAN.</small>
                         </div>
@@ -68,16 +75,16 @@
                         </div>
                         <div class="form-group">
                             <label for="levelEmployee">Level</label>
-                            <input value="${employee.getLevel()}" type="number" name="level" class="form-control" id="levelEmployee" aria-describedby="levelEmployee" placeholder="Password" required>
+                            <input value="${employee.getLevel()}" type="number" name="level" class="form-control" id="levelEmployee" aria-describedby="levelEmployee" placeholder="Level" required>
                             <small id="levelHelp" class="form-text text-muted">Employee's phone number.</small>
                         </div>
-						<c:if test="${new == false}">
+						<c:if test="${newEmployee == false}">
 	                        <div class="form-group">
 	                            <a class="btn btn-primary" href="/admin/personal/${employee.getID()}" title="Edit employee's files">Edit Files</a>
 	                        </div>
 	                        <button type="submit" class="btn btn-dark">Update</button>
                         </c:if>
-                        <c:if test="${new == true}">
+                        <c:if test="${newEmployee == true}">
 	                        <button type="submit" class="btn btn-dark">Register</button>
                         </c:if>
                     </form>
