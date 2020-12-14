@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <link href="/css/main.css" rel="stylesheet">
-    <link href="/css/components/modules.css" rel="stylesheet">
 
     <!--Add vendor's js files-->
     <script src="/webjars/jquery/3.5.1/jquery.js"></script>
@@ -28,18 +27,34 @@
                 <header class="py-3">
                     <h1 class="ty-page-title">Active Modules</h1>
                 </header>
-                <%Map<String, Boolean> modules = (Map<String, Boolean>)request.getAttribute("modules");
-                for(Map.Entry<String, Boolean> module : modules.entrySet()){ %>
-                	<div class="module-container">
-                		<p class="module-name"><%=module.getKey()%></p>
-                		<%if((boolean)(modules.get(module.getKey()))){ %>
-                			<input type="checkbox" id=<%=module.getKey()%> name=<%=module.getKey()%> checked="true">
-                		<%}else{ %>
-                			<input type="checkbox" id=<%=module.getKey()%> name=<%=module.getKey()%>>
-                		<%}%>
-                	</div>
-                <%}%>
-                <button class="actives">Update</button>
+                <div class="my-3 d-flex flex-row-reverse">
+                    <button class="btn btn-dark module-update">Update</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="col-11">Module Name</th>
+                            <th scope="col" class="col-1">Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%Map<String, Boolean> modules = (Map<String, Boolean>)request.getAttribute("modules");
+                        for(Map.Entry<String, Boolean> module : modules.entrySet()){ %>
+                                <tr>
+                                    <td class="col-11">
+						                <h4 class="module-name"><%=module.getKey()%></h4>
+					                </td>
+                	                <td class="col-1">
+                                        <div class="text-center">
+                                            <c:set var="check" value="<%= (boolean)(modules.get(module.getKey())) %>" />
+                                            <input type="checkbox" id="<%=module.getKey()%>" name="<%=module.getKey()%>" ${check ? "checked" : ""}>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <%}%>
+                        
+                    </tbody>
+                </table>
             </div>
             <footer>
                 <%@include file="boxes/footer.jsp" %>
