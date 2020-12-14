@@ -30,6 +30,9 @@ public class EmployeeController {
     @PostMapping("/password")
     public String updatePassword(@RequestParam String newPassword, @RequestParam String confirmPassword,
                                  @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
+        if (!active) {
+            return "notFound";
+        }
 
         if(!newPassword.equals(confirmPassword)){
             model.addAttribute("mismatch", true);
@@ -54,6 +57,10 @@ public class EmployeeController {
 
     @GetMapping("/password/new")
     public String getPasswordUpdate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws IOException{
+        if (!active) {
+            return "notFound";
+        }
+
         injectLoggedInEmployeeInfo(model, employeeDetails);
         model.addAttribute("mismatch", false);
 
@@ -77,7 +84,11 @@ public class EmployeeController {
 
     @GetMapping("/dismiss")
 	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
-		try{
+        if (!active) {
+            return "notFound";
+        }
+
+        try{
 			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());

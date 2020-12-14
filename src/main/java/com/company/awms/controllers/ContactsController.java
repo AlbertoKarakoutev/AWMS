@@ -25,6 +25,10 @@ public class ContactsController {
 
     @GetMapping("contacts")
     public String getContacts(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+        if (!active) {
+            return "notFound";
+        }
+
         try {
             Employee owner = this.employeeService.getOwner();
             List<Employee> managers = this.employeeService.getManagers();

@@ -34,6 +34,10 @@ public class ForumController {
 
 	@GetMapping("")
 	public String getAllThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreads();
 			model.addAttribute("threads", threads);
@@ -48,6 +52,10 @@ public class ForumController {
 
 	@GetMapping("/thread/{threadID}")
 	public String getThreadWithReplies(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
 			model.addAttribute("thread", threadAndReplies.getForumThread());
@@ -65,6 +73,10 @@ public class ForumController {
 
 	@GetMapping("answered")
 	public String getAllAnsweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			List<ForumThread> threads = this.forumService.getAllAnsweredThreads();
 			model.addAttribute("threads", threads);
@@ -79,6 +91,10 @@ public class ForumController {
 
 	@GetMapping("unanswered")
 	public String getAllUnansweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			List<ForumThread> threads = this.forumService.getAllUnansweredThreads();
 			model.addAttribute("threads", threads);
@@ -94,6 +110,10 @@ public class ForumController {
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/threads/{employeeID}")
 	public String getAllThreadsFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			List<ForumThread> threads = this.forumService.getAllThreadsFromEmployee(employeeID);
 			model.addAttribute("threads", threads);
@@ -108,6 +128,10 @@ public class ForumController {
 
 	@GetMapping("/thread/new")
 	public String newThread(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
@@ -121,6 +145,10 @@ public class ForumController {
 	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/replies/{employeeID}")
 	public String getAllRepliesFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			List<ForumReply> replies = this.forumService.getAllRepliesFromEmployee(employeeID);
 			model.addAttribute("replies", replies);
@@ -136,6 +164,10 @@ public class ForumController {
 	// Forum edit thread
 	@GetMapping("/thread/{threadID}/edit")
 	public String getThreadEdit(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			ForumThread thread = this.forumService.getThread(threadID);
 
@@ -154,6 +186,10 @@ public class ForumController {
 
 	@GetMapping("/thread/{threadID}/reply/new")
 	public String newReply(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			ForumThread thread = this.forumService.getThread(threadID);
 
@@ -172,6 +208,10 @@ public class ForumController {
 
 	@PostMapping(value = "/add")
 	public String addThread(@RequestParam String title, @RequestParam String body, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			ForumThread forumThread = this.forumService.addNewThread(employeeDetails, title, body);
 
@@ -187,6 +227,10 @@ public class ForumController {
 
 	@PostMapping(value = "/thread/{threadID}/add")
 	public String addReply(@RequestParam String body, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			this.forumService.addNewReply(employeeDetails, body, threadID);
 			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID);
@@ -203,6 +247,10 @@ public class ForumController {
 
 	@PostMapping(value = "/thread/{threadID}/answered")
 	public String markThreadAsAnswered(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			ForumThread forumThread = this.forumService.getThread(threadID);
 
@@ -225,6 +273,10 @@ public class ForumController {
 
 	@PostMapping(value = "/thread/{oldThreadID}/edit")
 	public String editThread(@RequestParam String title, @RequestParam String body, @PathVariable String oldThreadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			ForumThread oldThread = this.forumService.getThread(oldThreadID);
 

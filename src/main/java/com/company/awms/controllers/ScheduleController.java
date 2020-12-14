@@ -49,6 +49,10 @@ public class ScheduleController {
 
 	@GetMapping("/decline")
 	public String declineSwap(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try{
 			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
 			injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -62,6 +66,10 @@ public class ScheduleController {
 	
 	@PostMapping(value = "/swap")
 	public String swapEmployees(Model model, @RequestParam String noteNum, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
+		if (!active) {
+			return "notFound";
+		}
+
 		try {
 			String receiverNationalID = employeeService.getEmployee(employeeDetails.getID()).getNationalID();
 			scheduleService.swapEmployees(Integer.parseInt(noteNum), requesterNationalID, receiverNationalID, requesterDate, receiverDate);
@@ -86,6 +94,10 @@ public class ScheduleController {
 
 	@GetMapping("")
 	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam YearMonth month) {
+		if (!active) {
+			return "notFound";
+		}
+
 		YearMonth monthChecked = month;
 		if (!monthChecked.equals(YearMonth.now().plusMonths(1)) && !monthChecked.equals(YearMonth.now())) {
 			monthChecked = YearMonth.of(YearMonth.now().getYear(), YearMonth.now().getMonthValue());
