@@ -11,7 +11,6 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +28,6 @@ import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
 import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.data.employees.Notification;
-import com.company.awms.data.forum.ForumThread;
 import com.company.awms.data.schedule.Day;
 import com.company.awms.data.schedule.ScheduleRepo;
 import com.company.awms.data.schedule.Task;
@@ -48,10 +46,6 @@ public class ScheduleService {
 		this.scheduleRepo = scheduleRepo;
 		this.employeeRepo = employeeRepo;
 	}
-
-	// Call employeeService.createEmployeeDailyReference(...) in the
-	// ScheduleController and them get edr from the arguments
-	// And remove injection of employeeService.
 
 	// Create a employee reference with appropriate information and add to the
 	// current day employees array
@@ -128,7 +122,21 @@ public class ScheduleService {
 		return true;
 	}
 
-	public void swapEmployees(int noteNumber, String requesterNationalID, String receiverNationalID, String requesterDateParam, String receiverDateParam) {
+	public void declineSwap(String employeeID, LocalDate receiverDate) throws IOException {
+		Optional<Employee> receiverOptional = employeeRepo.findByNationalID(employeeID);
+		if(receiverOptional.isEmpty()) {
+			throw new IOException();
+		}
+		Employee receiver = receiverOptional.get();
+		List<Object> notificationData = new ArrayList<Object>();
+		notificationData.add("request-reply");
+		notificationData.add(receiverDate);
+		String message = "Your swap request for " + receiverDate + "has been declined.";
+		receiver.getNotifications().add(new Notification(message, notificationData));
+		employeeRepo.save(receiver);
+	}
+	
+	public void swapEmployees(String requesterNationalID, String receiverNationalID, String requesterDateParam, String receiverDateParam) {
 		
 		EmployeeDailyReference requester = null;
 		EmployeeDailyReference receiver = null;
@@ -183,10 +191,6 @@ public class ScheduleService {
 			requesterDay.getEmployees().add(receiver);
 			receiverDay.getEmployees().add(requester);
 			
-			Employee receiverObj = employeeRepo.findByNationalID(receiverNationalID).get();
-			receiverObj.getNotifications().get(noteNumber).setRead(true);
-			employeeRepo.save(receiverObj);
-			
 			scheduleRepo.save(requesterDay);
 			scheduleRepo.save(receiverDay);
 			
@@ -194,9 +198,17 @@ public class ScheduleService {
 		} else {
 			System.err.println("No such EDR in those days");
 		}
+		List<Object> notificationData = new ArrayList<Object>();
+		Employee requesterObj = employeeRepo.findByNationalID(requesterNationalID).get();
+		notificationData.add("request-reply");
+		notificationData.add(receiver.getNationalID());
+		String message = receiver.getFirstName() + " " + receiver.getLastName() + " has accepted your request to swap his/her " + receiverDate + " shift with your " + requesterDate + " shift.";
+		requesterObj.getNotifications().add(new Notification(message, notificationData));
+		employeeRepo.save(requesterObj);
+	
 	}
 
-	public void swapRequest(String requesterNationalID, String receiverID, String requesterDateParam, String receiverDateParam) throws IOException {
+	public void swapRequest(String requesterID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException {
 		List<Object> notificationData = new ArrayList<Object>();
 
 		LocalDate requesterDate, receiverDate;
@@ -208,13 +220,14 @@ public class ScheduleService {
 			return;
 		}
 
-		Optional<Employee> requesterOptional = employeeRepo.findById(requesterNationalID);
+		Optional<Employee> requesterOptional = employeeRepo.findById(requesterID);
 		if (requesterOptional.isEmpty()) {
+			System.out.println(requesterID);
 			throw new IOException("Requester not found!");
 		}
 		Employee requester = requesterOptional.get();
 
-		Optional<Employee> receiverOptional = employeeRepo.findById(receiverID);
+		Optional<Employee> receiverOptional = employeeRepo.findByNationalID(receiverNationalID);
 		if (receiverOptional.isEmpty()) {
 			throw new IOException("Requester not found!");
 		}
@@ -288,7 +301,7 @@ public class ScheduleService {
 				for (int j = 0; j < thisDay.getEmployees().size(); j++) {
 					Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(thisDay.getEmployees().get(j).getNationalID());
 					if (employeeOptional.isEmpty()) {
-						throw new IOException("Invalid nationalID");
+						throw new IOException();
 					} else if (employeeOptional.get().getAccessLevel().equals(viewer.getAccessLevel()) || (employeeOptional.get().getDepartment().equals(viewer.getDepartment()) && employeeOptional.get().getLevel() <= viewer.getLevel())) {
 						if (!employeeOptional.get().getNationalID().equals(viewer.getNationalID())) {
 							if(sameLevelEmployees[i]!=null) {

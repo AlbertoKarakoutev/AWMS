@@ -2,7 +2,6 @@ package com.company.awms.services;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.company.awms.data.employees.Employee;
-import com.company.awms.data.employees.EmployeeDailyReference;
 import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.data.employees.Notification;
 
@@ -125,7 +123,7 @@ public class EmployeeService {
 		}
 		
 	}
-	
+
  	public void registerEmployee(Employee newEmployee) {
 		// TODO:
 		// Validation? from Validator Class
@@ -155,6 +153,7 @@ public class EmployeeService {
 		String[] dataValues = data.split("\\n");
 		Map<String, String> newInfo = new HashMap<String, String>();
 		for(String field : dataValues) {
+			field = field.substring(0, field.length()-1);
 			newInfo.put(field.split("=")[0], field.split("=")[1]);
 		}
 		employee.setFirstName(newInfo.get("firstName"));
