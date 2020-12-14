@@ -63,5 +63,6 @@
         </section>
     </div>
 <script type="module" src="/js/modules.js"></script>
+<script type="module" src="/js/main.js"></script>
 </body>
 </html>

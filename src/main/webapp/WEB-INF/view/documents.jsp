@@ -36,21 +36,26 @@
 							<c:if test='${type == "admin-edit"}'>Editing ${name}'s personal documents:</c:if>
 					    </h1>
                     </header>
-					<div class="d-flex my-3">
-						<div class="flex-grow-1">
+					<div class="d-md-flex my-3">
+						<div class="flex-grow-1 my-2 my-md-0">
 							<form class="form-inline" method='get' action='/document/public/search/'>
-								<input class="form-control" type="text" name='name'
-									placeholder="Search document" aria-label="Search documents...">
+								<div class="form-group m-0">
+								    <input class="form-control" type="text" name='name'
+									    placeholder="Search document" aria-label="Search documents...">
+								</div>
 								<button class="btn btn-dark ml-2" type="submit">Search</button>
 							</form>
 						</div>
-						<div>
-							<form enctype="multipart/form-data" method="POST" action="/document/public/upload">
-							    <button type="submit" id="upload" class="btn btn-dark">Upload</button>
-							    <input type="file" id="uploadFile" name="file">
+						<div class="my-2 my-md-0">
+							<form class="form-inline" enctype="multipart/form-data" method="POST" action="/document/public/upload">
+							    <button type="submit" id="upload" class="btn btn-dark m-2 ml-0">Upload</button>
+							    <div class="form-group m-0">
+								    <input type="file" id="uploadFile" name="file">
+								</div>
 						    </form>
 						</div>
 					</div>
+					<div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
@@ -82,6 +87,7 @@
 				    	</c:forEach>
                         </tbody>
 					</table>
+					</div>
 				</div>
 				<nav aria-label="Page navigation example">
 				    <ul class="pagination justify-content-center">

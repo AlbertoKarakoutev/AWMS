@@ -40,26 +40,26 @@
                         <h1 class="ty-page-title"><%=yearMonth.getMonth()%> <%=yearMonth.getYear()%></h1>
                     </header>
 				    <div class="container-fluid">
-				    	<div class="row">
-				    		<div class="col">
+				    	<div class="row seven-cols">
+				    		<div class="col-md-1">
 				    			<h3 class="text-center">Monday</h3>
 				    		</div>
-				    		<div class="col">
+				    		<div class="col-md-1">
 			    				<h3 class="text-center">Tuesday</h3>
 			    			</div>
-	    					<div class="col">
+	    					<div class="col-md-1">
 	    						<h3 class="text-center">Wednesday</h3>
 	    					</div>
-	    					<div class="col">
+	    					<div class="col-md-1">
 		    					<h3 class="text-center">Thursday</h3>
 		    				</div>
-		    				<div class="col">
+		    				<div class="col-md-1">
 		    					<h3 class="text-center">Friday</h3>
 		    				</div>
-		    				<div class="col">
+		    				<div class="col-md-1">
 		    					<h3 class="text-center">Saturday</h3>
 		    				</div>
-		    				<div class="col">
+		    				<div class="col-md-1">
 		    					<h3 class="text-center">Sunday</h3>
 		    				</div>
 		    			</div>

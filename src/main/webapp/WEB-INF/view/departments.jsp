@@ -31,8 +31,9 @@
 	                <header class="py-3">
 	                    <h1 class="ty-page-title">Department Editor</h1>
 	                </header>
+                    <div class="form-group">
 	                <label for="departments">Select Department:</label>
-	                <select id="departments">
+	                <select id="departments" class="form-control">
 	                <%Map<String, String> departments = (Map<String, String>)request.getAttribute("departments");
 	                
 	                if(departments!=null){
@@ -41,18 +42,16 @@
 	                	<%}
 	                }%>
                 	</select>
+                    </div>
                 	<div id="button-content">
-                		<button id="display" class="btn btn-lg btn-dark">DISPLAY</button>
-                		<button id="add" class="btn btn-lg btn-dark">ADD NEW</button>
-                		<button id="addLevel" class="btn btn-lg btn-dark" style="{display:none;}">ADD LEVEL</button>
-                		<button id="create" class="btn btn-lg btn-danger" style="{display:none;}">CREATE DEPARTMENT</button>
-                		<button id="update" class="btn btn-lg btn-danger" style="{display:none;}">UPDATE</button>
+                		<button id="display" class="btn btn-dark m-1">DISPLAY</button>
+                		<button id="add" class="btn btn-dark m-1">ADD NEW</button>
+                		<button id="addLevel" class="btn btn-dark m-1" style="{display:none;}">ADD LEVEL</button>
+                		<button id="create" class="btn btn-danger m-1" style="{display:none;}">CREATE DEPARTMENT</button>
+                		<button id="update" class="btn btn-danger m-1" style="{display:none;}">UPDATE</button>
                 	</div>
                 	
-                	<div id="department-content"></div>
-                	
-                	
-					
+                	<div id="department-content" class="my-3"></div>
                 </div>
                 <footer>
                     <%@include file="boxes/footer.jsp" %>

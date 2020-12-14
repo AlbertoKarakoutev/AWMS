@@ -26,6 +26,7 @@
 			    	<header class="py-3">
                         <h1 class="ty-page-title">Employees List</h1>
                     </header>
+					<div class="table-responsive">
 				    <table class="table">
                         <thead>
                             <tr>
@@ -58,6 +59,7 @@
 			                </c:forEach>
 					    </tbody>
 					</table>
+					</div>
 				</div>
 			    <footer>
 			    	<%@include file="boxes/footer.jsp"%>
