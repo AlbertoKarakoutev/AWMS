@@ -35,7 +35,7 @@
 	                <label for="departments">Select Department:</label>
 	                <select id="departments" class="form-control">
 	                <%Map<String, String> departments = (Map<String, String>)request.getAttribute("departments");
-	                
+	                System.out.println(departments.get("a"));
 	                if(departments!=null){
 	                	for(Map.Entry<String, String> department : departments.entrySet()){%>
 	                			<option value='<%=department.getKey()%>'> <%=departments.get(department.getKey())%> </option>
