@@ -11,7 +11,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <link href="/css/main.css" rel="stylesheet">
-    <link href="/css/components/departments.css" rel="stylesheet">
 
     <!--Add vendor's js files-->
     <script src="/webjars/jquery/3.5.1/jquery.js"></script>

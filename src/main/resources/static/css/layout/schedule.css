@@ -117,30 +117,3 @@
 		height: 100%;
 	}
 }
-
-.work-shifts {
-	background-color: gray;
-	margin: 5px;
-	border: 2px solid dark-gray;
-	border-radius: 2px;
-}
-
-.tasks {
-	background-color: gray;
-	margin: 5px;
-	border: 2px solid dark-gray;
-	border-radius: 2px;
-	flex-grow: 1;
-}
-
-.swap {
-	display: flex;
-	border: none;
-	background-color: var(--secondary-color);
-	transition: background-color 0.2s, scale 0.2s;
-}
-
-.swap:hover {
-	scale: 1.05;
-	background-color: #aaaaaa;
-}

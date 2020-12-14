@@ -83,20 +83,40 @@
                                                             </button>
 											    	    </div>
 											    		<div class="modal-body">
-		                         	  		 		        <div class='work-shifts'>
-				                    	    		          	<%if(sle[i-offset] != null){%>
-																  test2
-				                    	    		          		<%for(int j = 0; j < sle[i-offset].size(); j++){
-				                     		 	  	          			EmployeeDailyReference thisEDR = sle[i-offset].get(j);
-				                     		   		          			String day = thisMonth.withDayOfMonth(i).toString();
-      	  				             		  	                 		out.println(thisEDR.getFirstName() + " " + thisEDR.getLastName() + " " + thisEDR.getWorkTimeInfo());%>
-      	  				               		     	    	
-					                    	   	    	     			<button class="swap" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
-					                        	        				<br />
+														<div class="table-responsive text-center">
+				                                            <table class="table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th scope="col">First Name</th>
+                                                                        <th scope="col">Family Name</th>
+                                                                        <th scope="col">Working Hours</th>
+								                                        <th scope="col">Swap</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+				                    	    		          	    <%if(sle[i-offset] != null){%>
+				                    	    		          	    	<%for(int j = 0; j < sle[i-offset].size(); j++){
+				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset].get(j);
+				                     		   		          	    		String day = thisMonth.withDayOfMonth(i).toString();%>
+																    				<tr>
+                                                                                    <th scope="row">
+																					    <h4><%= thisEDR.getFirstName() %></h4>
+																					</th>
+                                                                                    <td>
+						                                                                <h4><%= thisEDR.getLastName() %></h4>
+						                                                            </td>
+                                                                                    <td>
+								                                                        <h4><%= thisEDR.getWorkTimeInfo() %></h4>
+								                                                    </td>
+                                                                                    <td>
+							                                                            <button class="btn btn-dark" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
+								                                                    </td>
+                                                                                </tr>
 		                    	          		        			<%}
 		                    	          		        		}%>
-		                    	   		     	        	</div>
-		                      		  
+															    </tbody>
+		                      		                        </table>
+															</div>
 		                          	  	    	         	<%if(tasks[i-1] != null){%>
 		                    	    	 		        	   	<div class="tasks">
 			                            		        			<p class="title">Tasks</p>
