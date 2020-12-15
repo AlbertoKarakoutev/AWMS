@@ -126,15 +126,6 @@ public class ScheduleController {
 		}
 	}
 
-	@GetMapping("/dismiss")
-	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum) {
-		try{
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
-			return "redirect:/";
-		}catch(Exception e) {
-			return "internalServerError";
-		}
-	}
 	
 	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());

@@ -70,6 +70,11 @@
                             <small id="ibanHelp" class="form-text text-muted">Employee's IBAN.</small>
                         </div>
                         <div class="form-group">
+                            <label for="salaryEmployee">Salary</label>
+                            <input value="${employee.getSalary()}" type="tel" name="salary" class="form-control" id="salaryEmployee" aria-describedby="salaryEmployee" placeholder="Password" required>
+                            <small id="salaryHelp" class="form-text text-muted">Employee's salary.</small>
+                        </div>
+                        <div class="form-group">
                             <label for="departmentEmployee">Department</label>
                             <select class="form-control" name="department" id="departmentEmployee">
                                 <c:forEach items="${departments.keySet()}" var="key">

@@ -154,8 +154,7 @@ public class ScheduleService {
 		}
 		Employee receiver = receiverOptional.get();
 		List<Object> notificationData = new ArrayList<Object>();
-		notificationData.add("request-reply");
-		notificationData.add(receiverDate);
+		notificationData.add("plain-notification");
 		String message = "Your swap request for " + receiverDate + "has been declined.";
 		receiver.getNotifications().add(new Notification(message, notificationData));
 		employeeRepo.save(receiver);
@@ -228,8 +227,7 @@ public class ScheduleService {
 		}
 		List<Object> notificationData = new ArrayList<Object>();
 		Employee requesterObj = employeeRepo.findByNationalID(requesterNationalID).get();
-		notificationData.add("request-reply");
-		notificationData.add(receiver.getNationalID());
+		notificationData.add("plain-notification");
 		String message = receiver.getFirstName() + " " + receiver.getLastName()
 				+ " has accepted your request to swap his/her " + receiverDate + " shift with your " + requesterDate
 				+ " shift.";

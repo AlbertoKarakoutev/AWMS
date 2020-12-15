@@ -166,6 +166,32 @@ public class AdminController {
 		}
 	}
 
+	@PostMapping("/employee/approveLeave")
+	public String approveLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String paid, @RequestParam String startDate, @RequestParam String endDate) {
+		try {
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			employeeService.approveLeave( employeeID,  Boolean.parseBoolean(paid),  startDate,  endDate);
+			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			return "redirect:/";
+		}catch(Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+	
+	@PostMapping("/employee/denyLeave")
+	public String denyLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String paid, @RequestParam String startDate, @RequestParam String endDate) {
+		try {
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			employeeService.denyLeave( employeeID,  Boolean.parseBoolean(paid),  startDate,  endDate);
+			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			return "redirect:/";
+		}catch(Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+	
 	// Schedule methods
 	@GetMapping(value = "/schedule/add")
 	public void addWorkDay(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String employeeNationalID, @RequestParam String date,

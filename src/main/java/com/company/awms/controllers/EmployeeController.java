@@ -67,7 +67,33 @@ public class EmployeeController {
 
         return "newPassword";
     }
+    
+    @GetMapping("/leaves")
+    public String getRequestLeave(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws IOException{
+        if (!active) {
+            return "notFound";
+        }
+        injectLoggedInEmployeeInfo(model, employeeDetails);
 
+        return "leaveRequest";
+    }
+    
+    @GetMapping("/requestLeave")
+    public String requestLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails,  @RequestParam String paidStr, @RequestParam String startDate, @RequestParam String endDate) {
+    	if (!active) {
+            return "notFound";
+        }
+    	
+    	try {
+    		boolean paid = Boolean.parseBoolean(paidStr);
+    		employeeService.requestLeave(employeeDetails.getID(), paid, startDate, endDate);
+    		injectLoggedInEmployeeInfo(model, employeeDetails);
+    		return"redirect:/";
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    		return "internalServerError";
+    	}
+    }
     private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
@@ -92,8 +118,6 @@ public class EmployeeController {
         try{
 			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
-            model.addAttribute("employee", employee);
             return "redirect:/";
 		}catch(Exception e) {
 			return "internalServerError";

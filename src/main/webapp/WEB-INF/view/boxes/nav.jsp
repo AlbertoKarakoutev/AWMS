@@ -30,6 +30,8 @@
 			<li class="vertical-item"><a
 				href="/schedule/?month=<%=YearMonth.now().toString()%>"
 				title="Working Shedule">Schedule</a></li>
+			<li class="vertical-item"><a href="/employee/leaves" title="Leaves">Leaves</a>
+			</li>
 			<li class="vertical-item">
 				<div class="dropdown">
 					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"

@@ -50,56 +50,66 @@
 							</form>
 						</div>
 					</div>
-		<%break;
-		case "new-reply":
-			ForumReply newReply = (ForumReply) notification.getData().get(2);%>
-			<div class="dropdown-item border-bottom">
-				<form action="/forum/dismiss/<%=newReply.getThreadID()%>">
-					<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
-					<button class="btn text-left p-0">
-						<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
-						<br>
-						<%=notification.getMessage()%>
-					</button>
-				</form>
-			</div>
-		<%break;
-		case "new-thread":
-			ForumThread newThread = (ForumThread) notification.getData().get(2);%>
-			<div class="dropdown-item border-bottom">
-				<form action="/forum/dismiss/<%=newThread.getID()%>">
-					<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
-					<button class="btn text-left p-0">
-						<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
-						<br>
-						<%=notification.getMessage()%>
-					</button>
-				</form>
-			</div>
-		<%break;
-		case "info-updated":%>
-			<a class="dropdown-item" href="/"> <span
-				class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
-				<br> <%=notification.getMessage()%>
-			</a>
-			<form style="float: right;" action="/employee/dismiss">
-				<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
-				<input style="display: inline-block" type="submit"
-					class="btn-dark btn btn-sm" id="dismiss" value="Dismiss" />
-			</form>
-		<%break;
-		case "request-reply":%>
-			<div class="dropdown-item border-bottom">
-				<form action="/schedule/dismiss">
-					<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
-					<button class="btn text-left p-0">
-						<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
-						<br>
-						<%=notification.getMessage()%>
-					</button>
-				</form>
-			</div>
-		<%break;
+				<%break;
+				case "leave-request":
+					String startDate = (String)notification.getData().get(2);
+					String endDate = (String)notification.getData().get(3);%>
+					<div class="dropdown-item border-bottom">
+						<a href="/schedule/?month=<%=YearMonth.now()%>"
+							class="text-decoration-none text-justify"> <span
+							class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
+							<br> <%=notification.getMessage()%>
+						</a>
+						<div class="d-flex">
+							<form action="/admin/employee/approveLeave?noteNum=<%=Integer.toString(i)%>&employeeID=<%=notification.getData().get(1)%>&paid=<%=notification.getData().get(4)%>&startDate=<%=startDate%>&endDate=<%=endDate%>"
+								method="POST">
+								<input type="submit" class="btn btn-success btn-sm" id="approve" value="Approve"/>
+							</form>
+							<form action="/admin/employee/denyLeave?noteNum=<%=Integer.toString(i)%>&employeeID=<%=notification.getData().get(1)%>&paid=<%=notification.getData().get(4)%>&startDate=<%=startDate%>&endDate=<%=endDate%>"
+								method="POST">
+								<input type="submit" class="btn btn-success btn-sm" id="deny" value="Deny"/>
+							</form>
+						</div>
+					</div>
+				<%break;
+				case "new-reply":
+					ForumReply newReply = (ForumReply) notification.getData().get(2);%>
+					<div class="dropdown-item border-bottom">
+						<form action="/forum/dismiss/<%=newReply.getThreadID()%>">
+							<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
+							<button class="btn text-left p-0">
+								<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
+								<br>
+								<%=notification.getMessage()%>
+							</button>
+						</form>
+					</div>
+				<%break;
+				case "new-thread":
+					ForumThread newThread = (ForumThread) notification.getData().get(2);%>
+					<div class="dropdown-item border-bottom">
+						<form action="/forum/dismiss/<%=newThread.getID()%>">
+							<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
+							<button class="btn text-left p-0">
+								<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
+								<br>
+								<%=notification.getMessage()%>
+							</button>
+						</form>
+					</div>
+				<%break;
+				case "plain-notification":%>
+					<div class="dropdown-item border-bottom">
+						<form action="/employee/dismiss">
+							<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
+							<button class="btn text-left p-0">
+								<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
+								<br>
+								<%=notification.getMessage()%>
+							</button>
+						</form>
+					</div>
+				<%break;
 		}
 		}
 		}

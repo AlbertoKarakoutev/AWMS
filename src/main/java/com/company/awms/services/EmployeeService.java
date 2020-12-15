@@ -137,6 +137,61 @@ public class EmployeeService {
 		return this.employeeRepo.findAllByRole("MANAGER");
 	}
 
+	public Boolean requestLeave(String employeeID, boolean paid, String startDate, String endDate) throws IOException {
+		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
+		if(adminOptional.isEmpty()) {
+			throw new IOException();
+		}
+		Employee admin = adminOptional.get();
+		Employee employee = getEmployee(employeeID);
+		
+		List<Object> notificationData = new ArrayList<Object>();
+        notificationData.add("leave-request");
+        notificationData.add(employeeID);
+        notificationData.add(startDate);
+        notificationData.add(endDate);
+        notificationData.add(paid);
+        String paidStr = "paid";
+        if(paid) {
+        	paidStr = "un" + paidStr;
+        }
+		String message = employee.getFirstName() + " " + employee.getLastName() + " has requested a "+ paidStr +" leave in the period from "+ startDate + " to " + endDate;
+		admin.getNotifications().add(new Notification(message, notificationData));
+		        
+		employeeRepo.save(admin);
+		return paid;
+	}
+	
+	public void approveLeave(String employeeID, boolean paid, String startDateStr, String endDateStr) throws IOException {
+		Employee employee = getEmployee(employeeID);
+		
+		LocalDate startDate = LocalDate.parse(startDateStr);
+		LocalDate endDate = LocalDate.parse(endDateStr);
+		Map<String, Object> leave = new HashMap<String, Object>();
+		leave.put("start", startDate);
+		leave.put("end", endDate);
+		leave.put("paid", paid);
+		employee.getLeaves().add(leave);
+		
+		List<Object> notificationData = new ArrayList<Object>();
+        notificationData.add("plain-notification");
+		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been approved";
+		employee.getNotifications().add(new Notification(message, notificationData));
+		
+		employeeRepo.save(employee);
+	}
+	
+	public void denyLeave(String employeeID, boolean paid, String startDateStr, String endDateStr) throws IOException {
+		Employee employee = getEmployee(employeeID);
+		
+		List<Object> notificationData = new ArrayList<Object>();
+        notificationData.add("plain-notification");
+		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been denied.";
+		employee.getNotifications().add(new Notification(message, notificationData));
+		
+		employeeRepo.save(employee);
+	}
+	
 	public void setNotificationRead(String employeeID, int notificationNumber) throws IOException {
 		Optional<Employee> employee = employeeRepo.findById(employeeID);
 		if(employee.isEmpty()) {
@@ -224,27 +279,11 @@ public class EmployeeService {
 		}
 		
         List<Object> notificationData = new ArrayList<Object>();
-        notificationData.add("info-updated");
+        notificationData.add("plain-notification");
 		String message = "Your profile information has been updated by the Administrator.";
 		employee.getNotifications().add(new Notification(message, notificationData));
         
 		this.employeeRepo.save(employee);
 		return employee;
 	}
-
-	public void addLeave(String employeeID, LocalDate start, LocalDate end, boolean paid) throws IOException {
-		Map<String, Object> leave = new HashMap<>();
-		leave.put("Start", start);
-		leave.put("End", end);
-		leave.put("Paid", paid);
-		Optional<Employee> employee = employeeRepo.findById(employeeID);
-
-		if (employee.isEmpty()) {
-			throw new IOException("Invalid employeeID!");
-		}
-		employee.get().getLeaves().add(leave);
-
-		employeeRepo.save(employee.get());
-	}
-
 }
