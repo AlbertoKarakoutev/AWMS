@@ -22,7 +22,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
@@ -31,6 +34,7 @@ import com.company.awms.data.employees.Notification;
 import com.company.awms.data.schedule.Day;
 import com.company.awms.data.schedule.ScheduleRepo;
 import com.company.awms.data.schedule.Task;
+import com.company.awms.security.EmployeeDetails;
 
 @Service
 public class ScheduleService {
@@ -49,16 +53,19 @@ public class ScheduleService {
 
 	// Create a employee reference with appropriate information and add to the
 	// current day employees array
-	public boolean addWorkDay(String employeeID, LocalDate date, boolean onCall, LocalTime startShift,
-			LocalTime endShift) {
+	public boolean addWorkDay(String employeeNationalID, String dateStr, boolean onCall, String startShiftStr,
+			String endShiftStr) {
 		Employee employee;
+		LocalDate date = LocalDate.parse(dateStr);
+		LocalTime startShift = LocalTime.parse(startShiftStr);
+		LocalTime endShift = LocalTime.parse(endShiftStr);
 		Day currentDay;
 		LocalTime[] workTime = new LocalTime[2];
 
 		int[] workTimeJSON;
 		JSONObject employeeLevel = null;
 
-		Optional<Employee> employeeOptional = this.employeeRepo.findById(employeeID);
+		Optional<Employee> employeeOptional = this.employeeRepo.findByNationalID(employeeNationalID);
 		if (employeeOptional.isEmpty()) {
 			System.err.println("Employee Not Found!");
 			return false;
@@ -75,8 +82,7 @@ public class ScheduleService {
 			JSONArray levels = (JSONArray) thisDepartment.get("levels");
 			JSONObject arrayElement = (JSONObject) levels.get(level);
 			employeeLevel = (JSONObject) arrayElement.get(Integer.toString(level));
-			workTimeJSON = Stream.of(((String) thisDepartment.get("Daily hours")).split(","))
-					.mapToInt(Integer::parseInt).toArray();
+			workTimeJSON = Stream.of(((String) employeeLevel.get("Daily hours")).split(","))	.mapToInt(Integer::parseInt).toArray();
 		}
 
 		try {
@@ -122,12 +128,25 @@ public class ScheduleService {
 			currentDay.setEmployees(singleEmployee);
 		}
 
-		System.out.print(currentDay.getEmployees().get(0).getWorkTimeInfo());
-		// currentDay.setEmployees(new ArrayList<EmployeeDailyReference>());
 		scheduleRepo.save(currentDay);
 		return true;
 	}
 
+	public void deleteWorkDay(String employeeNationalID, String date) throws IOException {
+		Optional<Day> selectedDayOptional = scheduleRepo.findByDate(LocalDate.parse(date));
+		if(selectedDayOptional.isEmpty()) {
+			throw new IOException();
+		}
+		Day selectedDay = selectedDayOptional.get();
+		for(EmployeeDailyReference edr : selectedDay.getEmployees()) {
+			if(edr.getNationalID().equals(employeeNationalID)) {
+				selectedDay.getEmployees().remove(edr);
+				break;
+			}
+		}
+		scheduleRepo.save(selectedDay);
+	}
+	
 	public void declineSwap(String employeeID, LocalDate receiverDate) throws IOException {
 		Optional<Employee> receiverOptional = employeeRepo.findByNationalID(employeeID);
 		if (receiverOptional.isEmpty()) {
@@ -296,8 +315,8 @@ public class ScheduleService {
 	@SuppressWarnings("unchecked")
 	public List<EmployeeDailyReference>[] viewSchedule(Employee viewer, YearMonth month) throws IOException {
 		int monthLength = LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).lengthOfMonth();
-		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[monthLength];
-		for (int i = 1; i < monthLength; i++) {
+		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[monthLength+1];
+		for (int i = 1; i <= monthLength; i++) {
 			Day thisDay;
 			Optional<Day> thisDayOptional = scheduleRepo.findByDate(
 					LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).withDayOfMonth(i));

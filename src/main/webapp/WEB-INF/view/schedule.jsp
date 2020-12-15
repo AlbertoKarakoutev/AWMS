@@ -68,7 +68,7 @@
 						<div class="mt-2">
 						    <div class="row seven-cols">
 								<%for(int i = 0; i <= 34; i++){%>
-								    <c:set var="i" value="<%= i %>" />
+								    <c:set var="i" value="<%=i%>" />
 
 								    <div class="col-md-1 p-0">
                    						<%if(i>=offset && i <= thisMonth.lengthOfMonth()){%>
@@ -89,34 +89,41 @@
 				                                            <table class="table">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th scope="col">First Name</th>
-                                                                        <th scope="col">Family Name</th>
+                                                                        <th scope="col">Name</th>
                                                                         <th scope="col">Working Hours</th>
-                                                                        <c:if test="${role != '[ADMIN]'}">
-								                                        	<th scope="col">Swap</th>
-								                                        </c:if>
                                                                     </tr>
                                                                 </thead>
-                                                                <tbody>
-				                    	    		          	    <%if(sle[i-offset] != null){%>
-				                    	    		          	    	<%for(int j = 0; j < sle[i-offset].size(); j++){
-				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset].get(j);
-				                     		   		          	    		String day = thisMonth.withDayOfMonth(i).toString();%>
-																    				<tr>
-                                                                                    <th scope="row">
-																					    <h4><%= thisEDR.getFirstName() %> <%=thisEDR.getLastName() %></h4>
-																					</th>
-                                                                                    <td>
-								                                                        <h4><%= thisEDR.getWorkTimeInfo() %></h4>
-								                                                    </td>
-																					<c:if test="${role != '[ADMIN]'}">
+                                                                <tbody id="body<%=i%>">
+				                    	    		          	    <%String day = thisMonth.withDayOfMonth(i).toString();%>
+				                    	    		          	    <%if(sle[i-offset+1] != null){%>
+				                    	    		          	    	<%for(int j = 0; j < sle[i-offset+1].size(); j++){
+				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset+1].get(j);%>
+																    				<tr id="<%=thisEDR.getNationalID()%>">
+	                                                                                    <th scope="row">
+																						    <h4><%= thisEDR.getFirstName() %> <%=thisEDR.getLastName() %></h4>
+																						</th>
 	                                                                                    <td>
-								                                                            <button class="btn btn-dark" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
+									                                                        <h4><%= thisEDR.getWorkTimeInfo() %></h4>
 									                                                    </td>
-								                                                    </c:if>
-                                                                                </tr>
-		                    	          		        			<%}
-		                    	          		        		}%>
+																						<c:if test="${role != '[ADMIN]'}">
+		                                                                                    <td>
+									                                                            <button class="btn btn-dark" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
+										                                                    </td>
+									                                                    </c:if>
+									                                                    <c:if test="${role == '[ADMIN]'}">
+									                                                    	<td>
+									                                                            <button class="btn btn-dark" onclick='deleteWorkDay("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Delete</button>
+										                                                    </td>
+									                                                    </c:if>
+									                                                <%}%>
+									                                                <c:if test="${role == '[ADMIN]'}">
+									                                                	<td>
+			                                                    							<button class="btn btn-dark" onclick='getInput("<%=i%>", "<%=day%>")'>Add </button>
+			                                                    						</td>
+				                                                 					</c:if>
+                                                                                	</tr>
+		                    	          		        				<%}%>
+		                    	          		        		
 															    </tbody>
 		                      		                        </table>
 															</div>

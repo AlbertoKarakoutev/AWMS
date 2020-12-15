@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -166,18 +167,28 @@ public class AdminController {
 	}
 
 	// Schedule methods
-	@PostMapping(value = "/schedule/add")
-	public ResponseEntity<String> addWorkDay(@RequestParam String employeeID, @RequestParam String date,
-			@RequestParam String startShift, @RequestParam String endShift) {
-		boolean success = scheduleService.addWorkDay(employeeID, LocalDate.parse(date), true,
-				LocalTime.parse(startShift), LocalTime.parse(endShift));
-		if (success) {
-			return new ResponseEntity<String>("Successfully applied schedule!", HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("Error applying schedule!", HttpStatus.BAD_REQUEST);
+	@GetMapping(value = "/schedule/add")
+	public void addWorkDay(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String employeeNationalID, @RequestParam String date,
+																					@RequestParam String startShift, @RequestParam String endShift) {
+		try{
+			scheduleService.addWorkDay(employeeNationalID, date, true, startShift, endShift);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 
+	@GetMapping("/schedule/delete")
+	public void deleteWorkDay(Model model, @RequestParam String employeeNationalID, @RequestParam String date, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+		try {
+			
+			this.scheduleService.deleteWorkDay(employeeNationalID, date);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			model.addAttribute(YearMonth.now());
+		}catch(Exception e) {
+		}
+	}
+	
 	@GetMapping("/schedule/apply")
 	public ResponseEntity<String> applySchedule() {
 		try {
