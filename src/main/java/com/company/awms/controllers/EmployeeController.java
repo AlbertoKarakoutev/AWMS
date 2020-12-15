@@ -34,13 +34,14 @@ public class EmployeeController {
             return "notFound";
         }
 
-        if(!newPassword.equals(confirmPassword)){
-            model.addAttribute("mismatch", true);
-
-            return "newPassword";
-        }
-
         try {
+            if(!newPassword.equals(confirmPassword)){
+                injectLoggedInEmployeeInfo(model, employeeDetails);
+                model.addAttribute("mismatch", true);
+
+                return "newPassword";
+            }
+
             Employee employee = this.employeeService.updatePassword(newPassword, employeeDetails.getID());
 
             model.addAttribute("employee", employee);

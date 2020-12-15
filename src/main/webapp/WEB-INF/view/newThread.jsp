@@ -25,23 +25,23 @@
             <section class="content">
                 <div class="p-4">
                 <header class="py-3">
-                    <h1 class="ty-page-title">${thread != null ? "Редактирай темата" : "Създай нова тема"}</h1>
+                    <h1 class="ty-page-title">${thread != null ? "Edit Topic" : "Create Topic"}</h1>
                 </header>
                 <div class="my-3">
                     <form method="POST" action="${thread != null ? String.format("/forum/thread/%s/edit", thread.getID()) : '/forum/add'}">
                         <div class="form-group">
-                            <label for="exampleInputEmail1">Тема</label>
+                            <label for="exampleInputEmail1">Title</label>
                             <input type="text" name="title" class="form-control" value="${thread != null ? thread.getTitle() : null}" id="threadTitle" aria-describedby="threadTitle" placeholder="Enter Title" required>
-                            <small id="threadTitleHelp" class="form-text text-muted">Заглавие на темата</small>
+                            <small id="threadTitleHelp" class="form-text text-muted">Title</small>
                         </div>
                         <div class="form-group">
-                            <label for="threadContent">Текст</label>
+                            <label for="threadContent">Body</label>
                             <textarea name="body" class="form-control" id="threadContent" rows="8" required>
                                 ${thread != null ? thread.getBody() : null}
                             </textarea>
-                            <small id="threadContentHelp" class="form-text text-muted">Тема</small>
+                            <small id="threadContentHelp" class="form-text text-muted">Body</small>
                         </div>
-                        <button type="submit" class="btn btn-dark">${thread != null ? "Редактирай": "Създай"}</button>
+                        <button type="submit" class="btn btn-dark">${thread != null ? "Edit": "Create"}</button>
                     </form>
                 </div>
                 </div>

@@ -27,7 +27,10 @@
             <section class="content">
                 <div class="p-4">
                 <header class="py-3">
-                    <h1 class="ty-page-title">Тема: ${thread.getTitle()}</h1>
+                    <h1 class="ty-page-title">Title: ${thread.getTitle()}</h1>
+                    <c:if test="${thread.getAnswered() == true}">
+                        <h2>Answered</h2>
+                    </c:if>
                 </header>
                 <div class="my-3 d-flex">
                     <div class="mr-2 avatar-container">
@@ -37,7 +40,7 @@
                         <div class="card w-100">
                             <c:if test="${not empty thread.getIssuerName()}">
                                 <div class="card-header">
-                                    <p><b>Създадена от:</b> ${thread.getIssuerName()}</p>
+                                    <p><b>Issuer:</b> ${thread.getIssuerName()}</p>
                                 </div>
                             </c:if>
                             <div class="card-body">
@@ -45,18 +48,23 @@
                             </div>
                             <c:if test="${not empty thread.getDateTime()}">
                                 <div class="card-footer text-muted">
-                                    <p><b>Създадена на:</b> ${thread.getDateTime()}</p>
+                                    <p><b>Created on:</b> ${thread.getDateTime()}</p>
                                 </div>
                             </c:if>
                         </div>
-                        <div class="mt-2 text-right">
+                        <div class="mt-3 text-right">
                             <c:if test="${thread.getIssuerID().equals(employeeID)}">
                                 <a href="/forum/thread/${thread.getID()}/edit" class="btn btn-dark btn-md">
-                                    <i class="fas fa-edit"></i> Редактирай
+                                    <i class="fas fa-edit"></i> Edit
                                 </a>
+                                <c:if test="${thread.getAnswered() == false}">
+                                    <form action="${thread.getID()}/answered" method="post">
+                                        <input type="submit" class="btn btn-dark btn-md" value="Mark as answered" />
+                                    </form>
+                                </c:if>
                             </c:if>
                             <a class="btn btn-dark btn-md" href="/forum/thread/${thread.getID()}/reply/new" title="reply">
-                                <i class="fas fa-reply"></i> Отговори
+                                <i class="fas fa-reply"></i> Add Reply
                             </a>
                         </div>
                         <br />
@@ -64,7 +72,7 @@
                             <div class="card w-100 my-2">
                                 <c:if test="${not empty reply.getIssuerName()}">
                                     <div class="card-header">
-                                        <p><b>Отговор от:</b> ${reply.getIssuerName()}</p>
+                                        <p><b>From:</b> ${reply.getIssuerName()}</p>
                                     </div>
                                 </c:if>
                                 <div class="card-body">
@@ -72,7 +80,7 @@
                                 </div>
                                 <c:if test="${not empty reply.getDateTime()}">
                                     <div class="card-footer text-muted">
-                                        <p><b>Отговорено на:</b> ${reply.getDateTime()}</p>
+                                        <p><b>Added:</b> ${reply.getDateTime()}</p>
                                     </div>
                                 </c:if>
                             </div>

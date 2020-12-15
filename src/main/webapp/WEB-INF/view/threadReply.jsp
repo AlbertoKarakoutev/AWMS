@@ -26,16 +26,16 @@
             <section class="content">
                 <div class="p-4">
                 <header class="py-3">
-                    <h1 class="ty-page-title">Отговор на ${threadTitle}</h1>
+                    <h1 class="ty-page-title">Reply to ${threadTitle}</h1>
                 </header>
                 <div class="my-3">
                 <form method="POST" action="/forum/thread/${threadID}/add">
                     <div class="form-group">
-                        <label for="threadContent">Текст</label>
+                        <label for="threadContent">Content</label>
                         <textarea name="body" class="form-control" id="threadContent" rows="8" required></textarea>
-                        <small id="threadContentHelp" class="form-text text-muted">Тема</small>
+                        <small id="threadContentHelp" class="form-text text-muted">Content</small>
                     </div>
-                    <button type="submit" class="btn btn-dark">Отговори</button>
+                    <button type="submit" class="btn btn-dark">Add Reply</button>
                     </form>
                 </div>
             </section>
