@@ -96,6 +96,25 @@
 	animation: border 1s 1;
 }
 
+.content::-webkit-scrollbar {
+    width: 10px;
+    }
+    
+    .content::-webkit-scrollbar-track {
+        padding: 2px 0;
+        background-color: #404040;
+    }
+    
+    .content::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        box-shadow: inset 0 0 6px var(--secondary-color);
+        background-color: var(--quaternary-color);
+    }
+    
+    .content::-webkit-scrollbar-thumb:hover {
+    background:rgb(54, 56, 58); 
+}
+
 @keyframes border {
 	0% {
 		width: 0;
