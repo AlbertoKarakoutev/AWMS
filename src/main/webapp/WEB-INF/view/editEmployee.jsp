@@ -75,6 +75,16 @@
                             <small id="salaryHelp" class="form-text text-muted">Employee's salary.</small>
                         </div>
                         <div class="form-group">
+                            <label for="roleEmployee">Role</label>
+                            <select class="form-control" name="role" id="roleEmployee">
+                            	<option>EMPLOYEE</option>
+                            	<option>MANAGER</option>
+                            	<option>ADMIN</option>
+                            	<option>OWNER</option>
+                            </select>
+                            <small id="roleHelp" class="form-text text-muted">Employee's role.</small>
+                        </div>
+                        <div class="form-group">
                             <label for="departmentEmployee">Department</label>
                             <select class="form-control" name="department" id="departmentEmployee">
                                 <c:forEach items="${departments.keySet()}" var="key">

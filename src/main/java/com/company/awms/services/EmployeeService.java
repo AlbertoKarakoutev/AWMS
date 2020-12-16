@@ -2,7 +2,9 @@ package com.company.awms.services;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -192,6 +194,21 @@ public class EmployeeService {
 		employeeRepo.save(employee);
 	}
 	
+	public void deleteLeave(String employeeID, String leave) throws IOException {
+		Employee employee = getEmployee(employeeID);
+		
+		LocalDate start = LocalDate.ofInstant(((Date) employee.getLeaves().get(Integer.parseInt(leave)).get("start")).toInstant(), ZoneId.systemDefault());
+		LocalDate end = LocalDate.ofInstant(((Date) employee.getLeaves().get(Integer.parseInt(leave)).get("end")).toInstant(), ZoneId.systemDefault());
+		
+		List<Object> notificationData = new ArrayList<Object>();
+        notificationData.add("plain-notification");
+		String message = "Your leave for the period from " + start + " to " + end + " has been removed.";
+		employee.getNotifications().add(new Notification(message, notificationData));
+		
+		employee.getLeaves().remove(Integer.parseInt(leave));
+		employeeRepo.save(employee);
+	}
+	
 	public void setNotificationRead(String employeeID, int notificationNumber) throws IOException {
 		Optional<Employee> employee = employeeRepo.findById(employeeID);
 		if(employee.isEmpty()) {
@@ -221,7 +238,7 @@ public class EmployeeService {
 		employee.setDepartment(newInfo.get("department").split(":")[0]);
 		String encodedPassword = this.passwordEncoder.encode(employee.getNationalID());
 		employee.setPassword(encodedPassword);
-		employee.setRole("EMPLOYEE");
+		employee.setRole(newInfo.get("role"));
 		try {
 			employee.setLevel(Integer.parseInt(newInfo.get("level")));
 		}catch(Exception e) {
@@ -271,6 +288,7 @@ public class EmployeeService {
 		employee.setIBAN(newInfo.get("iban"));
 		employee.setPhoneNumber(newInfo.get("phoneNumber"));
 		employee.setDepartment(newInfo.get("department").split(":")[0]);
+		employee.setRole(newInfo.get("role"));
 		try {
 			employee.setLevel(Integer.parseInt(newInfo.get("level")));
 		}catch(Exception e) {

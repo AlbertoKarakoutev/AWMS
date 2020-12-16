@@ -166,6 +166,20 @@ public class AdminController {
 		}
 	}
 
+	@GetMapping("/employee/leaves/{employeeID}")
+    public String getLeaves(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @PathVariable String employeeID){
+        try {
+	        injectLoggedInEmployeeInfo(model, employeeDetails);
+	        Employee employee = employeeService.getEmployee(employeeID);
+	        model.addAttribute("employeeID", employeeID);
+	        model.addAttribute("leaves", employee.getLeaves());
+	        model.addAttribute("name", employee.getFirstName() + " " + employee.getLastName());
+	        return "leaves";
+        }catch(Exception e) {
+        	return "internalServerError";
+        }
+    }
+	
 	@PostMapping("/employee/approveLeave")
 	public String approveLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String paid, @RequestParam String startDate, @RequestParam String endDate) {
 		try {
@@ -188,6 +202,16 @@ public class AdminController {
 			return "redirect:/";
 		}catch(Exception e) {
 			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+	
+	@GetMapping("/employee/deleteLeave")
+	public String deleteLeave(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String employeeID, @RequestParam String leave) {
+		try {
+			employeeService.deleteLeave(employeeID, leave);
+			return "redirect:/admin/employee/leaves/"+employeeID;
+		} catch (Exception e) {
 			return "internalServerError";
 		}
 	}

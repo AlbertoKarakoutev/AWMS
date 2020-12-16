@@ -64,6 +64,7 @@
                                 <th scope="col">Family Name</th>
                                 <th scope="col">Department</th>
 								<th scope="col">Edit</th>
+								<th scope="col">Leaves</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -83,6 +84,11 @@
 								<td>
 								    <a class="btn btn-dark" href="/admin/employee/edit/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
 									    Edit
+									</a>
+								</td>
+								<td>
+								    <a class="btn btn-dark" href="/admin/employee/leaves/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
+									    View Leaves
 									</a>
 								</td>
                                 </tr>

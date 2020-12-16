@@ -69,13 +69,18 @@ public class EmployeeController {
     }
     
     @GetMapping("/leaves")
-    public String getRequestLeave(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws IOException{
+    public String getLeaves(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model){
         if (!active) {
             return "notFound";
         }
-        injectLoggedInEmployeeInfo(model, employeeDetails);
-
-        return "leaveRequest";
+        try {
+	        injectLoggedInEmployeeInfo(model, employeeDetails);
+	        Employee employee = employeeService.getEmployee(employeeDetails.getID());
+	        model.addAttribute("leaves", employee.getLeaves());
+	        return "leaves";
+        }catch(Exception e) {
+        	return "internalServerError";
+        }
     }
     
     @GetMapping("/requestLeave")
