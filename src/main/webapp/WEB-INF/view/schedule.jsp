@@ -98,21 +98,26 @@
 				                    	    		          	    <%if(sle[i-offset+1] != null){%>
 				                    	    		          	    	<%for(int j = 0; j < sle[i-offset+1].size(); j++){
 				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset+1].get(j);%>
-																    				<tr id="<%=thisEDR.getNationalID()%>">
+																    				<tr id="<%=i%>-<%=thisEDR.getNationalID()%>">
 	                                                                                    <th scope="row">
 																						    <h4><%= thisEDR.getFirstName() %> <%=thisEDR.getLastName() %></h4>
 																						</th>
 	                                                                                    <td>
 									                                                        <h4><%= thisEDR.getWorkTimeInfo() %></h4>
 									                                                    </td>
-																						<c:if test="${role != '[ADMIN]'}">
+																						<c:if test="${role == '[EMPLOYEE]'}">
 		                                                                                    <td>
 									                                                            <button class="btn btn-dark" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
 										                                                    </td>
 									                                                    </c:if>
 									                                                    <c:if test="${role == '[ADMIN]'}">
 									                                                    	<td>
-									                                                            <button class="btn btn-dark" onclick='deleteWorkDay("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Delete</button>
+									                                                            <button class="btn btn-dark" onclick='deleteWorkDay("<%=i%>","<%=thisEDR.getNationalID()%>", "<%=day%>")'>Delete</button>
+										                                                    </td>
+									                                                    </c:if>
+									                                                    <c:if test="${role == '[MANAGER]'}">
+									                                                    	<td>
+									                                                            <button class="btn btn-dark" onclick='getTaskInput("<%=i%>", "<%=thisEDR.getNationalID()%>","<%=day%>")'>Add a Task</button>
 										                                                    </td>
 									                                                    </c:if>
 									                                                <%}%>
@@ -128,14 +133,32 @@
 		                      		                        </table>
 															</div>
 		                          	  	    	         	<%if(tasks[i-1] != null){%>
-		                    	    	 		        	   	<div class="tasks">
-			                            		        			<p class="title">Tasks</p>
-			                            		        			<c:set var="day" value="init"/>
-			                        	    	        		   	<%pageContext.setAttribute("day", i-1);%>
-			                        	    	        			<c:forEach items="${tasks[day]}" var="task">
-								    	    	        				<c:out value="${task.getTaskTitle()}"/>
-								    	    	        			</c:forEach>
-		                    	    	    	        		</div>
+		                    	    	 		        	   	<table class="table">
+			                    	    	 		        	   	<thead>
+	                                                                    <tr>
+	                                                                        <th scope="col">Title</th>
+	                                                                        <th scope="col">Assignment</th>
+	                                                                        <th scope="col">Reward</th>
+	                                                                    </tr>
+	                                                                </thead>
+	                                                                <tbody>
+				                            		        			<c:set var="day" value="init"/>
+	                                                                	<%pageContext.setAttribute("day", i-offset);%>
+				                        	    	        			<c:forEach items="${tasks[day]}" var="task">
+				                        	    	        				<tr id="<%=i%>">
+				                        	    	        					<th scope="row">
+																					<h4><b></b><c:out value="${task.getTaskTitle()}"/></</h4>
+																				</th>
+																				<td>
+									                                            	<h4><c:out value="${task.getTaskBody()}"/></h4>
+									                                            </td>
+									                                            <td>
+									                                            	<h4><c:out value="${task.getTaskReward()}"/></h4>
+									                                            </td>
+									    	    	        				</tr>
+									    	    	        			</c:forEach>
+								    	    	        			</tbody>
+								    	    	        		</table>
 		                          	  	            		<%}%> 	
 												    	</div>
 		                             			    </div>

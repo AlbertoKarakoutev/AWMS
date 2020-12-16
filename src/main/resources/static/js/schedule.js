@@ -14,14 +14,33 @@ function datePrompt(nationalID, receiverDate){
 	}
 }
 
-function deleteWorkDay(nationalID, date){
+function deleteWorkDay(modalID, nationalID, date){
 	let req = new XMLHttpRequest();
 	req.open("GET", "/admin/schedule/delete/?employeeNationalID="+String(nationalID)+"&date="+date, true);
 	req.send();
 	console.log(nationalID);
 	console.log(date);
-	let row = document.getElementById(String(nationalID));
+	let row = document.getElementById(String(modalID)+"-"+String(nationalID));
 	row.remove();
+}
+
+
+function getTaskInput(modalID, nationalID, date){
+	let modal = document.getElementById(String(modalID));
+	let modalRow = document.getElementById(String(modalID)+"-"+String(nationalID));
+	let newForm = '<td><form method="POST" action="/schedule/addTask" enctype="text/plain">'
+							+'<input type="text" class="form-control" name="title" placeholder="Title" required>'
+							+'<input type="text" class="form-control" name="body" rows="3" placeholder="Body" required>'
+							+'<input type="number" class="form-control" name="reward" placeholder="Reward" required>'
+							+'<input type="text" class="form-control" name="date" value="'+String(date)+'" hidden>'
+							+'<input type="text" class="form-control" name="receiverNationalID" value="'+String(nationalID)+'" hidden>'
+  							+'<input type="submit" value="Add" class="btn btn-dark"></form></td>';
+	modalRow.insertAdjacentHTML('afterend', newForm);
+}
+
+function addTask(){
+	let title = document.getElementById("title");
+	let body = document.getElementById()
 }
 
 function getInput(modalID, date){

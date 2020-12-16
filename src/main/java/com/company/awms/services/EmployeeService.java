@@ -273,8 +273,6 @@ public class EmployeeService {
 
 	public Employee updateEmployeeInfo(String employeeID, String data) throws IOException {
 		Employee employee = getEmployee(employeeID);
-		// TODO:
-		// Validation? from Validator Class
 		String[] dataValues = data.split("\\n");
 		Map<String, String> newInfo = new HashMap<String, String>();
 		for(String field : dataValues) {

@@ -6,16 +6,14 @@ import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
@@ -83,15 +81,18 @@ public class ScheduleController {
 		}
 	}
 
-	@ResponseBody
-	@GetMapping("/task/add")
-	public ResponseEntity<String> addTask(@RequestParam String taskDay, @RequestParam String receiverNationalID) {
+	@PostMapping("/addTask")
+	public String addTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestBody String data) {
+		if(!employeeDetails.getRole().equals("MANAGER")){
+			return "notAuthorized";
+		}
 		try {
-			scheduleService.addTask(taskDay, receiverNationalID);
-			return new ResponseEntity<>("Added task for " + receiverNationalID, HttpStatus.OK);
+			scheduleService.addTask(data);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			return "redirect:/schedule/?month="+YearMonth.now();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<>("Error adding task for " + receiverNationalID, HttpStatus.BAD_REQUEST);
+			return "internalServerError";
 		}
 	}
 
@@ -125,7 +126,6 @@ public class ScheduleController {
 			return "internalServerError";
 		}
 	}
-
 	
 	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());

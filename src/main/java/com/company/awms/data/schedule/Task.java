@@ -9,15 +9,13 @@ public class Task {
 	@Id
 	private String id;
 
-	private String receiverNationalID;
 	private String taskBody;
 	private String taskTitle;
 	private boolean completed;
 	private boolean paidFor;
 	private double taskReward = 0;
 
-	public Task(String receiverNationalID, Day date, String taskTitle, String taskBody) {
-		this.receiverNationalID = receiverNationalID;
+	public Task(Day date, String taskTitle, String taskBody) {
 		this.taskBody = taskBody;
 		this.taskTitle = taskTitle;
 	}
@@ -29,10 +27,6 @@ public class Task {
 		return this.id;
 	}
 	
-	public String getTaskReceiverNationalID() {
-		return receiverNationalID;
-	}
-
 	public String getTaskBody() {
 		return taskBody;
 	}
@@ -63,10 +57,6 @@ public class Task {
 	
 	public void setTaskReward(double taskReward) {
 		this.taskReward = taskReward;
-	}
-
-	public void setTaskReceiverNationalID(String receiverNationalID) {
-		this.receiverNationalID = receiverNationalID;
 	}
 
 	public void setTaskBody(String taskBody) {

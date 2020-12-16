@@ -99,6 +99,7 @@ public class EmployeeController {
     		return "internalServerError";
     	}
     }
+
     private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());

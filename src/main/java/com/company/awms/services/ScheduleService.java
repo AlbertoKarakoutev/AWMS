@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,10 +23,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeDailyReference;
@@ -34,7 +32,6 @@ import com.company.awms.data.employees.Notification;
 import com.company.awms.data.schedule.Day;
 import com.company.awms.data.schedule.ScheduleRepo;
 import com.company.awms.data.schedule.Task;
-import com.company.awms.security.EmployeeDetails;
 
 @Service
 public class ScheduleService {
@@ -273,11 +270,18 @@ public class ScheduleService {
 
 	}
 
-	public void addTask(String taskDay, String receiverNationalID) {
+	public void addTask(String data) {
+		
+		String[] dataValues = data.split("\\n");
+		Map<String, String> newInfo = new HashMap<String, String>();
+		for(String field : dataValues) {
+			field = field.substring(0, field.length()-1);
+			newInfo.put(field.split("=")[0], field.split("=")[1]);
+		}
+		
 		Day currentDay;
-		LocalDate taskDate = LocalDate.parse(taskDay);
-		Optional<Day> currentDayOptional = this.scheduleRepo
-				.findByDate(taskDate.withDayOfMonth(taskDate.getDayOfMonth() + 1));
+		LocalDate taskDate = LocalDate.parse(newInfo.get("date"));
+		Optional<Day> currentDayOptional = this.scheduleRepo.findByDate(taskDate);
 
 		if (currentDayOptional.isEmpty()) {
 			System.err.println("Invalid date!");
@@ -287,9 +291,9 @@ public class ScheduleService {
 
 		Task task;
 		for (EmployeeDailyReference edr : currentDay.getEmployees()) {
-			if (edr.getNationalID().equals(receiverNationalID)) {
-				task = createTask(receiverNationalID, currentDay, "Test task title", "Test task body");
-				System.out.println(currentDay);
+			if (edr.getNationalID().equals(newInfo.get("receiverNationalID"))) {
+				task = createTask(currentDay, newInfo.get("title"), newInfo.get("body"));
+				task.setTaskReward(Integer.parseInt(newInfo.get("reward")));
 				if (edr.getTasks() != null) {
 					edr.getTasks().add(task);
 					this.scheduleRepo.save(currentDay);
@@ -299,13 +303,18 @@ public class ScheduleService {
 					edr.setTasks(taskList);
 					this.scheduleRepo.save(currentDay);
 				}
-
+				Employee employee = employeeRepo.findByNationalID(newInfo.get("receiverNationalID")).get();
+				List<Object> notificationData = new ArrayList<Object>();
+				notificationData.add("plain-notification");
+				String message = "You have a new task for " + newInfo.get("date");
+				employee.getNotifications().add(new Notification(message, notificationData));
+				employeeRepo.save(employee);
 			}
 		}
 	}
 
-	public Task createTask(String receiverNationalID, Day date, String taskBody, String taskTitle) {
-		return new Task(receiverNationalID, date, taskBody, taskTitle);
+	public Task createTask( Day date, String taskBody, String taskTitle) {
+		return new Task(date, taskBody, taskTitle);
 	}
 
 	// Get all equivalent access level employees with their schedules, by iterating

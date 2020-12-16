@@ -1,5 +1,18 @@
 package com.company.awms.controllers;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.forum.ForumReply;
 import com.company.awms.data.forum.ForumThread;
@@ -7,15 +20,6 @@ import com.company.awms.data.forum.ThreadReplyDTO;
 import com.company.awms.security.EmployeeDetails;
 import com.company.awms.services.EmployeeService;
 import com.company.awms.services.ForumService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
 
 @Controller
 @RequestMapping("/forum")
