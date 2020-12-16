@@ -139,24 +139,33 @@
 	                                                                        <th scope="col">Title</th>
 	                                                                        <th scope="col">Assignment</th>
 	                                                                        <th scope="col">Reward</th>
+	                                                                        <th scope="col">State</th>
 	                                                                    </tr>
 	                                                                </thead>
 	                                                                <tbody>
 				                            		        			<c:set var="day" value="init"/>
-	                                                                	<%pageContext.setAttribute("day", i-offset);%>
-				                        	    	        			<c:forEach items="${tasks[day]}" var="task">
-				                        	    	        				<tr id="<%=i%>">
+				                        	    	        			<%for(int index = 0; index < tasks[i-offset].size();index++){%>
+				                        	    	        				<tr>
 				                        	    	        					<th scope="row">
-																					<h4><b></b><c:out value="${task.getTaskTitle()}"/></</h4>
+																					<h4><b></b><c:out value="<%=tasks[i-offset].get(index).getTaskTitle()%>"/></h4>
 																				</th>
 																				<td>
-									                                            	<h4><c:out value="${task.getTaskBody()}"/></h4>
+									                                            	<h4><c:out value="<%=tasks[i-offset].get(index).getTaskBody()%>"/></h4>
 									                                            </td>
 									                                            <td>
-									                                            	<h4><c:out value="${task.getTaskReward()}"/></h4>
+									                                            	<h4><c:out value="<%=tasks[i-offset].get(index).getTaskReward()%>"/></h4>
 									                                            </td>
+									                                            <%if(!tasks[i-offset].get(index).getCompleted()){%>
+										                                            <td>
+										                                            	<a class="btn btn-dark" href="/schedule/taskComplete/?taskNum=<%=index%>&date=<%=day%>">Mark as Complete</a>
+										    	    	        					</td>
+										    	    	        				<%}else{%>
+										    	    	        					<td>
+										                                            	<i class="fas fa-check-circle"></i>
+										    	    	        					</td>
+										    	    	        				<%}%>
 									    	    	        				</tr>
-									    	    	        			</c:forEach>
+									    	    	        			<%}%>
 								    	    	        			</tbody>
 								    	    	        		</table>
 		                          	  	            		<%}%> 	

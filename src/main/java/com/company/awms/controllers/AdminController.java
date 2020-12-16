@@ -191,10 +191,10 @@ public class AdminController {
 	}
 	
 	@PostMapping("/employee/denyLeave")
-	public String denyLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String paid, @RequestParam String startDate, @RequestParam String endDate) {
+	public String denyLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String startDate, @RequestParam String endDate) {
 		try {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			employeeService.denyLeave( employeeID,  Boolean.parseBoolean(paid),  startDate,  endDate);
+			employeeService.denyLeave( employeeID,  startDate,  endDate);
 			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
 			return "redirect:/";
 		}catch(Exception e) {

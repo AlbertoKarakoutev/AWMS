@@ -102,7 +102,7 @@
 					<div class="dropdown-item border-bottom">
 						<form action="/employee/dismiss">
 							<input type="hidden" name="noteNum" value="<%=Integer.toString(i)%>">
-							<button class="btn text-left p-0">
+							<button style="white-space:normal;" class="btn text-left p-0">
 								<span class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
 								<br>
 								<%=notification.getMessage()%>

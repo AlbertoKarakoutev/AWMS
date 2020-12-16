@@ -26,7 +26,6 @@ function deleteWorkDay(modalID, nationalID, date){
 
 
 function getTaskInput(modalID, nationalID, date){
-	let modal = document.getElementById(String(modalID));
 	let modalRow = document.getElementById(String(modalID)+"-"+String(nationalID));
 	let newForm = '<td><form method="POST" action="/schedule/addTask" enctype="text/plain">'
 							+'<input type="text" class="form-control" name="title" placeholder="Title" required>'
@@ -36,11 +35,6 @@ function getTaskInput(modalID, nationalID, date){
 							+'<input type="text" class="form-control" name="receiverNationalID" value="'+String(nationalID)+'" hidden>'
   							+'<input type="submit" value="Add" class="btn btn-dark"></form></td>';
 	modalRow.insertAdjacentHTML('afterend', newForm);
-}
-
-function addTask(){
-	let title = document.getElementById("title");
-	let body = document.getElementById()
 }
 
 function getInput(modalID, date){

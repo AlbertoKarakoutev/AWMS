@@ -175,23 +175,15 @@ public class EmployeeService {
 		leave.put("paid", paid);
 		employee.getLeaves().add(leave);
 		
-		List<Object> notificationData = new ArrayList<Object>();
-        notificationData.add("plain-notification");
 		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been approved";
-		employee.getNotifications().add(new Notification(message, notificationData));
+		notify(employeeID, message, false);
 		
 		employeeRepo.save(employee);
 	}
 	
-	public void denyLeave(String employeeID, boolean paid, String startDateStr, String endDateStr) throws IOException {
-		Employee employee = getEmployee(employeeID);
-		
-		List<Object> notificationData = new ArrayList<Object>();
-        notificationData.add("plain-notification");
+	public void denyLeave(String employeeID, String startDateStr, String endDateStr) throws IOException {
 		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been denied.";
-		employee.getNotifications().add(new Notification(message, notificationData));
-		
-		employeeRepo.save(employee);
+		notify(employeeID, message, false);
 	}
 	
 	public void deleteLeave(String employeeID, String leave) throws IOException {
@@ -294,12 +286,27 @@ public class EmployeeService {
 			employee.setLevel(0);
 		}
 		
-        List<Object> notificationData = new ArrayList<Object>();
-        notificationData.add("plain-notification");
 		String message = "Your profile information has been updated by the Administrator.";
-		employee.getNotifications().add(new Notification(message, notificationData));
+		notify(employeeID, message, false);
         
 		this.employeeRepo.save(employee);
 		return employee;
+	}
+
+	public void notify(String employeeID, String message, boolean searchByNationalID) throws IOException {
+		Optional<Employee> employeeOptional;
+		if(searchByNationalID) {
+			employeeOptional = employeeRepo.findById(employeeID);
+		}else {
+			employeeOptional = employeeRepo.findByNationalID(employeeID);
+		}
+		if(employeeOptional.isEmpty()) {
+			throw new IOException("Employee not found!");	
+		}
+		Employee employee = employeeOptional.get();
+		List<Object> notificationData = new ArrayList<Object>();
+		notificationData.add("plain-notification");
+		employee.getNotifications().add(new Notification(message, notificationData));
+		employeeRepo.save(employee);
 	}
 }

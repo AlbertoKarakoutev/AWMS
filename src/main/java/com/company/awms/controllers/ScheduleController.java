@@ -47,7 +47,7 @@ public class ScheduleController {
 	}
 
 	@GetMapping("/decline")
-	public String declineSwap(Model model, @RequestParam String receiverNationalID, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String date) {
+	public String declineSwapRequest(Model model, @RequestParam String receiverNationalID, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String date) {
 		if (!active) {
 			return "notFound";
 		}
@@ -65,7 +65,7 @@ public class ScheduleController {
 	}
 	
 	@PostMapping(value = "/swap")
-	public String swapEmployees(Model model, @RequestParam String noteNum, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
+	public String acceptSwapRequest(Model model, @RequestParam String noteNum, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
 		if (!active) {
 			return "notFound";
 		}
@@ -96,6 +96,17 @@ public class ScheduleController {
 		}
 	}
 
+	@GetMapping("taskComplete")
+	public String markTaskAsComplete(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails,  @RequestParam String taskNum,  @RequestParam String date) {
+		try {
+			scheduleService.markTaskAsComplete(employeeDetails.getID(), taskNum, date);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			return "redirect:/schedule/?month="+YearMonth.now();
+		}catch(Exception e) {
+			return "internalServerError";
+		}
+	}
+	
 	@GetMapping("")
 	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam YearMonth month) {
 		if (!active) {
