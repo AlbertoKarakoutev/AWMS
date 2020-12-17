@@ -12,9 +12,11 @@ import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
@@ -50,12 +52,12 @@ public class ScheduleService {
 
 	public Day getDay(LocalDate date) throws IOException {
 		Optional<Day> dayOptional = scheduleRepo.findByDate(date);
-		if(dayOptional.isEmpty()) {
+		if (dayOptional.isEmpty()) {
 			throw new IOException("Invaid date");
 		}
 		return dayOptional.get();
 	}
-	
+
 	public void addWorkDay(String employeeNationalID, String dateStr, boolean onCall, String startShiftStr, String endShiftStr) throws IOException {
 		Employee employee;
 		LocalDate date = LocalDate.parse(dateStr);
@@ -278,19 +280,20 @@ public class ScheduleService {
 	public void markTaskAsComplete(String employeeID, String taskNum, String dateStr) throws IOException {
 		Day day = getDay(LocalDate.parse(dateStr));
 		Optional<Employee> employeeOptional = employeeRepo.findById(employeeID);
-		if(employeeOptional.isEmpty()) {
+		if (employeeOptional.isEmpty()) {
 			throw new IOException("Employee not found");
 		}
 		String employeeNationalID = employeeOptional.get().getNationalID();
-		
-		for(EmployeeDailyReference edr : day.getEmployees()) {
-			if(edr.getNationalID().equals(employeeNationalID)) {
+
+		for (EmployeeDailyReference edr : day.getEmployees()) {
+			if (edr.getNationalID().equals(employeeNationalID)) {
 				Task task = edr.getTasks().get(Integer.parseInt(taskNum));
-				if(!task.getCompleted())task.setCompleted(true);
+				if (!task.getCompleted())
+					task.setCompleted(true);
 				scheduleRepo.save(day);
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
-				for(Employee manager : managers) {
-					if(manager.getDepartment().equals(edr.getDepartment())) {
+				for (Employee manager : managers) {
+					if (manager.getDepartment().equals(edr.getDepartment())) {
 						List<Object> notificationData = new ArrayList<Object>();
 						notificationData.add("plain-notification");
 						String message = edr.getFirstName() + " " + edr.getLastName() + "has marked assignment \"" + task.getTaskTitle() + "\" as completed.";
@@ -301,11 +304,7 @@ public class ScheduleService {
 				break;
 			}
 		}
-		
-		
-		
-		
-		
+
 	}
 
 	public void addMonthlyDays(LocalDate date) {
@@ -316,7 +315,7 @@ public class ScheduleService {
 			scheduleRepo.save(day);
 		}
 	}
-	
+
 	@Scheduled(cron = "1 0 0 1 * *")
 	public void applySchedule() throws IOException {
 
@@ -397,7 +396,7 @@ public class ScheduleService {
 			issuer.getNotifications().add(new Notification(message, notificationData));
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<EmployeeDailyReference>[] viewSchedule(Employee viewer, YearMonth month) throws IOException {
 		int monthLength = LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).lengthOfMonth();
@@ -435,7 +434,7 @@ public class ScheduleService {
 		int monthLength = LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).lengthOfMonth();
 		List<Task>[] tasks = new ArrayList[monthLength];
 		for (int i = 0; i < monthLength; i++) {
-			Day taskDay= getDay(LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).withDayOfMonth(i + 1));
+			Day taskDay = getDay(LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).withDayOfMonth(i + 1));
 
 			EmployeeDailyReference thisEDR = null;
 
@@ -705,7 +704,7 @@ public class ScheduleService {
 		}
 		return false;
 	}
-	
+
 	private JSONObject getDepartmentAtLevel(String department, int level) {
 
 		JSONObject thisDepartment = getDepartment(department);
@@ -733,20 +732,24 @@ public class ScheduleService {
 		return thisDepartment;
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings("unchecked")
 	public void setDepartment(String departmentCode, JSONObject department) throws FileNotFoundException, IOException, ParseException {
 		JSONParser parser = new JSONParser();
 		String key = departmentCode.replace("\"", "");
 		JSONObject departments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
 		if (key.equals("undefined")) {
-			for (Object keyObj : departments.keySet()) {
-				String nextStr = (String) keyObj;
-				char next = nextStr.replace("\"", "").charAt(0);
-				int ascii = (int) next + 1;
-				if (ascii < 123) {
-					key = String.valueOf(Character.toChars(ascii));
-				} else {
-					return;
+			if (departments.keySet().size() == 0) {
+				key = "a";
+			} else {
+				for (Object keyObj : departments.keySet()) {
+					String nextStr = (String) keyObj;
+					char next = nextStr.replace("\"", "").charAt(0);
+					int ascii = (int) next + 1;
+					if (ascii < 123) {
+						key = String.valueOf(Character.toChars(ascii));
+					} else {
+						return;
+					}
 				}
 			}
 		}
@@ -759,6 +762,31 @@ public class ScheduleService {
 		try (FileWriter file = new FileWriter("src/main/resources/departments.json")) {
 			file.write(departments.toJSONString());
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void deleteDepartment(String departmentCode) throws FileNotFoundException, IOException, ParseException {
+		String key = departmentCode.replace("\"", "");
+		try {
+			JSONObject allDepartments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));	
+			allDepartments.remove(key);
+			JSONObject newDepartments = new JSONObject();
+			int newKey = 97;
+			Set<String> keys = allDepartments.keySet();
+			Iterator<String> keyIterator = keys.iterator();
+			while (keyIterator.hasNext()) {
+				String currentKey = keyIterator.next();
+				JSONObject department = (JSONObject) allDepartments.get(currentKey);
+				currentKey = String.valueOf(Character.toChars(newKey));
+				newKey++;
+				newDepartments.put(currentKey, department);
+			}
+			FileWriter file = new FileWriter("src/main/resources/departments.json");
+			file.write(newDepartments.toJSONString());
+			file.close();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

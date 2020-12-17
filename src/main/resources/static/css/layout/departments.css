@@ -1,9 +1,5 @@
-#update, #create, #addLevel{
+#update, #create, #addLevel, #deleteBtn{
 	display:none;
-}
-
-#update, #create{
-	color:var(--secondary-color);
 }
 
 #department-content{

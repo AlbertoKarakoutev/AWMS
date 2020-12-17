@@ -48,6 +48,7 @@
                 		<button id="addLevel" class="btn btn-dark m-1" style="{display:none;}">ADD LEVEL</button>
                 		<button id="create" class="btn btn-danger m-1" style="{display:none;}">CREATE DEPARTMENT</button>
                 		<button id="update" class="btn btn-danger m-1" style="{display:none;}">UPDATE</button>
+                		<button id="deleteBtn" class="btn btn-danger m-1" style="{display:none;}">DELETE</button>
                 	</div>
                 	
                 	<div id="department-content" class="my-3"></div>

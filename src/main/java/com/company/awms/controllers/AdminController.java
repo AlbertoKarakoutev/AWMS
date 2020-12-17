@@ -370,9 +370,7 @@ public class AdminController {
 		} catch (Exception e) {
 			return "internalServerError";
 		}
-
 		return "departments";
-
 	}
 
 	@GetMapping("/departments/view")
@@ -387,7 +385,29 @@ public class AdminController {
 	}
 
 	@PostMapping(value = "/departments/set", consumes = "application/json")
-	public String setDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model,
+	public String setDepartment(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model,
+			@RequestBody Object departmentObj) throws ParseException {
+		JSONObject departmentBody = new JSONObject((Map) departmentObj);
+		String key = null;
+		Set<String> keys = departmentBody.keySet();
+		Iterator<String> keyIterator = keys.iterator();
+		while (keyIterator.hasNext()) {
+			key = keyIterator.next();
+			break;
+		}
+		try {
+			scheduleService.setDepartment(key, departmentBody);
+			Map<String, String> departmentDTOs = getDepartmentDTOs();
+			model.addAttribute("departments", departmentDTOs);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			return "redirect:/admin/departments";
+		} catch (Exception e) {
+			return "internalServerError";
+		}
+	}
+	
+	@PostMapping(value = "/departments/delete", consumes = "application/json")
+	public String deleteDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model,
 			@RequestBody Object departmentObj) throws ParseException {
 
 		JSONObject departmentBody = new JSONObject((Map) departmentObj);
@@ -399,11 +419,14 @@ public class AdminController {
 			break;
 		}
 		try {
-			scheduleService.setDepartment(key, departmentBody);
+			Map<String, String> departmentDTOs = getDepartmentDTOs();
+			model.addAttribute("departments", departmentDTOs);
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			scheduleService.deleteDepartment(key);
+			return "redirect:/admin/departments";
 		} catch (Exception e) {
 			return "internalServerError";
 		}
-		return getDepartments(employeeDetails, model);
 	}
 
 	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {

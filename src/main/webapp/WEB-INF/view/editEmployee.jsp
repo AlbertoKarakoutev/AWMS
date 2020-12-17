@@ -66,12 +66,12 @@
                         </div>
                         <div class="form-group">
                             <label for="ibanEmployee">IBAN</label>
-                            <input value="${employee.getIBAN()}" type="tel" name="iban" class="form-control" id="ibanEmployee" aria-describedby="ibanEmployee" placeholder="Password" required>
+                            <input value="${employee.getIBAN()}" type="tel" name="iban" class="form-control" id="ibanEmployee" aria-describedby="ibanEmployee" placeholder="IBAN" required>
                             <small id="ibanHelp" class="form-text text-muted">Employee's IBAN.</small>
                         </div>
                         <div class="form-group">
                             <label for="salaryEmployee">Salary</label>
-                            <input value="${employee.getSalary()}" type="tel" name="salary" class="form-control" id="salaryEmployee" aria-describedby="salaryEmployee" placeholder="Password" required>
+                            <input value="${employee.getSalary()}" type="tel" name="salary" class="form-control" id="salaryEmployee" aria-describedby="salaryEmployee" placeholder="Salary" required>
                             <small id="salaryHelp" class="form-text text-muted">Employee's salary.</small>
                         </div>
                         <div class="form-group">
