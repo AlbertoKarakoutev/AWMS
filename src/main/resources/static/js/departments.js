@@ -63,7 +63,6 @@ update.onclick = function () {
 		req.open("POST", "/admin/departments/set", true);
 		req.setRequestHeader("Content-Type", "application/json");
 		req.send(dataJSON);
-		window.location.assign("/admin/departments");
 	}
 }
 
@@ -109,29 +108,32 @@ add.onclick = function () {
 	if (multilevel) {
 		addLevel.style.display = "inline-block";
 		add.style.display = "none";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Name' type='text' id='Name'/><small class='form-text text-muted'>Department name.</small><br>"
-		+ "<input class='data-field form-control' type='text' id='Universal schedule' value='false' readonly/><small class='form-text text-muted'>Applies for the entire deaprtment</small><br>"
+		content.innerHTML += "<input class='data-field form-control' placeholder='Name' type='text' id='Name' required><small class='form-text text-muted'>Department name</small><br>"
+		+ "<input class='data-field form-control' type='text' id='Universal schedule' value='false' readonly/><small class='form-text text-muted'>Information applies for the entire deaprtment</small><br>"
+		+ "<input class='data-field form-control' placeholder='Code' type='text' id='departmentCode'/><small class='form-text text-muted'>Optional: Manually enter the department code</small><br>"
 		+ "<h2><b>Level " + levelCounter + "</b></h2><br><input class='data-field form-control' placeholder='Breaks' type='number' id='Daily break duration total"+levelCounter+"'/><small class='form-text text-muted'>Total break time for the day.</small><br>"
 		+ "<select class='data-field form-control' id='Schedule type"+levelCounter+"'/><option value='Regular' selected>Regular</option><option value='Irregular'>Irregular</option><option value='OnCall'>On Call</option></select>"
 		+ "<small class='form-text text-muted'>Type of scheduling for the department</small><br>"
-		+ "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='number' id='Daily hours"+levelCounter+"'/><small class='form-text text-muted'>Department's open hours</small><br>"
+		+ "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='text' id='Daily hours"+levelCounter+"'/><small class='form-text text-muted'>Department's open hours</small><br>"
 		+ "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length"+levelCounter+"'/><small class='form-text text-muted'>Each employee's shift length</small><br>"
 		+ "<select class='data-field form-control' id='Work on weekends"+levelCounter+"'/><option value='true' selected>Yes</option><option value='false'>No</option></select>"
 		+	"<small class='form-text text-muted'>Do the employees work on the weekends</small><br>"
 		+ "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monhtly work days"+levelCounter+"'/><small class='form-text text-muted'>Work days per month</small><br>"
 		+ "<input class='data-field form-control' placeholder='Number of employees' type='number' id='Employees per shift"+levelCounter+"'/><small class='form-text text-muted'>Number of employees for each shift</small><br>"
 		+ "<input class='data-field form-control' placeholder='Hours' type='number' id='Break between shifts"+levelCounter+"'/><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
+		
 		let refresh = content.innerHTML;
 		content.innerHTML=refresh;
 	} else {
 		create.style.display = "inline-block";
 		add.style.display = "none";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Name' type='text' id='Name'/><small class='form-text text-muted'>Employee's name.</small><br>";
-		content.innerHTML += "<input class='data-field form-control' type='text' id='Universal schedule' value='true' readonly/><small class='form-text text-muted'>Applies for the entire deaprtment</small><br>";
+		content.innerHTML += "<input class='data-field form-control' placeholder='Name' type='text' id='Name' required><small class='form-text text-muted'>Department name.</small><br>";
+		content.innerHTML += "<input class='data-field form-control' type='text' id='Universal schedule' value='true' readonly/><small class='form-text text-muted'>Information applies for the entire deaprtment</small><br>";
+		content.innerHTML += "<input class='data-field form-control' placeholder='Code' type='text' id='departmentCode'/><small class='form-text text-muted'>Optional: Manually enter the department code</small><br>"
 		content.innerHTML += "<input class='data-field form-control' placeholder='Breaks' type='number' id='Daily break duration total'/><small class='form-text text-muted'>Total break time for the day.</small><br>";
-		content.innerHTML += "<select class='data-field form-control' id='Schedule type'/><option value='Regular' selected>Regular</option><option value='Irregular'>Irregular</option><option value='OnCall'>On Call</option></select>";
+		content.innerHTML += "<select class='data-field form-control' id='Schedule type'><option value='Regular' selected>Regular</option><option value='Irregular'>Irregular</option><option value='OnCall'>On Call</option></select>";
 		content.innerHTML += "<small class='form-text text-muted'>Type of scheduling for the department</small><br>";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='number' id='Daily hours'/><small class='form-text text-muted'>Department's open hours</small><br>";
+		content.innerHTML += "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='text' id='Daily hours'/><small class='form-text text-muted'>Department's open hours</small><br>";
 		content.innerHTML += "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length'/><small class='form-text text-muted'>Each employee's shift length</small><br>";
 		content.innerHTML += "<select class='data-field form-control' id='Work on weekends'/><option value='true' selected>Yes</option><option value='false'>No</option></select>";
 		content.innerHTML += "<small class='form-text text-muted'>Do the employees work on the weekends</small><br>";

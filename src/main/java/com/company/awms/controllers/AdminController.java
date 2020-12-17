@@ -48,8 +48,7 @@ public class AdminController {
 	private ScheduleService scheduleService;
 
 	@Autowired
-	public AdminController(EmployeeService employeeService, DocumentService documentService,
-			ScheduleService scheduleService) {
+	public AdminController(EmployeeService employeeService, DocumentService documentService, ScheduleService scheduleService) {
 		this.documentService = documentService;
 		this.employeeService = employeeService;
 		this.scheduleService = scheduleService;
@@ -72,8 +71,7 @@ public class AdminController {
 	}
 
 	@PostMapping(value = "/employee/register", consumes = "text/plain")
-	public String registerEmployee(@RequestBody String data, @AuthenticationPrincipal EmployeeDetails employeeDetails,
-			Model model) {
+	public String registerEmployee(@RequestBody String data, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<Employee> employee = new ArrayList<>();
 			employee.add(employeeService.registerEmployee(data));
@@ -86,8 +84,7 @@ public class AdminController {
 	}
 
 	@GetMapping("/employee/edit/{employeeID}")
-	public String editEmployee(@PathVariable String employeeID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String editEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			Employee employee = employeeService.getEmployee(employeeID);
 			model.addAttribute("employee", employee);
@@ -113,8 +110,7 @@ public class AdminController {
 	}
 
 	@GetMapping(value = "/personal/{employeeID}")
-	public String getAllPersonalDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails,
-			@PathVariable String employeeID, Model model) {
+	public String getAllPersonalDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, @PathVariable String employeeID, Model model) {
 		try {
 			List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeID);
 
@@ -132,8 +128,7 @@ public class AdminController {
 	}
 
 	@PostMapping(value = "/employee/update", consumes = "text/plain")
-	public String updateEmployeeInfo(@RequestBody String data, @RequestParam String employeeId,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String updateEmployeeInfo(@RequestBody String data, @RequestParam String employeeId, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<Employee> employee = new ArrayList<>();
 			employee.add(employeeService.updateEmployeeInfo(employeeId, data));
@@ -148,8 +143,7 @@ public class AdminController {
 	}
 
 	@GetMapping("/employee/search")
-	public String searchEmployees(@RequestParam String searchTerm, @RequestParam String type,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String searchEmployees(@RequestParam String searchTerm, @RequestParam String type, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			List<Employee> employees = this.employeeService.getAllEmployees();
 			List<Employee> foundEmployees = this.employeeService.searchEmployees(employees, searchTerm, type);
@@ -164,63 +158,63 @@ public class AdminController {
 	}
 
 	@GetMapping("/employee/leaves/{employeeID}")
-    public String getLeaves(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @PathVariable String employeeID){
-        try {
-	        injectLoggedInEmployeeInfo(model, employeeDetails);
-	        Employee employee = employeeService.getEmployee(employeeID);
-	        model.addAttribute("employeeID", employeeID);
-	        model.addAttribute("leaves", employee.getLeaves());
-	        model.addAttribute("name", employee.getFirstName() + " " + employee.getLastName());
-	        return "leaves";
-        }catch(Exception e) {
-        	return "internalServerError";
-        }
-    }
-	
-	@PostMapping("/employee/approveLeave")
-	public String approveLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String paid, @RequestParam String startDate, @RequestParam String endDate) {
+	public String getLeaves(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @PathVariable String employeeID) {
 		try {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			employeeService.approveLeave( employeeID,  Boolean.parseBoolean(paid),  startDate,  endDate);
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
-			return "redirect:/";
-		}catch(Exception e) {
-			e.printStackTrace();
-			return "internalServerError";
-		}
-	}
-	
-	@PostMapping("/employee/denyLeave")
-	public String denyLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String startDate, @RequestParam String endDate) {
-		try {
-			injectLoggedInEmployeeInfo(model, employeeDetails);
-			employeeService.denyLeave( employeeID,  startDate,  endDate);
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
-			return "redirect:/";
-		}catch(Exception e) {
-			e.printStackTrace();
-			return "internalServerError";
-		}
-	}
-	
-	@GetMapping("/employee/deleteLeave")
-	public String deleteLeave(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String employeeID, @RequestParam String leave) {
-		try {
-			employeeService.deleteLeave(employeeID, leave);
-			return "redirect:/admin/employee/leaves/"+employeeID;
+			Employee employee = employeeService.getEmployee(employeeID);
+			model.addAttribute("employeeID", employeeID);
+			model.addAttribute("leaves", employee.getLeaves());
+			model.addAttribute("name", employee.getFirstName() + " " + employee.getLastName());
+			return "leaves";
 		} catch (Exception e) {
 			return "internalServerError";
 		}
 	}
-	
+
+	@PostMapping("/employee/approveLeave")
+	public String approveLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String paid, @RequestParam String startDate,
+			@RequestParam String endDate) {
+		try {
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			employeeService.approveLeave(employeeID, Boolean.parseBoolean(paid), startDate, endDate);
+			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			return "redirect:/";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+
+	@PostMapping("/employee/denyLeave")
+	public String denyLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String employeeID, @RequestParam String startDate, @RequestParam String endDate) {
+		try {
+			injectLoggedInEmployeeInfo(model, employeeDetails);
+			employeeService.denyLeave(employeeID, startDate, endDate);
+			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			return "redirect:/";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+
+	@GetMapping("/employee/deleteLeave")
+	public String deleteLeave(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String employeeID, @RequestParam String leave) {
+		try {
+			employeeService.deleteLeave(employeeID, leave);
+			return "redirect:/admin/employee/leaves/" + employeeID;
+		} catch (Exception e) {
+			return "internalServerError";
+		}
+	}
+
 	// Schedule methods
 	@GetMapping(value = "/schedule/add")
-	public void addWorkDay(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String employeeNationalID, @RequestParam String date,
-																					@RequestParam String startShift, @RequestParam String endShift) {
-		try{
+	public void addWorkDay(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String employeeNationalID, @RequestParam String date, @RequestParam String startShift, @RequestParam String endShift) {
+		try {
 			scheduleService.addWorkDay(employeeNationalID, date, true, startShift, endShift);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -228,14 +222,14 @@ public class AdminController {
 	@GetMapping("/schedule/delete")
 	public void deleteWorkDay(Model model, @RequestParam String employeeNationalID, @RequestParam String date, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
 		try {
-			
+
 			this.scheduleService.deleteWorkDay(employeeNationalID, date);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			model.addAttribute(YearMonth.now());
-		}catch(Exception e) {
+		} catch (Exception e) {
 		}
 	}
-	
+
 	@GetMapping("/schedule/apply")
 	public ResponseEntity<String> applySchedule() {
 		try {
@@ -250,8 +244,7 @@ public class AdminController {
 
 	// Document methods
 	@PostMapping(value = "/document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public String uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.documentService.uploadPersonalDocument(file, employeeID);
 
@@ -270,8 +263,7 @@ public class AdminController {
 	}
 
 	@DeleteMapping(value = "/document/personal/delete/{documentID}")
-	public String deletePersonalDocument(@PathVariable int documentID, @RequestParam String ownerID,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String deletePersonalDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.documentService.deletePersonalDocument(documentID, ownerID);
 
@@ -297,12 +289,10 @@ public class AdminController {
 		for (File controllerFile : controllers) {
 			String controllerName = controllerFile.getName().split("\\.")[0];
 			try {
-				if (!controllerName.equals("updatedActivesController") && !controllerName.equals("AdminController")
-						&& !controllerName.equals("IndexController")) {
+				if (!controllerName.equals("updatedActivesController") && !controllerName.equals("AdminController") && !controllerName.equals("IndexController")) {
 					Class<?> controller = Class.forName("com.company.awms.controllers." + controllerName);
 					Method active = controller.getMethod("getActive");
-					controllerConditions.put(controllerName.split("Controller")[0],
-							(boolean) active.invoke(null, null));
+					controllerConditions.put(controllerName.split("Controller")[0], (boolean) active.invoke(null, null));
 				}
 			} catch (Exception e) {
 			}
@@ -326,14 +316,10 @@ public class AdminController {
 
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "/modules/set", consumes = "application/json")
-	public String setActives(@RequestBody String updatedActives,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model)
-			throws JsonMappingException, JsonProcessingException {
-		String updatedActivitiesFormatted = updatedActives.substring(19, updatedActives.length() - 2).replaceAll("\\\\",
-				"");
+	public String setActives(@RequestBody String updatedActives, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws JsonMappingException, JsonProcessingException {
+		String updatedActivitiesFormatted = updatedActives.substring(19, updatedActives.length() - 2).replaceAll("\\\\", "");
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Boolean> actives = (Map<String, Boolean>) mapper.readValue(updatedActivitiesFormatted,
-				HashMap.class);
+		Map<String, Boolean> actives = (Map<String, Boolean>) mapper.readValue(updatedActivitiesFormatted, HashMap.class);
 
 		for (String key : actives.keySet()) {
 			try {
@@ -374,8 +360,7 @@ public class AdminController {
 	}
 
 	@GetMapping("/departments/view")
-	public ResponseEntity<JSONObject> getDepartment(@RequestParam String departmentCode,
-			@AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	public ResponseEntity<JSONObject> getDepartment(@RequestParam String departmentCode, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
 		try {
 			JSONObject department = scheduleService.getDepartment(departmentCode);
 			return new ResponseEntity<JSONObject>(department, HttpStatus.OK);
@@ -385,18 +370,11 @@ public class AdminController {
 	}
 
 	@PostMapping(value = "/departments/set", consumes = "application/json")
-	public String setDepartment(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model,
-			@RequestBody Object departmentObj) throws ParseException {
-		JSONObject departmentBody = new JSONObject((Map) departmentObj);
-		String key = null;
-		Set<String> keys = departmentBody.keySet();
-		Iterator<String> keyIterator = keys.iterator();
-		while (keyIterator.hasNext()) {
-			key = keyIterator.next();
-			break;
-		}
+	public String setDepartment(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestBody Object departmentObj) throws ParseException {
+	
+
 		try {
-			scheduleService.setDepartment(key, departmentBody);
+			scheduleService.setDepartment(departmentObj);
 			Map<String, String> departmentDTOs = getDepartmentDTOs();
 			model.addAttribute("departments", departmentDTOs);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -405,10 +383,9 @@ public class AdminController {
 			return "internalServerError";
 		}
 	}
-	
+
 	@PostMapping(value = "/departments/delete", consumes = "application/json")
-	public String deleteDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model,
-			@RequestBody Object departmentObj) throws ParseException {
+	public String deleteDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestBody Object departmentObj) throws ParseException {
 
 		JSONObject departmentBody = new JSONObject((Map) departmentObj);
 		String key = null;

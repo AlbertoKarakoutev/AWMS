@@ -733,32 +733,50 @@ public class ScheduleService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setDepartment(String departmentCode, JSONObject department) throws FileNotFoundException, IOException, ParseException {
+	public void setDepartment(Object departmentObj) throws FileNotFoundException, IOException, ParseException {
 		JSONParser parser = new JSONParser();
-		String key = departmentCode.replace("\"", "");
-		JSONObject departments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
+		JSONObject department = new JSONObject((Map) departmentObj);
+		JSONObject departments = (JSONObject) parser.parse(new FileReader("src/main/resources/departments.json"));
+
+		String key = null;
+		JSONObject departmentBody = null;
+
+		Set<String> keys = department.keySet();
+		Iterator<String> keyIterator = keys.iterator();
+		while (keyIterator.hasNext()) {
+			key = keyIterator.next();
+			break;
+		}
+		
+		Object obj = department.get(key);
+		departmentBody = (JSONObject) parser.parse((String) obj);
+		key = key.replace("\"", "");
+		// Check if it is a new department
 		if (key.equals("undefined")) {
+			// Check if it is the first department
 			if (departments.keySet().size() == 0) {
 				key = "a";
 			} else {
-				for (Object keyObj : departments.keySet()) {
-					String nextStr = (String) keyObj;
-					char next = nextStr.replace("\"", "").charAt(0);
-					int ascii = (int) next + 1;
-					if (ascii < 123) {
-						key = String.valueOf(Character.toChars(ascii));
+				// Check if the admin has specified a dpt. code
+				key = ((String) departmentBody.get("departmentCode"));
+				if(key!=null) {
+					departmentBody.remove("departmentCode");
+				} else {
+					int firstCode = 97;
+					Set keySet = departments.keySet();
+					while (keySet.contains(String.valueOf(Character.toChars(firstCode)))) {
+						firstCode++;
+					}
+					if (firstCode < 123) {
+						key = String.valueOf(Character.toChars(firstCode)).replace("\"", "");
 					} else {
 						return;
 					}
 				}
 			}
-		}
-		try {
-			JSONObject departmentBody = (JSONObject) parser.parse((String) department.get(departmentCode));
-			departments.put(key, departmentBody);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} 
+
+		departments.put(key, departmentBody);
 		try (FileWriter file = new FileWriter("src/main/resources/departments.json")) {
 			file.write(departments.toJSONString());
 		} catch (IOException e) {
@@ -770,21 +788,10 @@ public class ScheduleService {
 	public void deleteDepartment(String departmentCode) throws FileNotFoundException, IOException, ParseException {
 		String key = departmentCode.replace("\"", "");
 		try {
-			JSONObject allDepartments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));	
+			JSONObject allDepartments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
 			allDepartments.remove(key);
-			JSONObject newDepartments = new JSONObject();
-			int newKey = 97;
-			Set<String> keys = allDepartments.keySet();
-			Iterator<String> keyIterator = keys.iterator();
-			while (keyIterator.hasNext()) {
-				String currentKey = keyIterator.next();
-				JSONObject department = (JSONObject) allDepartments.get(currentKey);
-				currentKey = String.valueOf(Character.toChars(newKey));
-				newKey++;
-				newDepartments.put(currentKey, department);
-			}
 			FileWriter file = new FileWriter("src/main/resources/departments.json");
-			file.write(newDepartments.toJSONString());
+			file.write(allDepartments.toJSONString());
 			file.close();
 		} catch (Exception e) {
 			e.printStackTrace();
