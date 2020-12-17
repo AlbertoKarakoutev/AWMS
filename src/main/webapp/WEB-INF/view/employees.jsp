@@ -52,6 +52,9 @@
 							</div>
 						</form>
 						<div class="w-100 text-right">
+						    <a class="btn btn-danger" href="/admin/schedule/apply" title="Apply schedule">Calculate schedule</a>
+						</div>
+						<div class="w-100 text-right">
 						    <a class="btn btn-dark" href="/admin/employee/register" title="Add employee">Add</a>
 						</div>
 					</div>

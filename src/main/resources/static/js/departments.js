@@ -118,7 +118,7 @@ add.onclick = function () {
 		+ "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length"+levelCounter+"'/><small class='form-text text-muted'>Each employee's shift length</small><br>"
 		+ "<select class='data-field form-control' id='Work on weekends"+levelCounter+"'/><option value='true' selected>Yes</option><option value='false'>No</option></select>"
 		+	"<small class='form-text text-muted'>Do the employees work on the weekends</small><br>"
-		+ "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monhtly work days"+levelCounter+"'/><small class='form-text text-muted'>Work days per month</small><br>"
+		+ "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monthly work days"+levelCounter+"'/><small class='form-text text-muted'>Work days per month</small><br>"
 		+ "<input class='data-field form-control' placeholder='Number of employees' type='number' id='Employees per shift"+levelCounter+"'/><small class='form-text text-muted'>Number of employees for each shift</small><br>"
 		+ "<input class='data-field form-control' placeholder='Hours' type='number' id='Break between shifts"+levelCounter+"'/><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
 		
@@ -137,7 +137,7 @@ add.onclick = function () {
 		content.innerHTML += "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length'/><small class='form-text text-muted'>Each employee's shift length</small><br>";
 		content.innerHTML += "<select class='data-field form-control' id='Work on weekends'/><option value='true' selected>Yes</option><option value='false'>No</option></select>";
 		content.innerHTML += "<small class='form-text text-muted'>Do the employees work on the weekends</small><br>";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monhtly work days'/><small class='form-text text-muted'>Work days per month</small><br>";
+		content.innerHTML += "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monthly work days'/><small class='form-text text-muted'>Work days per month</small><br>";
 		content.innerHTML += "<input class='data-field form-control' placeholder='Number of employees' type='number' id='Employees per shift'/><small class='form-text text-muted'>Number of employees for each shift</small><br>";
 		content.innerHTML += "<input class='data-field form-control' placeholder='Hours' type='number' id='Break between shifts'/><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
 	}
@@ -153,7 +153,7 @@ addLevel.onclick = function () {
 		+ "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length"+levelCounter+"'/><small class='form-text text-muted'>Each employee's shift length</small><br>"
 		+ "<select class='data-field form-control' id='Work on weekends"+levelCounter+"'/><option value='true' selected>Yes</option><option value='false'>No</option></select>"
 		+	"<small class='form-text text-muted'>Do the employees work on the weekends</small><br>"
-		+ "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monhtly work days"+levelCounter+"'/><small class='form-text text-muted'>Work days per month</small><br>"
+		+ "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monthly work days"+levelCounter+"'/><small class='form-text text-muted'>Work days per month</small><br>"
 		+ "<input class='data-field form-control' placeholder='Number of employees' type='number' id='Employees per shift"+levelCounter+"'/><small class='form-text text-muted'>Number of employees for each shift</small><br>"
 		+ "<input class='data-field form-control' placeholder='Hours' type='number' id='Break between shifts"+levelCounter+"'/><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
 	

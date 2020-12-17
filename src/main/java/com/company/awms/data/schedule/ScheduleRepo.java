@@ -9,6 +9,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface ScheduleRepo extends MongoRepository<Day, String> {
 
 	Optional<Day> findByDate(LocalDate date);
-
 	List<Day> findAllByDateBetween(LocalDate firstDay, LocalDate lastDay);
 }

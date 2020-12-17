@@ -231,14 +231,14 @@ public class AdminController {
 	}
 
 	@GetMapping("/schedule/apply")
-	public ResponseEntity<String> applySchedule() {
+	public String applySchedule() {
 		try {
 			this.scheduleService.applySchedule();
 
-			return new ResponseEntity<>(HttpStatus.OK);
+			return "redirect:/schedule/?month="+YearMonth.now();
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return "internalServerError";
 		}
 	}
 
