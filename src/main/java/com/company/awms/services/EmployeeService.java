@@ -147,7 +147,7 @@ public class EmployeeService {
 		Employee admin = adminOptional.get();
 		Employee employee = getEmployee(employeeID);
 		
-		List<Object> notificationData = new ArrayList<Object>();
+		List<Object> notificationData = new ArrayList<>();
         notificationData.add("leave-request");
         notificationData.add(employeeID);
         notificationData.add(startDate);
@@ -169,7 +169,7 @@ public class EmployeeService {
 		
 		LocalDate startDate = LocalDate.parse(startDateStr);
 		LocalDate endDate = LocalDate.parse(endDateStr);
-		Map<String, Object> leave = new HashMap<String, Object>();
+		Map<String, Object> leave = new HashMap<>();
 		leave.put("start", startDate);
 		leave.put("end", endDate);
 		leave.put("paid", paid);
@@ -192,7 +192,7 @@ public class EmployeeService {
 		LocalDate start = LocalDate.ofInstant(((Date) employee.getLeaves().get(Integer.parseInt(leave)).get("start")).toInstant(), ZoneId.systemDefault());
 		LocalDate end = LocalDate.ofInstant(((Date) employee.getLeaves().get(Integer.parseInt(leave)).get("end")).toInstant(), ZoneId.systemDefault());
 		
-		List<Object> notificationData = new ArrayList<Object>();
+		List<Object> notificationData = new ArrayList<>();
         notificationData.add("plain-notification");
 		String message = "Your leave for the period from " + start + " to " + end + " has been removed.";
 		employee.getNotifications().add(new Notification(message, notificationData));
@@ -213,32 +213,14 @@ public class EmployeeService {
 	}
 
  	public Employee registerEmployee(String data) {
- 		
- 		String[] dataValues = data.split("\\n");
-		Map<String, String> newInfo = new HashMap<String, String>();
-		for(String field : dataValues) {
-			field = field.substring(0, field.length()-1);
-			newInfo.put(field.split("=")[0], field.split("=")[1]);
-		}
 		Employee employee = new Employee();
-		employee.setFirstName(newInfo.get("firstName"));
-		employee.setLastName(newInfo.get("familyName"));
-		employee.setNationalID(newInfo.get("nationalID"));
-		employee.setEmail(newInfo.get("email"));
-		employee.setIBAN(newInfo.get("iban"));
-		employee.setPhoneNumber(newInfo.get("phoneNumber"));
-		employee.setDepartment(newInfo.get("department").split(":")[0]);
+
+ 		setEmployeeInfo(data, employee);
+
 		String encodedPassword = this.passwordEncoder.encode(employee.getNationalID());
 		employee.setPassword(encodedPassword);
-		employee.setRole(newInfo.get("role"));
-		try {
-			employee.setLevel(Integer.parseInt(newInfo.get("level")));
-		}catch(Exception e) {
-			System.out.println("Level is 0");
-			employee.setLevel(0);
-		}
-		
-        List<Object> notificationData = new ArrayList<Object>();
+
+        List<Object> notificationData = new ArrayList<>();
         notificationData.add("info-updated");
 		String message = "Your profile information has been updated by the Administrator.";
 		employee.getNotifications().add(new Notification(message, notificationData));
@@ -265,8 +247,19 @@ public class EmployeeService {
 
 	public Employee updateEmployeeInfo(String employeeID, String data) throws IOException {
 		Employee employee = getEmployee(employeeID);
+
+		setEmployeeInfo(data, employee);
+		
+		String message = "Your profile information has been updated by the Administrator.";
+		notify(employeeID, message, false);
+        
+		this.employeeRepo.save(employee);
+		return employee;
+	}
+
+	private void setEmployeeInfo(String data, Employee employee){
 		String[] dataValues = data.split("\\n");
-		Map<String, String> newInfo = new HashMap<String, String>();
+		Map<String, String> newInfo = new HashMap<>();
 		for(String field : dataValues) {
 			field = field.substring(0, field.length()-1);
 			newInfo.put(field.split("=")[0], field.split("=")[1]);
@@ -285,15 +278,9 @@ public class EmployeeService {
 			System.out.println("Level is 0");
 			employee.setLevel(0);
 		}
-		
-		String message = "Your profile information has been updated by the Administrator.";
-		notify(employeeID, message, false);
-        
-		this.employeeRepo.save(employee);
-		return employee;
 	}
 
-	public void notify(String employeeID, String message, boolean searchByNationalID) throws IOException {
+	private void notify(String employeeID, String message, boolean searchByNationalID) throws IOException {
 		Optional<Employee> employeeOptional;
 		if(searchByNationalID) {
 			employeeOptional = employeeRepo.findById(employeeID);
@@ -304,7 +291,7 @@ public class EmployeeService {
 			throw new IOException("Employee not found!");	
 		}
 		Employee employee = employeeOptional.get();
-		List<Object> notificationData = new ArrayList<Object>();
+		List<Object> notificationData = new ArrayList<>();
 		notificationData.add("plain-notification");
 		employee.getNotifications().add(new Notification(message, notificationData));
 		employeeRepo.save(employee);

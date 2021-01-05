@@ -23,8 +23,6 @@ import com.company.awms.data.employees.EmployeeRepo;
 @Service
 public class DocumentService {
 
-	private static final String ADMIN_ID = "5fbe50169283684476c02096";
-
 	private DocumentRepo documentRepo;
 	private EmployeeRepo employeeRepo;
 
@@ -51,7 +49,14 @@ public class DocumentService {
 
 		Employee employee = getEmployee(employeeID);
 		List<Doc> departmentDocuments;
-		if (employee.getID().equals(employeeRepo.findByRole("ADMIN").get().getID())) {
+
+		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
+
+		if(adminOptional.isEmpty()){
+			throw new IOException("Admin not found!");
+		}
+
+		if (employee.getID().equals(adminOptional.get().getID())) {
 			departmentDocuments = this.documentRepo.findAll();
 			for (Doc document : departmentDocuments) {
 				DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(), document.getType(), document.getUploaderID(), employee.getFirstName() + " " + employee.getLastName());
@@ -155,7 +160,13 @@ public class DocumentService {
 			throw new IOException("Document not found!");
 		}
 
-		if (employeeID.equals(ADMIN_ID) || documentToDelete.get().getUploaderID().equals(employeeID)) {
+		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
+
+		if(adminOptional.isEmpty()){
+			throw new IOException("Admin not found!");
+		}
+
+		if (employeeID.equals(adminOptional.get().getID()) || documentToDelete.get().getUploaderID().equals(employeeID)) {
 			this.documentRepo.deleteById(documentID);
 		} else {
 			throw new IllegalAccessException("You don't have permission to delete document");
@@ -192,15 +203,21 @@ public class DocumentService {
 		return foundDocuments;
 	}
 
-	private boolean isAccessible(String department, int level, String employeeID) {
+	private boolean isAccessible(String department, int level, String employeeID) throws IOException {
 		Optional<Employee> employee = this.employeeRepo.findById(employeeID);
 
 		if (employee.isEmpty()) {
 			return false;
 		}
 
+		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
+
+		if(adminOptional.isEmpty()){
+			throw new IOException("Admin not found!");
+		}
+
 		// The Admin always has access
-		if (employeeID.equals(ADMIN_ID)) {
+		if (employeeID.equals(adminOptional.get().getID())) {
 			return true;
 		} else {
 			return department.equals(employee.get().getDepartment()) && level <= employee.get().getLevel();

@@ -84,14 +84,13 @@ public class ForumService {
     }
 
     public ForumThread addNewThread(EmployeeDetails employeeDetails, String title, String body) {
-        //TODO:
-        //Validation? from Validator Class
         ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(),
                 false, employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 
         Employee uploader = employeeRepo.findById(employeeDetails.getID()).get();
+
         List<Employee> sameDepartmentEmployees = employeeRepo.findByDepartment(uploader.getDepartment());
-        List<Object> notificationData = new ArrayList<Object>();
+        List<Object> notificationData = new ArrayList<>();
         
         
         notificationData.add("new-thread");
@@ -109,14 +108,12 @@ public class ForumService {
     }
 
     public void addNewReply(EmployeeDetails employeeDetails, String body, String threadID) {
-        //TODO:
-        //Validation? from Validator Class
         ForumReply newReply = new ForumReply(threadID, employeeDetails.getID(), body, LocalDateTime.now(),
                 employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
         
         Employee replier = employeeRepo.findById(employeeDetails.getID()).get();
         ForumThread answered = forumThreadRepo.findById(threadID).get();
-        List<Object> notificationData = new ArrayList<Object>();
+        List<Object> notificationData = new ArrayList<>();
         notificationData.add("new-reply");
 		notificationData.add(replier.getID());
 		notificationData.add(newReply);
@@ -137,8 +134,6 @@ public class ForumService {
     }
 
     public ForumThread editThread(String body, String title, ForumThread oldThread) {
-        //TODO:
-        //Validation? from Validator Class
         //We don't update the issuerID, time and isAnswered because they are presumed to be the same.
         oldThread.setBody(body);
         oldThread.setTitle(title);

@@ -1,6 +1,5 @@
 package com.company.awms.services;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,8 +40,6 @@ public class ScheduleService {
 	private ScheduleRepo scheduleRepo;
 	private EmployeeRepo employeeRepo;
 
-	private JSONObject departments;
-
 	@Autowired
 	public ScheduleService(ScheduleRepo scheduleRepo, EmployeeRepo employeeRepo) {
 
@@ -50,7 +47,7 @@ public class ScheduleService {
 		this.employeeRepo = employeeRepo;
 	}
 
-	public Day getDay(LocalDate date) throws IOException {
+	private Day getDay(LocalDate date) throws IOException {
 		Optional<Day> dayOptional = scheduleRepo.findByDate(date);
 		if (dayOptional.isEmpty()) {
 			throw new IOException("Invaid date");
@@ -60,7 +57,8 @@ public class ScheduleService {
 
 	public void addWorkDay(String employeeNationalID, String dateStr, boolean onCall, String startShiftStr, String endShiftStr) throws IOException {
 		LocalDate date = LocalDate.parse(dateStr);
-		LocalTime startShift = null, endShift = null;
+		LocalTime startShift = null;
+		LocalTime endShift = null;
 		try {
 			startShift = LocalTime.parse(startShiftStr);
 			endShift = LocalTime.parse(endShiftStr);
@@ -149,7 +147,8 @@ public class ScheduleService {
 
 		EmployeeDailyReference requester = null;
 		EmployeeDailyReference receiver = null;
-		LocalDate requesterDate, receiverDate;
+		LocalDate requesterDate;
+		LocalDate receiverDate;
 		try {
 			requesterDate = LocalDate.parse(requesterDateParam);
 			receiverDate = LocalDate.parse(receiverDateParam);
@@ -191,7 +190,7 @@ public class ScheduleService {
 		} else {
 			System.err.println("No such EDR in those days");
 		}
-		List<Object> notificationData = new ArrayList<Object>();
+		List<Object> notificationData = new ArrayList<>();
 		Employee requesterObj = employeeRepo.findByNationalID(requesterNationalID).get();
 		notificationData.add("plain-notification");
 		String message = receiver.getFirstName() + " " + receiver.getLastName() + " has accepted your request to swap his/her " + receiverDate + " shift with your " + requesterDate + " shift.";
@@ -201,9 +200,10 @@ public class ScheduleService {
 	}
 
 	public void swapRequest(String requesterID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException {
-		List<Object> notificationData = new ArrayList<Object>();
+		List<Object> notificationData = new ArrayList<>();
 
-		LocalDate requesterDate, receiverDate;
+		LocalDate requesterDate;
+		LocalDate receiverDate;
 		try {
 			requesterDate = LocalDate.parse(requesterDateParam);
 			receiverDate = LocalDate.parse(receiverDateParam);
@@ -238,7 +238,7 @@ public class ScheduleService {
 	public void addTask(String data) throws IOException {
 
 		String[] dataValues = data.split("\\n");
-		Map<String, String> newInfo = new HashMap<String, String>();
+		Map<String, String> newInfo = new HashMap<>();
 		for (String field : dataValues) {
 			field = field.substring(0, field.length() - 1);
 			newInfo.put(field.split("=")[0], field.split("=")[1]);
@@ -262,7 +262,7 @@ public class ScheduleService {
 					this.scheduleRepo.save(currentDay);
 				}
 				Employee employee = employeeRepo.findByNationalID(newInfo.get("receiverNationalID")).get();
-				List<Object> notificationData = new ArrayList<Object>();
+				List<Object> notificationData = new ArrayList<>();
 				notificationData.add("plain-notification");
 				String message = "You have a new task for " + newInfo.get("date");
 				employee.getNotifications().add(new Notification(message, notificationData));
@@ -288,7 +288,7 @@ public class ScheduleService {
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
 				for (Employee manager : managers) {
 					if (manager.getDepartment().equals(edr.getDepartment())) {
-						List<Object> notificationData = new ArrayList<Object>();
+						List<Object> notificationData = new ArrayList<>();
 						notificationData.add("plain-notification");
 						String message = edr.getFirstName() + " " + edr.getLastName() + "has marked assignment \"" + task.getTaskTitle() + "\" as completed.";
 						manager.getNotifications().add(new Notification(message, notificationData));
@@ -301,7 +301,7 @@ public class ScheduleService {
 
 	}
 
-	public void addMonthlyDays(LocalDate date) {
+	private void addMonthlyDays(LocalDate date) {
 		YearMonth yearMonthObject = YearMonth.of(date.getYear(), date.getMonthValue());
 		for (int i = 1; i <= yearMonthObject.lengthOfMonth(); i++) {
 			LocalDate correctDate = date.withDayOfMonth(i);
@@ -378,7 +378,7 @@ public class ScheduleService {
 			}
 		}
 		List<Employee> allEmployees = employeeRepo.findAll();
-		List<Object> notificationData = new ArrayList<Object>();
+		List<Object> notificationData = new ArrayList<>();
 		notificationData.add("schedule-update");
 		String message = "The schedule for " + YearMonth.from(LocalDate.now().plus(1, ChronoUnit.MONTHS)) + " has been updated.";
 		for (Employee issuer : allEmployees) {
@@ -714,7 +714,7 @@ public class ScheduleService {
 
 		JSONObject thisDepartment;
 		try {
-			departments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
+			JSONObject departments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
 			thisDepartment = (JSONObject) departments.get(department);
 		} catch (Exception e) {
 			System.out.println("Could not parse JSON file!");
@@ -725,7 +725,7 @@ public class ScheduleService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setDepartment(Object departmentObj) throws FileNotFoundException, IOException, ParseException {
+	public void setDepartment(Object departmentObj) throws IOException, ParseException {
 		JSONParser parser = new JSONParser();
 		JSONObject department = new JSONObject((Map) departmentObj);
 		JSONObject departments = (JSONObject) parser.parse(new FileReader("src/main/resources/departments.json"));
@@ -776,8 +776,7 @@ public class ScheduleService {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public void deleteDepartment(String departmentCode) throws FileNotFoundException, IOException, ParseException {
+	public void deleteDepartment(String departmentCode) throws IOException, ParseException {
 		String key = departmentCode.replace("\"", "");
 		try {
 			JSONObject allDepartments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
