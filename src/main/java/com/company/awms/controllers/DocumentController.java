@@ -54,6 +54,7 @@ public class DocumentController {
 
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
             model.addAttribute("documents", documents);
+            model.addAttribute("type", "public");
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "documents";
@@ -86,11 +87,11 @@ public class DocumentController {
         }
     }
 
-    @GetMapping(value = "/personal/download/{documentID}")
-    public ResponseEntity<Resource> downloadPersonalDocument(@PathVariable int documentID,
+    @GetMapping(value = "/personal/download/{ownerID}/{documentID}")
+    public ResponseEntity<Resource> downloadPersonalDocument(@PathVariable int documentID, @PathVariable String ownerID,
             @AuthenticationPrincipal EmployeeDetails employeeDetails) {
         try {
-            Doc document = documentService.downloadPersonalDocument(documentID, employeeDetails.getID());
+            Doc document = documentService.downloadPersonalDocument(documentID, ownerID, employeeDetails.getID());
 
             ByteArrayResource byteArrayResource = new ByteArrayResource(document.getData().getData());
             return ResponseEntity.ok()
@@ -99,6 +100,8 @@ public class DocumentController {
                     .contentType(MediaType.APPLICATION_OCTET_STREAM).body(byteArrayResource);
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalAccessException e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -118,6 +121,7 @@ public class DocumentController {
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
 
             model.addAttribute("documents", documents);
+            model.addAttribute("type", "public");
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "documents";
@@ -164,6 +168,7 @@ public class DocumentController {
 
             model.addAttribute("documents", documents);
             model.addAttribute("type", "personal");
+            model.addAttribute("ownerID", employeeDetails.getID());
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "documents";

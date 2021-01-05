@@ -80,7 +80,7 @@ public class DocumentService {
 		List<DocInfoDTO> privateDocumentsInfo = new ArrayList<>();
 		Employee employee = getEmployee(employeeID);
 
-		ArrayList<Doc> personalDocuments = (ArrayList<Doc>) employee.getPersonalDocuments();
+		List<Doc> personalDocuments = employee.getPersonalDocuments();
 
 		for (int i = 0; i < personalDocuments.size(); i++) {
 			DocInfoDTO documentInfo = new DocInfoDTO(Integer.toString(i), personalDocuments.get(i).getName(), personalDocuments.get(i).getSize(), personalDocuments.get(i).getType(), personalDocuments.get(i).getUploaderID(),
@@ -111,7 +111,7 @@ public class DocumentService {
 		this.documentRepo.save(document);
 	}
 
-	// only the admin can upload the private Docs
+	// only the admin can upload personal docs
 	public void uploadPersonalDocument(MultipartFile file, String ownerID) throws IOException {
 		Employee owner = getEmployee(ownerID);
 
@@ -141,10 +141,19 @@ public class DocumentService {
 	}
 
 	// Both Employee and Admin can download a personal document
-	public Doc downloadPersonalDocument(int documentID, String downloaderID) throws IOException {
-		Employee downloader = getEmployee(downloaderID);
+	public Doc downloadPersonalDocument(int documentID, String ownerID, String downloaderID) throws IOException, IllegalAccessException {
+		Employee owner = getEmployee(ownerID);
 
-		List<Doc> personalDocuments = downloader.getPersonalDocuments();
+		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
+
+		if(adminOptional.isEmpty()){
+			throw new IOException("Admin not found!");
+		}
+		if (!downloaderID.equals(adminOptional.get().getID()) && !downloaderID.equals(ownerID)) {
+			throw new IllegalAccessException("not authorized");
+		}
+
+		List<Doc> personalDocuments = owner.getPersonalDocuments();
 
 		if (personalDocuments.size() <= documentID) {
 			throw new IOException("Document with id " + documentID + " doesn't exists");

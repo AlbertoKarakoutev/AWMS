@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -118,6 +117,7 @@ public class AdminController {
 			model.addAttribute("type", "admin-edit");
 			Employee employee = employeeService.getEmployee(employeeID);
 			model.addAttribute("name", employee.getFirstName() + " " + employee.getLastName());
+			model.addAttribute("ownerID", employee.getID());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "documents";
@@ -199,7 +199,7 @@ public class AdminController {
 	}
 
 	@GetMapping("/employee/deleteLeave")
-	public String deleteLeave(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String employeeID, @RequestParam String leave) {
+	public String deleteLeave(@RequestParam String employeeID, @RequestParam String leave) {
 		try {
 			employeeService.deleteLeave(employeeID, leave);
 			return "redirect:/admin/employee/leaves/" + employeeID;
@@ -243,14 +243,18 @@ public class AdminController {
 	}
 
 	// Document methods
-	@PostMapping(value = "/document/personal/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/personal/document/upload/{employeeID}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public String uploadPersonalDocument(@RequestParam MultipartFile file, @PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.documentService.uploadPersonalDocument(file, employeeID);
 
-			List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeDetails.getID());
+			List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(employeeID);
 
 			model.addAttribute("documents", documents);
+			model.addAttribute("type", "admin-edit");
+			Employee employee = employeeService.getEmployee(employeeID);
+			model.addAttribute("name", employee.getFirstName() + " " + employee.getLastName());
+			model.addAttribute("ownerID", employee.getID());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "documents";
@@ -262,14 +266,18 @@ public class AdminController {
 		}
 	}
 
-	@DeleteMapping(value = "/document/personal/delete/{documentID}")
+	@PostMapping(value = "/document/personal/delete/{documentID}")
 	public String deletePersonalDocument(@PathVariable int documentID, @RequestParam String ownerID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
 			this.documentService.deletePersonalDocument(documentID, ownerID);
 
-			List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
+			List<DocInfoDTO> documents = this.documentService.getPersonalDocumentsInfo(ownerID);
 
+			model.addAttribute("type", "admin-edit");
 			model.addAttribute("documents", documents);
+			Employee employee = employeeService.getEmployee(ownerID);
+			model.addAttribute("name", employee.getFirstName() + " " + employee.getLastName());
+			model.addAttribute("ownerID", employee.getID());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "documents";
