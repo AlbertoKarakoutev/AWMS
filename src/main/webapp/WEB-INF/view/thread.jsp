@@ -52,18 +52,18 @@
                                 </div>
                             </c:if>
                         </div>
-                        <div class="mt-3 text-right">
+                        <div class="d-flex mt-3 text-right align-items-center">
                             <c:if test="${thread.getIssuerID().equals(employeeID)}">
-                                <a href="/forum/thread/${thread.getID()}/edit" class="btn btn-dark btn-md">
+                                <a href="/forum/thread/${thread.getID()}/edit" class="btn btn-dark btn-md ml-auto">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
                                 <c:if test="${thread.getAnswered() == false}">
-                                    <form action="${thread.getID()}/answered" method="post">
-                                        <input type="submit" class="btn btn-dark btn-md" value="Mark as answered" />
+                                    <form action="${thread.getID()}/answered" method="post" class="m-0">
+                                        <input type="submit" class="btn btn-dark btn-md mx-2" value="Mark as answered" />
                                     </form>
                                 </c:if>
                             </c:if>
-                            <a class="btn btn-dark btn-md" href="/forum/thread/${thread.getID()}/reply/new" title="reply">
+                            <a class="btn btn-dark btn-md mx-2" href="/forum/thread/${thread.getID()}/reply/new" title="reply">
                                 <i class="fas fa-reply"></i> Add Reply
                             </a>
                         </div>
