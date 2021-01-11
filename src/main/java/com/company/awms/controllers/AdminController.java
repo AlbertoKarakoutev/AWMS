@@ -327,7 +327,7 @@ public class AdminController {
 	public String setActives(@RequestBody String updatedActives, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws JsonMappingException, JsonProcessingException {
 		String updatedActivitiesFormatted = updatedActives.substring(19, updatedActives.length() - 2).replaceAll("\\\\", "");
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Boolean> actives = (Map<String, Boolean>) mapper.readValue(updatedActivitiesFormatted, HashMap.class);
+		Map<String, Boolean> actives = mapper.readValue(updatedActivitiesFormatted, HashMap.class);
 
 		for (String key : actives.keySet()) {
 			try {
@@ -335,14 +335,14 @@ public class AdminController {
 				Method active = controller.getMethod("setActive", boolean.class);
 				active.invoke(null, actives.get(key));
 			} catch (Exception e) {
-				continue;
+				return "internalServerError";
 			}
 		}
 		return "redirect:/";
 	}
 
 	// Department methods
-	public Map<String, String> getDepartmentDTOs() {
+	private Map<String, String> getDepartmentDTOs() {
 		Map<String, String> departmentDTOs = new HashMap<>();
 		for (int i = 97; i < 123; i++) {
 			String departmentCode = Character.toString((char) i);
@@ -371,7 +371,7 @@ public class AdminController {
 	public ResponseEntity<JSONObject> getDepartment(@RequestParam String departmentCode, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
 		try {
 			JSONObject department = scheduleService.getDepartment(departmentCode);
-			return new ResponseEntity<JSONObject>(department, HttpStatus.OK);
+			return new ResponseEntity<>(department, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}

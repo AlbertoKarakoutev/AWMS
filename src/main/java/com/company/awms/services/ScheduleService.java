@@ -9,13 +9,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.time.temporal.TemporalAmount;
+import java.util.*;
 import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
@@ -243,7 +238,6 @@ public class ScheduleService {
 			field = field.substring(0, field.length() - 1);
 			newInfo.put(field.split("=")[0], field.split("=")[1]);
 		}
-
 		LocalDate taskDate = LocalDate.parse(newInfo.get("date"));
 		Day currentDay = getDay(taskDate);
 
@@ -395,7 +389,7 @@ public class ScheduleService {
 			if (thisDay.getEmployees().isEmpty()) {
 				continue;
 			}
-			if (viewer.getRole().equals("ADMIN")) {
+			if (viewer.getRole().equals("ADMIN") || viewer.getRole().equals("MANAGER")) {
 				sameLevelEmployees[i] = thisDay.getEmployees();
 				continue;
 			} else {

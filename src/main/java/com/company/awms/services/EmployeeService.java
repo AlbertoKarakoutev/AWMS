@@ -56,7 +56,7 @@ public class EmployeeService {
 
 		Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
 		Matcher matcher;
-		employeeLoop: for (Employee employee : employees) {
+		for (Employee employee : employees) {
 			switch (type) {
 			case "ID":
 				matcher = pattern.matcher(employee.getID());
@@ -119,7 +119,7 @@ public class EmployeeService {
 				}
 				break;
 			default:
-				continue employeeLoop;
+				continue;
 			}
 		}
 		return foundEmployees;

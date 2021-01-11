@@ -1,34 +1,32 @@
-package com.company.awms.unit;
+package com.company.awms.services;
 
 import com.company.awms.data.documents.DocumentRepo;
 import com.company.awms.data.employees.Employee;
 import com.company.awms.data.employees.EmployeeRepo;
-import com.company.awms.services.DocumentService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@RunWith(SpringRunner.class)
 public class DocumentServiceTest {
     private DocumentService documentService;
     private Employee employee;
 
-    @Mock
+    @MockBean
     private EmployeeRepo employeeRepo;
-    @Mock
+    @MockBean
     private DocumentRepo documentRepo;
 
     @Rule

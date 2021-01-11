@@ -132,7 +132,7 @@
 															    </tbody>
 		                      		                        </table>
 															</div>
-		                          	  	    	         	<%if(tasks[i-1] != null){%>
+		                          	  	    	         	<%if(tasks[i-offset] != null){%>
 		                    	    	 		        	   	<table class="table">
 			                    	    	 		        	   	<thead>
 	                                                                    <tr>
