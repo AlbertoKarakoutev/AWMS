@@ -1,30 +1,31 @@
 package com.company.awms.data.employees;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class Notification {
 
 	private String message;
 	private LocalDateTime dateTime;
-	private String url;
+	private List<Object> data;
 	private boolean read = false;
 
 	public Notification() {
 		this.dateTime = LocalDateTime.now();
 	}
 
-	public Notification(String message, String url) {
+	public Notification(String message, List<Object> data) {
 		this.dateTime = LocalDateTime.now();
 		this.message = message;
-		this.url = url;
+		this.data = data;
 	}
 
 	public void setMessage(String message) {
 		this.message = message;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setUrl(List<Object> data) {
+		this.data = data;
 	}
 
 	public void setDateTime(LocalDateTime dateTime) {
@@ -39,8 +40,8 @@ public class Notification {
 		return this.message;
 	}
 
-	public String getUrl() {
-		return this.url;
+	public List<Object> getData() {
+		return this.data;
 	}
 
 	public LocalDateTime getDateTime() {

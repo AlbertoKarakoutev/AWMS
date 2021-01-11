@@ -1,6 +1,6 @@
 /*Vendors*/
-@import "../webjars/bootstrap/4.5.3/css/bootstrap.css";
-@import "../webjars/font-awesome/5.15.1/css/all.css";
+@import "/webjars/bootstrap/4.5.3/css/bootstrap.css";
+@import "/webjars/font-awesome/5.15.1/css/all.css";
 
 /*Abstracts*/
 @import "abstracts/variables.css";
@@ -8,6 +8,9 @@
 /*Base*/
 @import "base/typography.css";
 @import "base/reset.css";
+
+/*Themes*/
+@import "themes/animations.css";
 
 /*Components*/
 @import "components/avatar.css";
@@ -19,3 +22,5 @@
 @import "layout/nav.css";
 @import "layout/header.css";
 @import "layout/footer.css";
+@import "layout/schedule.css";
+@import "layout/departments.css";

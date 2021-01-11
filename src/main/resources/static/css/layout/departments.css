@@ -1,0 +1,8 @@
+#update, #create, #addLevel, #deleteBtn{
+	display:none;
+}
+
+#department-content{
+	display:none;
+	position:relative;
+}

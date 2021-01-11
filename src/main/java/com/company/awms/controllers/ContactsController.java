@@ -16,6 +16,8 @@ import java.util.List;
 public class ContactsController {
     private EmployeeService employeeService;
 
+    private static final boolean active = true;
+    
     @Autowired
     public ContactsController(EmployeeService employeeService) {
         this.employeeService = employeeService;
@@ -23,13 +25,18 @@ public class ContactsController {
 
     @GetMapping("contacts")
     public String getContacts(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+        if (!active) {
+            return "notFound";
+        }
+
         try {
             Employee owner = this.employeeService.getOwner();
             List<Employee> managers = this.employeeService.getManagers();
-
+            injectLoggedInEmployeeInfo(model, employeeDetails);
             model.addAttribute("owner", owner);
             model.addAttribute("managers", managers);
-
+            injectLoggedInEmployeeInfo(model, employeeDetails);
+            
             return "contacts";
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,4 +46,23 @@ public class ContactsController {
             return "internalServerError";
         }
     }
+
+    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeID", employeeDetails.getID());
+		Employee user = employeeService.getEmployee(employeeDetails.getID());
+		int unread = 0;
+		for(int i = 0; i < user.getNotifications().size(); i++) {
+			if(!user.getNotifications().get(i).getRead()) {
+				unread++;
+			}
+		}
+		model.addAttribute("notifications", user.getNotifications());
+		model.addAttribute("unread", unread);
+	}
+    
+    public static boolean getActive() {
+		return active;
+	}
 }

@@ -1,0 +1,138 @@
+
+@media (max-width: 767px){
+	.seven-cols {
+		width: 665px;
+	}
+	.seven-cols .col-md-1,
+	.seven-cols .col-sm-1,
+	.seven-cols .col-lg-1  {
+	  width: 95px;
+	}
+  }
+
+@media (min-width: 768px){
+	.seven-cols .col-md-1,
+	.seven-cols .col-sm-1,
+	.seven-cols .col-lg-1  {
+		width: 14.285714285714285714285714285714%;
+		*width: 14.285714285714285714285714285714%;
+		max-width: 14.285714285714285714285714285714% !important;
+		flex:none !important;
+	}
+  }
+  
+  @media (min-width: 992px) {
+	.seven-cols .col-md-1,
+	.seven-cols .col-sm-1,
+	.seven-cols .col-lg-1 {
+	  width: 14.285714285714285714285714285714%;
+	  *width: 14.285714285714285714285714285714%;
+	  max-width: 14.285714285714285714285714285714% !important;
+      flex:none !important;
+	}
+  }
+   
+  @media (min-width: 1200px) {
+	.seven-cols .col-md-1,
+	.seven-cols .col-sm-1,
+	.seven-cols .col-lg-1 {
+	  width: 14.285714285714285714285714285714%;
+	  *width: 14.285714285714285714285714285714%;
+	  max-width: 14.285714285714285714285714285714% !important;
+  flex:none !important;
+	}
+  }
+
+.empty-day {
+	border: 1px solid black;
+	width: 100%;
+	height: 95px;
+	background-color: var(--primary-color);
+}
+
+.day-box {
+	border: 0;
+	outline: none;
+	width: 100%;
+	height: 95px;
+	font-size: xx-large;
+	text-transform: capitalize;
+	transition: 0s border;
+	overflow: hidden;
+	position: relative;
+}
+.day-box:focus{
+	outline:none;
+	border:0;
+}
+
+.day-box:hover{
+	border: 2px solid rgb(200, 200, 200);
+	transition-delay:1s;
+}
+.day-box::before,
+.day-box::after {
+	content: '';
+	box-sizing: border-box;
+	position: absolute;
+	border: 2px solid transparent;
+	width: 0;
+	height: 0;
+}
+
+.day-box:hover::before {
+	top: 0;
+	left: 0;
+	border-top-color: rgb(200, 200, 200);
+	border-right-color: rgb(200, 200, 200);
+	animation: border 1s 1;
+}
+
+.day-box:hover::after {
+	bottom: 0;
+	right: 0;
+	border-bottom-color: rgb(200, 200, 200);
+	border-left-color: rgb(200, 200, 200);
+	animation: border 1s 1;
+}
+
+.content::-webkit-scrollbar {
+    width: 10px;
+    }
+    
+    .content::-webkit-scrollbar-track {
+        padding: 2px 0;
+        background-color: #404040;
+    }
+    
+    .content::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        box-shadow: inset 0 0 6px var(--secondary-color);
+        background-color: var(--quaternary-color);
+    }
+    
+    .content::-webkit-scrollbar-thumb:hover {
+    background:rgb(54, 56, 58); 
+}
+
+@keyframes border {
+	0% {
+		width: 0;
+		height: 0;
+	}
+
+	25% {
+		width: 100%;
+		height: 0;
+	}
+
+	50% {
+		width: 100%;
+		height: 100%;
+	}
+
+	100% {
+		width: 100%;
+		height: 100%;
+	}
+}

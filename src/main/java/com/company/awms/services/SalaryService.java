@@ -1,10 +1,8 @@
-
 package com.company.awms.services;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.List;
 
 import com.company.awms.data.schedule.ScheduleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,41 +19,39 @@ public class SalaryService {
 
 	@Autowired
 	public SalaryService(ScheduleRepo scheduleRepo) {
+		this.scheduleRepo = scheduleRepo;
 	}
 
 	// Rewards for user's completed tasks
-	private double taskRewardBonus(String nationalID) {
-		double taskRewards = 0;	
+	private double getTaskRewardBonus(String nationalID) {
+		double taskRewards = 0.0d;
+
 		LocalDate date = LocalDate.now();
-		try {
-			for (int i = 1; i < date.getDayOfMonth(); i++) {
-				LocalDate dateTemplate = date.withDayOfMonth(i);
-				Optional<Day> thisDay = this.scheduleRepo.findByDate(dateTemplate);
-				if(thisDay.isEmpty()){
-					throw new IOException("Day is missing in the database!");
-				}
-				for (EmployeeDailyReference edr : thisDay.get().getEmployees()) {
-					if (edr.getRefNationalID().equals(nationalID)) {
-						for(Task currentTask : edr.getTasks()) {	
-							if (currentTask.getCompleted() && !currentTask.getPaidFor() && currentTask.getTaskReward()!=0.0) {
-								currentTask.setPaidFor(true);
-								taskRewards+=currentTask.getTaskReward();
-								this.scheduleRepo.save(thisDay.get());
-							}
+		List<Day> elapsedDays = getElapsedDays(date);
+
+		for (int i = 1; i < elapsedDays.size(); i++) {
+			Day thisDay = elapsedDays.get(i);
+			for (EmployeeDailyReference edr : thisDay.getEmployees()) {
+				if (edr.getNationalID().equals(nationalID)) {
+					for(Task currentTask : edr.getTasks()) {
+						if (currentTask.getCompleted() && !currentTask.getPaidFor() && currentTask.getTaskReward()!=0.0d) {
+							currentTask.setPaidFor(true);
+							taskRewards += currentTask.getTaskReward();
+							this.scheduleRepo.save(thisDay);
 						}
 					}
 				}
 			}
-		}catch(Exception e) {
-			return 0;
 		}
+
 		return taskRewards;
 	}
 	
 	public double estimateSalary(String nationalID, Double payPerHour) {
 		double salary = 0;
-		salary+=calculateWorkHours(nationalID)*payPerHour;
-		salary+=taskRewardBonus(nationalID);	
+		salary+=calculateWorkHours(nationalID) * payPerHour;
+		salary+=getTaskRewardBonus(nationalID);
+
 		return salary;
 	}
 
@@ -64,26 +60,24 @@ public class SalaryService {
 		double hours = 0;
 
 		LocalDate date = LocalDate.now();
-		try {
-			
-			for (int i = 1; i < date.getDayOfMonth(); i++) {
-				LocalDate dateTemplate = date.withDayOfMonth(i);
-				Optional<Day> thisDay = this.scheduleRepo.findByDate(dateTemplate);
-				if(thisDay.isEmpty()){
-					throw new IOException("Day is missing in the database!");
-				}
-				for (EmployeeDailyReference edr : thisDay.get().getEmployees()) {
-					if (edr.getRefNationalID().equals(nationalID)) {
-						Duration shiftLength =  Duration.between(edr.getWorkTime()[1], edr.getWorkTime()[0]);
-						hours += (double)shiftLength.toHours();
-					}
+		List<Day> elapsedDays = getElapsedDays(date);
+
+		for (int i = 1; i < elapsedDays.size(); i++) {
+			Day thisDay = elapsedDays.get(i);
+			for (EmployeeDailyReference edr : thisDay.getEmployees()) {
+				if (edr.getNationalID().equals(nationalID)) {
+					Duration shiftLength =  Duration.between(edr.getWorkTime()[0], edr.getWorkTime()[1]);
+					hours += (double)shiftLength.toHours();
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return 0;
 		}
+
 		return hours;
 	}
 
+	private List<Day> getElapsedDays(LocalDate date){
+		LocalDate firstDay = date.withDayOfMonth(1);
+		LocalDate lastDay = date.withDayOfMonth(date.getDayOfMonth());
+		return this.scheduleRepo.findAllByDateBetween(firstDay, lastDay);
+	}
 }

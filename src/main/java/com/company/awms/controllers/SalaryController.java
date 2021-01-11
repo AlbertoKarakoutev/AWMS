@@ -1,61 +1,81 @@
 package com.company.awms.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
+import com.company.awms.data.employees.Employee;
+import com.company.awms.security.EmployeeDetails;
+import com.company.awms.services.EmployeeService;
 import com.company.awms.services.SalaryService;
 
-@RestController
+@Controller
 @RequestMapping("/salary")
 public class SalaryController {
 
+	private static final double PAY_PER_HOUR = 6.5d;
 	private static boolean active = true;
 
 	private SalaryService salaryService;
+	private EmployeeService employeeService;
 
 	@Autowired
-	public SalaryController(SalaryService salaryService) {
+	public SalaryController(SalaryService salaryService, EmployeeService employeeService) {
 		this.salaryService = salaryService;
+		this.employeeService = employeeService;
 	}
 
-	@GetMapping("/workHours/{nationalID}")
-	public ResponseEntity<String> getByName(@PathVariable String nationalID) {
-		if (active) {
-			try {
-				double workHours = salaryService.calculateWorkHours(nationalID);
-				return new ResponseEntity<>(String.format("%3.2f hours of work this month", workHours), HttpStatus.OK);
-			} catch (Exception e) {
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	@GetMapping
+	public String getSalary(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		if (!active) {
+			return "notFound";
+		}
+
+		try {
+			Employee employee = employeeService.getEmployee(employeeDetails.getID());
+
+			double workHours = this.salaryService.calculateWorkHours(employee.getNationalID());
+			double salary = salaryService.estimateSalary(employee.getNationalID(), PAY_PER_HOUR);
+			double taskRewards = salary - workHours * PAY_PER_HOUR;
+
+			this.employeeService.updateSalary(salary, employee);
+
+			model.addAttribute("workHours", workHours);
+			model.addAttribute("salary", salary);
+			model.addAttribute("taskRewards", taskRewards);
+			model.addAttribute("nationalID", employee.getNationalID());
+			model.addAttribute("payPerHour", PAY_PER_HOUR);
+			injectLoggedInEmployeeInfo(model, employeeDetails, employee);
+
+			return "salary";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
 		}
 	}
-
-	@GetMapping("/{nationalID}")
-	public ResponseEntity<String> getSalary(@PathVariable String nationalID) {
-		if (active) {
-			try {
-				double salary = salaryService.estimateSalary(nationalID, 1.0);
-				return new ResponseEntity<>(String.format("Approximately %3.2f leva for this month", salary), HttpStatus.OK);
-			} catch (Exception e) {
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	
+	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails, Employee employee) {
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeID", employeeDetails.getID());
+		int unread = 0;
+		for(int i = 0; i < employee.getNotifications().size(); i++) {
+			if(!employee.getNotifications().get(i).getRead()) {
+				unread++;
 			}
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+		model.addAttribute("notifications", employee.getNotifications());
+		model.addAttribute("unread", unread);
 	}
 
 	public static boolean getActive() {
 		return active;
 	}
-	
-	public void setActive(boolean newActive) {
+
+	public static void setActive(boolean newActive) {
 		active = newActive;
 	}
 }

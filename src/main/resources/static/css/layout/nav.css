@@ -1,42 +1,210 @@
+/*User css*/
+
+.user-container {
+    min-height: 75px;
+    border-bottom: 1px solid var(--quaternary-color);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.user-container > * {
+    margin-right: 10px;
+}
+
+.user-info-container {
+    width: max-content;
+    font-size: 14px;
+    color: var(--secondary-color);
+}
+
+/*Navigation css*/
+
+.navbar {
+    height: 100%;
+    padding: 0;
+    background-color: var(--primary-color);
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--primary-transition) ease-in-out;
+}
+
+@media(max-width: 991px) {
+    .navbar {
+        position: absolute;
+        min-width: 230px;
+        left: -230px;
+        z-index: 2;
+    }
+
+    .navbar.show {
+        left: 0;
+        transition: all var(--primary-transition) ease-in-out;
+    }
+
+    .navbar-backdrop {
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.3);
+        animation: var(--primary-transition) fadeIn forwards;
+        z-index: 1;
+    }
+}
+
 .vertical-menu {
-    width: 280px;
-    height: 81%;
-    list-style-type: none;
+    flex-grow: 1;
+    height: 100%;
+    width: 100%;
     margin: 0;
-    padding: 0px 45px;
+    padding: 0;
+    list-style-type: none;
+    overflow-y: auto;
 }
 
-.vertical-menu a {
-    color: white; 
-    display: block; 
-    padding: 12px; 
+.vertical-menu .vertical-item a {
+    color: var(--secondary-color);   
     text-decoration: none; 
+    display: block;
+    padding: 12px;
     text-align: left;
+    border: none;
+    border-radius: 0;
+    
 }
 
-.vertical-menu a:hover {
-    background-color: #ccc; 
-}
-
-.vertical-menu a:active {
-    background-color: #ccc; 
+.vertical-menu .vertical-item:hover > a,
+.vertical-menu .vertical-item > a:active,
+.vertical-menu .vertical-item > a:focus,
+.dropdown-toggle:hover, .dropdown-toggle:active,
+.dropdown-toggle:focus {
+    transition: all var(--primary-transition) ease-in-out;
+    background-color: rgba(var(--teritary-color-rgb), 0.05); 
     color: white;
+    box-shadow: none;
+    border: none;
+    outline: none;
+}
+    .vertical-menu::-webkit-scrollbar {
+    width: 10px;
+    }
+    
+    .vertical-menu::-webkit-scrollbar-track {
+        padding: 2px 0;
+        background-color: #404040;
+    }
+    
+    .vertical-menu::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        box-shadow: inset 0 0 6px var(--secondary-color);
+        background-color: var(--quaternary-color);
+    }
+    
+    .vertical-menu::-webkit-scrollbar-thumb:hover {
+    background:rgb(54, 56, 58); 
 }
 
 .sign-out-btn {
-    color: white;
-    text-decoration: underline;
-    text-decoration-color: #A8F8E7;
+    color: var(--secondary-color);
+    text-decoration: none;
+    display: block;
+    position: relative;
+    border-radius: 0;
+    transition: all var(--primary-transition) ease-in-out;
+    background-color: #202020;
+    padding: 14px 0;
+    width: 100%;
+}
+
+.sign-out-btn::before {
+    position: absolute;
+    content: '';
+    bottom: 8px;
+    left: 50%;
+    top: 70%;
+    transform: translate(-50%, -50%);
+    height: 0.5px;
+    width: 80px;
+    background-color: #A8F8E7;
 }
 
 .sign-out-btn:hover {
-    background-color: gray;
+    color: white;
+    background-color: rgba(var(--teritary-color-rgb), 0.05);
 }
 
- 
-/* Portrait tablets and small desktops */ 
-@media (max-width: 991px) { 
-    .vertical-menu {
-        display: none;
-    }
-} 
+.navbar .dropdown-menu  {
+    position: unset !important;
+    transform: unset !important;
+    float: unset;
+    background-color: rgba(var(--teritary-color-rgb), 0.05);
+    border-radius: 0;
+    margin: 0;
+    width: 100%;
+    border: none;
+    padding: 0;
+}
+
+.navbar .dropdown-item {
+    transition: all var(--primary-transition) ease-in-out;
+}
+
+.navbar .dropdown-item:hover {
+    background-color: rgba(var(--teritary-color-rgb), 0.05);
+}
+
+.navbar .dropdown-toggle {
+    position: relative;
+}
+
+.navbar .dropdown-toggle::after {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#navigation {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.navbar .navbar-toggler {
+    position: absolute;
+    height: 45px;
+    width: 45px;
+    padding: 0;
+    margin: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -45px;
+    background-color: var(--primary-color);
+    border-radius: 0;
+}
+
+.navbar .navbar-toggler:active,
+.navbar .navbar-toggler:focus {
+    border: none;
+    box-shadow: none;
+    outline: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar .navbar-toggler span{
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    font-size: 24px;
+}
+
+.navbar .nav-footer {
+    width: 100%;
+}

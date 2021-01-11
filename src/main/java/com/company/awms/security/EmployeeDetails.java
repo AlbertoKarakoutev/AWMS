@@ -40,7 +40,11 @@ public class EmployeeDetails implements UserDetails {
     }
 
     public String getID() {
-        return ID;
+        return this.ID;
+    }
+    
+    public String getRole() {
+    	return this.role;
     }
 
     @Override

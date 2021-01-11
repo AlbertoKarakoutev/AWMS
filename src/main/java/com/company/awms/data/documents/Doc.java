@@ -20,14 +20,14 @@ public class Doc {
 	private String type;
 	private String uploaderID;
 	private LocalDateTime uploadDateTime;
-	private Set<String> downloaderIDs = new HashSet<>();
-	private double size;
+	private List<String> downloaderIDs = new ArrayList<>();
+	private long size;
 	
 	public Doc() {
 	}
 
 	public Doc(Binary data, int level, String department, String name, String type, String uploaderID,
-			   LocalDateTime uploadDateTime, double size) {
+			   LocalDateTime uploadDateTime, long size) {
 		this.data = data;
 		this.level = level;
 		this.department = department;
@@ -54,7 +54,7 @@ public class Doc {
 		return level;
 	}
 
-	public double getSize() {
+	public long getSize() {
 		return size;
 	}
 
@@ -74,11 +74,7 @@ public class Doc {
 		return uploaderID;
 	}
 
-	public String getUploader() {
-		return this.uploaderID;
-	}
-
-	public Set<String> getDownloaderIDs() {
+	public List<String> getDownloaderIDs() {
 		return this.downloaderIDs;
 	}
 
@@ -114,11 +110,11 @@ public class Doc {
 		this.uploadDateTime = uploadDateTime;
 	}
 
-	public void setDownloaderIDs(Set<String> downloaderIDs) {
+	public void setDownloaderIDs(List<String> downloaderIDs) {
 		this.downloaderIDs = downloaderIDs;
 	}
 
-	public void setSize(double size) {
+	public void setSize(long size) {
 		this.size = size;
 	}
 }

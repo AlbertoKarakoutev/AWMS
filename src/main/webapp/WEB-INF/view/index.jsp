@@ -7,28 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <link href="/css/main.css" rel="stylesheet">
-    <script
-        src="https://code.jquery.com/jquery-3.5.1.min.js"
-        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-        crossorigin="anonymous">
-    </script>  
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <link href="css/main.css" rel="stylesheet">
-    <script src="assets/js/main.js"></script>
+
+    <!--Add vendor's js files-->
+    <script src="/webjars/jquery/3.5.1/jquery.js"></script>
+    <script src="/webjars/bootstrap/4.5.3/js/bootstrap.bundle.js"></script>
+    <script src="/webjars/font-awesome/5.15.1/js/fontawesome.js"></script> 
 	<title>Dashboard</title>
 </head>
 <body>
     <div class="panel">
-        <nav class="navigation">
-            <%@include file="boxes/nav.jsp" %>
-        </nav>       
+        <%@include file="boxes/nav.jsp" %>    
         <section class="page">
             <header class="header">
                 <%@include file="boxes/header.jsp" %>
             </header>
-            <section class="p-4 content">
+            <section class="content">
+                <div class="p-4">
                 <header class="py-3">
                     <h1 class="ty-page-title">Welcome, ${employee.getFirstName()} ${employee.getLastName()}!</h1>
                 </header>
@@ -36,7 +30,7 @@
                     <div class="avatar"></div>
                 </div>
                 <div class="py-3">
-                <div class="row">
+                  <div class="row">
                     <div class="col-12 col-lg-6">
                         <div class="row">
                         <div class="col-12 col-md-6">
@@ -62,13 +56,18 @@
                     <div class="col-12 col-lg-6">
                         <div class="row"></div>
                     </div>
+                  </div>
+                </div>
+                <div class="d-flex flex-row">
+                    <a class="btn btn-dark" href="/employee/password/new" title="Change Password">Change Password</a>
                 </div>
                 </div>
+                <footer>
+                    <%@include file="boxes/footer.jsp" %>
+                </footer>
             </section>
-            <footer>
-                <%@include file="boxes/footer.jsp" %>
-            </footer>
         </section>
     </div>
+<script type="module" src="/js/main.js"></script>
 </body>
 </html>

@@ -29,7 +29,7 @@ public class Employee {
 	private String phoneNumber;
 	private double salary;
 	private int[] workWeek = new int[2];
-	//Should be in the form ("Start":Date, "End":Date, "Paid":boolean)
+	//Should be in the form ("start":Date, "end":Date, "paid":boolean)
 	private List<Map<String, Object>> leaves = new ArrayList<>();
 	private List<Notification> notifications = new ArrayList<>();
 	private List<Doc> personalDocuments = new ArrayList<>();

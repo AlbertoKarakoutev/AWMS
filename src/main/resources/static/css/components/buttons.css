@@ -1,4 +1,11 @@
+.ap-base-button {
+    border: none;
+    position: relative;
+}
+
 .ap-button {
+    @extend .ap-base-button;
+
     background-color: var(--tertiary-color);
     color: var(--primary-color);
     transition: background-color var(--primary-transition) ease-in-out;
@@ -6,4 +13,11 @@
 
 .ap-button:hover {
     background-color: rgba(var(--tertiary-color), .6);
+}
+
+.ap-badge-position {
+    position: absolute;
+    top: -5px;
+    right: 0;
+    z-index: var(--primary-zIndex);
 }
