@@ -36,7 +36,7 @@ public class DocumentServiceTest {
     @Before
     public void setup(){
         this.employee = new Employee("Test", "Tester", "1234567890", "abcd", "a@a.bg", "4324ffw432", "a3", "a", 3,
-                "0889122334", 1234d, new int[]{ 2, 3 });
+                "0889122334", 1234d, new int[]{ 2, 3 }, 3.4);
         this.documentService = new DocumentService(this.documentRepo, this.employeeRepo);
     }
 

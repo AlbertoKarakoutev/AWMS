@@ -272,6 +272,7 @@ public class EmployeeService {
 		employee.setPhoneNumber(newInfo.get("phoneNumber"));
 		employee.setDepartment(newInfo.get("department").split(":")[0]);
 		employee.setRole(newInfo.get("role"));
+		employee.setPayPerHour(Double.parseDouble(newInfo.get("payPerHour")));
 		try {
 			employee.setLevel(Integer.parseInt(newInfo.get("level")));
 		}catch(Exception e) {
@@ -283,9 +284,9 @@ public class EmployeeService {
 	private void notify(String employeeID, String message, boolean searchByNationalID) throws IOException {
 		Optional<Employee> employeeOptional;
 		if(searchByNationalID) {
-			employeeOptional = employeeRepo.findById(employeeID);
-		}else {
 			employeeOptional = employeeRepo.findByNationalID(employeeID);
+		}else {
+			employeeOptional = employeeRepo.findById(employeeID);
 		}
 		if(employeeOptional.isEmpty()) {
 			throw new IOException("Employee not found!");	

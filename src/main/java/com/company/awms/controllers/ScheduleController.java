@@ -103,6 +103,7 @@ public class ScheduleController {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "redirect:/schedule/?month="+YearMonth.now();
 		}catch(Exception e) {
+			e.printStackTrace();
 			return "internalServerError";
 		}
 	}
