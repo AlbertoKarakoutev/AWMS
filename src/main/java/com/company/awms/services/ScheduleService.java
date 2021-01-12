@@ -9,10 +9,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -42,18 +48,19 @@ public class ScheduleService {
 		this.employeeRepo = employeeRepo;
 	}
 
-	private Day getDay(LocalDate date) throws IOException {
+	public Day getDay(LocalDate date) throws IOException {
 		Optional<Day> dayOptional = scheduleRepo.findByDate(date);
 		if (dayOptional.isEmpty()) {
-			throw new IOException("Invaid date");
+			throw new IOException("Invalid date");
 		}
 		return dayOptional.get();
 	}
 
 	public void addWorkDay(String employeeNationalID, String dateStr, boolean onCall, String startShiftStr, String endShiftStr) throws IOException {
-		LocalDate date = LocalDate.parse(dateStr);
+
 		LocalTime startShift = null;
 		LocalTime endShift = null;
+		
 		try {
 			startShift = LocalTime.parse(startShiftStr);
 			endShift = LocalTime.parse(endShiftStr);
@@ -65,13 +72,8 @@ public class ScheduleService {
 		int[] workTimeJSON;
 		JSONObject employeeLevel = null;
 
-		EmployeeDailyReference employee = null;
-		try {
-			employee = new EmployeeDailyReference(this.employeeRepo, employeeNationalID);
-		} catch (IOException e) {
-			System.err.println("Employee not found!");
-		}
-
+		EmployeeDailyReference employee = new EmployeeDailyReference(this.employeeRepo, employeeNationalID);
+		
 		JSONObject thisDepartment = getDepartment(employee.getDepartment());
 		int level = employee.getLevel();
 		if (Boolean.parseBoolean((String) thisDepartment.get("Universal schedule"))) {
@@ -90,18 +92,19 @@ public class ScheduleService {
 				workTime[0] = start;
 				LocalTime end = start.plus(Integer.parseInt(employeeLevel.get("Shift length").toString()) + Integer.parseInt(employeeLevel.get("Daily break duration total").toString()), ChronoUnit.HOURS);
 				workTime[1] = end;
-			} else {
-				workTime[0] = startShift;
-				workTime[1] = endShift;
-			}
+			} 
 			employee.setWorkTime(workTime);
 		} catch (Exception e) {
 			System.out.println("DateTime error!");
 			e.printStackTrace();
 			return;
 		}
-
-		currentDay = getDay(date);
+		if(onCall) {
+			workTime[0] = startShift;
+			workTime[1] = endShift;
+		}
+		
+		currentDay = getDay(LocalDate.parse(dateStr));
 
 		if (currentDay.getEmployees() != null) {
 			currentDay.addEmployee(employee);
@@ -128,7 +131,7 @@ public class ScheduleService {
 	public void declineSwap(String employeeID, LocalDate receiverDate) throws IOException {
 		Optional<Employee> receiverOptional = employeeRepo.findByNationalID(employeeID);
 		if (receiverOptional.isEmpty()) {
-			throw new IOException();
+			throw new IOException("No such employee!");
 		}
 		Employee receiver = receiverOptional.get();
 		List<Object> notificationData = new ArrayList<Object>();
@@ -138,31 +141,21 @@ public class ScheduleService {
 		employeeRepo.save(receiver);
 	}
 
-	public void swapEmployees(String requesterNationalID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException {
+	public void swapEmployees(String requesterNationalID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException, NullPointerException {
 
 		EmployeeDailyReference requester = null;
 		EmployeeDailyReference receiver = null;
-		LocalDate requesterDate;
-		LocalDate receiverDate;
-		try {
-			requesterDate = LocalDate.parse(requesterDateParam);
-			receiverDate = LocalDate.parse(receiverDateParam);
-		} catch (Exception e) {
-			System.err.println("Date not recognised!");
-			return;
-		}
-		Day requesterDay = getDay(requesterDate.withDayOfMonth(requesterDate.getDayOfMonth()));
-		Day receiverDay = getDay(receiverDate.withDayOfMonth(receiverDate.getDayOfMonth()));
+		
+		Day requesterDay = getDay(LocalDate.parse(requesterDateParam).withDayOfMonth(LocalDate.parse(requesterDateParam).getDayOfMonth()));
+		Day receiverDay = getDay(LocalDate.parse(receiverDateParam).withDayOfMonth(LocalDate.parse(receiverDateParam).getDayOfMonth()));
 
 		for (EmployeeDailyReference edr : requesterDay.getEmployees()) {
 			if (edr.getNationalID().equals(requesterNationalID)) {
-
 				requester = edr;
 			}
 		}
 		for (EmployeeDailyReference edr : receiverDay.getEmployees()) {
 			if (edr.getNationalID().equals(receiverNationalID)) {
-				System.out.println(edr.getFirstName());
 				receiver = edr;
 			}
 		}
@@ -177,70 +170,62 @@ public class ScheduleService {
 
 			requesterDay.getEmployees().add(receiver);
 			receiverDay.getEmployees().add(requester);
-
-			scheduleRepo.save(requesterDay);
-			scheduleRepo.save(receiverDay);
-
-			System.out.println("Successfully swapped!");
+			
 		} else {
-			System.err.println("No such EDR in those days");
+			throw new NullPointerException("No such EDR in those days");
 		}
+
 		List<Object> notificationData = new ArrayList<>();
 		Employee requesterObj = employeeRepo.findByNationalID(requesterNationalID).get();
 		notificationData.add("plain-notification");
-		String message = receiver.getFirstName() + " " + receiver.getLastName() + " has accepted your request to swap his/her " + receiverDate + " shift with your " + requesterDate + " shift.";
+		String message = receiver.getFirstName() + " " + receiver.getLastName() + " has accepted your request to swap his/her " + LocalDate.parse(receiverDateParam) + " shift with your " + LocalDate.parse(requesterDateParam) + " shift.";
 		requesterObj.getNotifications().add(new Notification(message, notificationData));
 		employeeRepo.save(requesterObj);
 
+		scheduleRepo.save(requesterDay);
+		scheduleRepo.save(receiverDay);
 	}
 
 	public void swapRequest(String requesterID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException {
 		List<Object> notificationData = new ArrayList<>();
 
-		LocalDate requesterDate;
-		LocalDate receiverDate;
-		try {
-			requesterDate = LocalDate.parse(requesterDateParam);
-			receiverDate = LocalDate.parse(receiverDateParam);
-		} catch (Exception e) {
-			System.err.println("Date not recognised!");
-			return;
-		}
-
 		Optional<Employee> requesterOptional = employeeRepo.findById(requesterID);
 		if (requesterOptional.isEmpty()) {
-			System.out.println(requesterID);
 			throw new IOException("Requester not found!");
 		}
 		Employee requester = requesterOptional.get();
 
 		Optional<Employee> receiverOptional = employeeRepo.findByNationalID(receiverNationalID);
 		if (receiverOptional.isEmpty()) {
-			throw new IOException("Requester not found!");
+			throw new IOException("Receiver not found!");
 		}
 		Employee receiver = receiverOptional.get();
 
 		notificationData.add("swap-request");
 		notificationData.add(requester.getNationalID());
-		notificationData.add(requesterDate);
-		notificationData.add(receiverDate);
-		String message = "You have received a request from " + requester.getFirstName() + " " + requester.getLastName() + " to swap his/her " + requesterDate + " shift with your " + receiverDate + " shift.";
+		notificationData.add(LocalDate.parse(requesterDateParam));
+		notificationData.add(LocalDate.parse(receiverDateParam));
+		String message = "You have received a request from " + requester.getFirstName() + " " + requester.getLastName() + " to swap his/her " + LocalDate.parse(requesterDateParam) + " shift with your " + LocalDate.parse(receiverDateParam) + " shift.";
 		receiver.getNotifications().add(new Notification(message, notificationData));
 		employeeRepo.save(receiver);
 
 	}
 
-	public void addTask(String data) throws IOException {
+	public void addTask(String data) throws Exception {
 
 		String[] dataValues = data.split("\\n");
+
+		if(dataValues.length != 5) {
+			throw new Exception("Invalid request");
+		}
 		Map<String, String> newInfo = new HashMap<>();
 		for (String field : dataValues) {
 			field = field.substring(0, field.length() - 1);
 			newInfo.put(field.split("=")[0], field.split("=")[1]);
 		}
-		LocalDate taskDate = LocalDate.parse(newInfo.get("date"));
-		Day currentDay = getDay(taskDate);
-
+		
+		Day currentDay = getDay(LocalDate.parse(newInfo.get("date")));
+		
 		Task task;
 		for (EmployeeDailyReference edr : currentDay.getEmployees()) {
 			if (edr.getNationalID().equals(newInfo.get("receiverNationalID"))) {
@@ -275,10 +260,12 @@ public class ScheduleService {
 
 		for (EmployeeDailyReference edr : day.getEmployees()) {
 			if (edr.getNationalID().equals(employeeNationalID)) {
+				if(!StringUtils.isNumeric(taskNum)) {
+					throw new NumberFormatException("Invalid task number");
+				}
 				Task task = edr.getTasks().get(Integer.parseInt(taskNum));
 				if (!task.getCompleted())
 					task.setCompleted(true);
-				scheduleRepo.save(day);
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
 				for (Employee manager : managers) {
 					if (manager.getDepartment().equals(edr.getDepartment())) {
@@ -289,6 +276,7 @@ public class ScheduleService {
 						employeeRepo.save(manager);
 					}
 				}
+				scheduleRepo.save(day);
 				break;
 			}
 		}

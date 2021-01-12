@@ -81,6 +81,10 @@ public class EmployeeDailyReference {
 		this.lastName = lastName;
 	}
 	
+	public void setNationalID(String nationalID) {
+		this.nationalID = nationalID;
+	}
+	
 	public void setWorkTime(LocalTime[] workTime) {
 		this.workTime = workTime;
 	}
