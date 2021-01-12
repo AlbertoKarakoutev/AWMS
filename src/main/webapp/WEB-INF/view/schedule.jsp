@@ -94,8 +94,9 @@
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody id="body<%=i%>">
-				                    	    		          	    <%String day = thisMonth.withDayOfMonth(i).toString();%>
+				                    	    		          	    <%String day = "";%>
 				                    	    		          	    <%if(sle[i-offset+1] != null){%>
+				                    	    		          	    <%day = thisMonth.withDayOfMonth(i-offset+1).toString();%>
 				                    	    		          	    	<%for(int j = 0; j < sle[i-offset+1].size(); j++){
 				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset+1].get(j);%>
 																    				<tr id="<%=i%>-<%=thisEDR.getNationalID()%>">
