@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,9 +15,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static javax.management.Query.times;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -29,9 +32,6 @@ public class DocumentServiceTest {
     @MockBean
     private DocumentRepo documentRepo;
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-
     //set up data before each test
     @Before
     public void setup(){
@@ -41,21 +41,22 @@ public class DocumentServiceTest {
     }
 
     @Test
-    public void getAccessibleDocsInfoThrowsIOExceptionWhenEmployeeIdDoesntExist(){
+    public void getAccessibleDocsInfo_ThrowsIOException_WhenEmployeeIdDoesntExist(){
         String id = "123";
         boolean thrown = false;
         String message = "";
 
-        //Mockito.when(this.employeeRepo.findById(id)).thenReturn(Optional.of(this.employee));
+        Mockito.when(this.employeeRepo.findById(id)).thenReturn(Optional.of(this.employee));
+        Mockito.when(this.employeeRepo.findByRole("ADMIN")).thenReturn(Optional.of(this.employee));
 
         try {
-            this.documentService.getAccessibleDocumentsInfo("1234");
+            this.documentService.getAccessibleDocumentsInfo(id);
         } catch (IOException e) {
             thrown = true;
             message = e.getMessage();
         }
 
-        assertTrue(thrown);
-        assertEquals("Employee with id 1234 doesn't exist", message);
+        assertFalse(thrown);
+        //verify(this.scheduleRepo, Mockito.times(1)).save();
     }
 }
