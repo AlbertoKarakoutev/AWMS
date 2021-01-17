@@ -342,7 +342,7 @@ public class AdminController {
 	}
 
 	// Department methods
-	private Map<String, String> getDepartmentDTOs() {
+	private Map<String, String> getDepartmentDTOs() throws Exception {
 		Map<String, String> departmentDTOs = new HashMap<>();
 		for (int i = 97; i < 123; i++) {
 			String departmentCode = Character.toString((char) i);

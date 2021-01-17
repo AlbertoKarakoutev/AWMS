@@ -1,13 +1,27 @@
 package com.company.awms.services;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,6 +42,7 @@ import com.company.awms.data.employees.EmployeeDailyReference;
 import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.data.schedule.Day;
 import com.company.awms.data.schedule.ScheduleRepo;
+import com.company.awms.data.schedule.Task;
 
 
 @SpringBootTest
@@ -37,6 +52,8 @@ public class ScheduleServiceTest {
     private ScheduleService scheduleService;
     private Employee employee;
     private Day day;
+    private EmployeeDailyReference mock;
+    private EmployeeDailyReference mock2;
     
     @MockBean
     private EmployeeRepo employeeRepo;
@@ -50,8 +67,8 @@ public class ScheduleServiceTest {
     @Before
     public void setup(){
     	this.day = new Day(LocalDate.parse("2021-01-01"));
-    	EmployeeDailyReference mock = new EmployeeDailyReference();
-    	EmployeeDailyReference mock2 = new EmployeeDailyReference();
+    	mock = new EmployeeDailyReference();
+    	mock2 = new EmployeeDailyReference();
     	mock.setNationalID("1");
     	mock2.setNationalID("2");
     	day.getEmployees().add(mock);
@@ -136,7 +153,7 @@ public class ScheduleServiceTest {
     	
     	try {
     		scheduleService.addWorkDay(id, date, false, null, null);
-       	} catch (IOException e) {
+       	} catch (Exception e) {
        		e.printStackTrace();
        	}
 
@@ -421,7 +438,6 @@ public class ScheduleServiceTest {
 
     	Mockito.when(this.employeeRepo.findByNationalID(id)).thenReturn(Optional.of(this.employee));
     	Mockito.when(this.scheduleRepo.findByDate(LocalDate.parse(date))).thenReturn(Optional.of(this.day));
-    	
     	try {
     		this.scheduleService.addTask(data);
     	}catch(Exception e) {
@@ -508,4 +524,223 @@ public class ScheduleServiceTest {
         assertEquals("Invalid task number", message);
     }
     
+    @Test
+    public void markTaskAsCompleteThrowsNullPointerExceptionWhenTaskDoesntExist() {
+    	String date = "2020-01-01";
+    	String id = "1";
+    	Mockito.when(this.scheduleRepo.findByDate(LocalDate.parse(date))).thenReturn(Optional.of(this.day));
+    	Mockito.when(this.employeeRepo.findById(id)).thenReturn(Optional.of(this.employee));
+    	boolean thrown = false;
+    	String message ="";
+    	
+    	try {
+    		this.scheduleService.markTaskAsComplete(id, "1", date);
+    	}catch(NullPointerException | IOException e) {
+        	thrown = true;
+        	message = e.getMessage();
+    	}
+
+    	assertTrue(thrown);
+        assertEquals("Task doesn't exist", message);
+    }
+    
+    @Test
+    public void markTaskAsCompleteExecutesFully() {
+    	String id = "1";
+    	String date = "2021-01-01";
+    	String taskNum = "0";
+    	
+    	mock.getTasks().add(new Task());
+    	
+    	Mockito.when(this.employeeRepo.findById(id)).thenReturn(Optional.of(this.employee));
+    	Mockito.when(this.scheduleRepo.findByDate(LocalDate.parse(date))).thenReturn(Optional.of(this.day));
+    	Mockito.when(this.employeeRepo.findAllByRole("MANAGER")).thenReturn(List.of(this.employee));
+    	try {
+    		this.scheduleService.markTaskAsComplete(id, taskNum, date);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	Mockito.verify(this.scheduleRepo).save(ArgumentMatchers.any(Day.class));
+    }
+    
+    @Test
+    public void removeReadNotificationsExecutesFully() {
+    	List<Employee> allEmployees = new ArrayList<Employee>();
+    	allEmployees.add(this.employee);
+    	Mockito.when(this.employeeRepo.findAll()).thenReturn(allEmployees);
+    	
+    	try {
+    		this.scheduleService.removeReadNotifications();
+    	}catch(Exception  e) {
+    		e.printStackTrace();    		
+    	}
+    	
+    	Mockito.verify(this.employeeRepo, Mockito.times(allEmployees.size())).save(ArgumentMatchers.any(Employee.class));
+    }
+    
+    @Test
+    public void getDepartmentThrowsExceptionWhenDepartmentsJSONFileIsWrong() {
+    	List<String> JSONData = null;
+    	FileWriter mockFR;
+    	String existingDepartment = "a";
+    	try {
+			JSONData = Files.readAllLines(Paths.get("src/main/resources/departments.json"));
+			
+			mockFR = new FileWriter("src/main/resources/departments.json", true);
+			mockFR.write("a");
+			mockFR.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	try {
+			assertEquals(null, this.scheduleService.getDepartment(existingDepartment));
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+    	
+    	try {
+			mockFR = new FileWriter("src/main/resources/departments.json", false);
+			for(String line : JSONData) {
+				mockFR.write(line);
+			}
+			mockFR.flush();
+			mockFR.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    
+    @Test
+    public void getDepartmentThrowsExceptionWhenDepartmentDoesNotExist() {
+
+    	boolean thrown = false;
+    	String message = "";
+    	try {
+    		this.scheduleService.getDepartment("wrongDepartment");
+    	}catch(Exception e) {
+    		thrown = true;
+    		message = e.getMessage();
+    	}
+    	
+    	assertTrue(thrown);
+    	assertEquals("Department not found", message);
+    	
+    }
+    
+    @Test 
+    public void getDepartmentExecutesFully() {
+    	String existingDepartment = "a";
+    	boolean exception = false;
+    	
+    	try {
+			assertNotEquals(this.scheduleService.getDepartment(existingDepartment), null);
+		} catch (Exception e) {
+			exception = true;
+			e.printStackTrace();
+		}
+    	assertFalse(exception);
+    }
+    
+    @Test 
+    public void getDepartmentAtLevelThrowsExceptionWhenUniversalScheduleIsTrue() {
+    	boolean thrown = false;
+    	String message = "";
+    	try {
+    		this.scheduleService.getDepartmentAtLevel("b", 0);
+    	}catch(Exception e) {
+    		thrown = true;
+    		message = e.getMessage();
+    	}
+    	
+    	assertTrue(thrown);
+    	assertEquals("This department has a universal schedule", message);
+    	
+    }
+    
+    @Test 
+    public void getDepartmentAtLevelThrowsExceptionWhenLevelDoesntExist() {
+    	boolean thrown = false;
+    	String message = "";
+    	try {
+    		this.scheduleService.getDepartmentAtLevel("a", 3);
+    	}catch(Exception e) {
+    		thrown = true;
+    		message = e.getMessage();
+    	}
+    	
+    	assertTrue(thrown);
+    	assertTrue(message.contains("Level doesn't exist") ); 	
+    }
+    
+    @Test 
+    public void getDepartmentAtLevelExecutesFully() {
+    	String existingDepartment = "a";
+    	int existingLevel = 0;
+    	boolean exception = false;
+    	
+    	try {
+			assertNotEquals(this.scheduleService.getDepartmentAtLevel(existingDepartment, existingLevel), null);
+		} catch (Exception e) {
+			exception = true;
+			e.printStackTrace();
+		}
+    	assertFalse(exception);
+    }
+    
+    @Test
+    public void isLeaveDayReturnsTrueWhenEmployeeHasALeaveForASpecificDay() {
+    	Map<String, Object> leave = new HashMap<String, Object>();
+    	leave.put("start", day.getDate().minus(1, ChronoUnit.DAYS));
+    	leave.put("end", day.getDate().plus(1, ChronoUnit.DAYS));
+    	leave.put("paid", false);
+    	employee.getLeaves().add(leave);
+    	
+    	try {
+			assertTrue(this.scheduleService.isLeaveDay(employee, day));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	employee.getLeaves().remove(leave);
+    }
+    
+    @Test
+    public void isLeaveDayReturnsFalseWhenEmployeeDoesNotHaveALeaveForASpecificDay() {
+    	Map<String, Object> leave = new HashMap<String, Object>();
+    	leave.put("start", day.getDate().plus(1, ChronoUnit.DAYS));
+    	leave.put("end", day.getDate().plus(2, ChronoUnit.DAYS));
+    	leave.put("paid", false);
+    	employee.getLeaves().add(leave);
+    	
+    	try {
+			assertFalse(this.scheduleService.isLeaveDay(employee, day));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	employee.getLeaves().remove(leave);
+    }
+    
+    /*Impossible to pass incorrect parameters to apply[schedule-type]Schedule(), 
+        because they are called only from applySchedule(), which picks its arguments
+        from the departments.json file itself, and can not pass them on incorrectly to the schedule types
+    */
+    @Test
+    public void applyRegularScheduleExecutesFully() {
+    	String existingDepartment = "b";
+    	int existingLevel = 1;
+    	boolean exception = false;
+    	
+    	Mockito.when(this.scheduleRepo.findAll()).thenReturn(List.of(this.day));
+    	Mockito.when(this.employeeRepo.findByAccessLevel(existingDepartment+ Integer.toString(existingLevel))).thenReturn(List.of(employee));
+    	
+    	try {
+			assertTrue(this.scheduleService.applyRegularSchedule(existingDepartment, existingLevel));
+		} catch (Exception e) {
+			exception = true;
+			e.printStackTrace();
+		}
+    	assertFalse(exception);
+    }
 }

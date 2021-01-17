@@ -26,7 +26,7 @@
 	List<Task>[] tasks = (List<Task>[])request.getAttribute("tasks");
 	YearMonth yearMonth = (YearMonth)request.getAttribute("month");
 	LocalDate thisMonth = LocalDate.now().withYear(yearMonth.getYear()).withMonth(yearMonth.getMonthValue());
-	int offset = thisMonth.withDayOfMonth(1).getDayOfWeek().getValue()-1; %>
+	int offset = thisMonth.withDayOfMonth(1).getDayOfWeek().getValue(); %>
     
     <div class="panel">
         <nav class="navigation">
@@ -95,10 +95,10 @@
                                                                 </thead>
                                                                 <tbody id="body<%=i%>">
 				                    	    		          	    <%String day = "";%>
-				                    	    		          	    <%if(sle[i-offset+1] != null){%>
-				                    	    		          	    <%day = thisMonth.withDayOfMonth(i-offset+1).toString();%>
-				                    	    		          	    	<%for(int j = 0; j < sle[i-offset+1].size(); j++){
-				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset+1].get(j);%>
+				                    	    		          	    <%if(sle[i-offset] != null){%>
+				                    	    		          	    <%day = thisMonth.withDayOfMonth(i-offset).toString();%>
+				                    	    		          	    	<%for(int j = 0; j < sle[i-offset].size(); j++){
+				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset].get(j);%>
 																    				<tr id="<%=i%>-<%=thisEDR.getNationalID()%>">
 	                                                                                    <th scope="row">
 																						    <h4><%= thisEDR.getFirstName() %> <%=thisEDR.getLastName() %></h4>
