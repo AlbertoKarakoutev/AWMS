@@ -36,9 +36,7 @@
                         </div>
                         <div class="form-group">
                             <label for="threadContent">Body</label>
-                            <textarea name="body" class="form-control" id="threadContent" rows="8" required>
-                                ${thread != null ? thread.getBody() : null}
-                            </textarea>
+                            <textarea name="body" class="form-control" id="threadContent" rows="8" required>${thread != null ? thread.getBody() : null}</textarea>
                             <small id="threadContentHelp" class="form-text text-muted">Body</small>
                         </div>
                         <button type="submit" class="btn btn-dark">${thread != null ? "Edit": "Create"}</button>
