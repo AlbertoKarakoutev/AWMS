@@ -103,6 +103,7 @@ public class ScheduleController {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "redirect:/schedule/?month="+YearMonth.now();
 		}catch(Exception e) {
+			e.printStackTrace();
 			return "internalServerError";
 		}
 	}
@@ -122,7 +123,6 @@ public class ScheduleController {
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
 			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee, monthChecked);
 			List<Task>[] tasks = this.scheduleService.viewTasks(authenticatedEmployee, monthChecked);
-
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 			model.addAttribute("month", monthChecked);
 			model.addAttribute("tasks", tasks);

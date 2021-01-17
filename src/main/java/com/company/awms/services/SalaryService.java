@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.company.awms.data.employees.Employee;
+import com.company.awms.data.employees.EmployeeRepo;
 import com.company.awms.data.schedule.ScheduleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,7 @@ public class SalaryService {
 	}
 
 	// Rewards for user's completed tasks
-	private double getTaskRewardBonus(String nationalID) {
+	private double getTaskRewardBonus(Employee employee) {
 		double taskRewards = 0.0d;
 
 		LocalDate date = LocalDate.now();
@@ -32,12 +34,15 @@ public class SalaryService {
 		for (int i = 1; i < elapsedDays.size(); i++) {
 			Day thisDay = elapsedDays.get(i);
 			for (EmployeeDailyReference edr : thisDay.getEmployees()) {
-				if (edr.getNationalID().equals(nationalID)) {
+				if (edr.getNationalID().equals(employee.getNationalID())) {
 					for(Task currentTask : edr.getTasks()) {
-						if (currentTask.getCompleted() && !currentTask.getPaidFor() && currentTask.getTaskReward()!=0.0d) {
-							currentTask.setPaidFor(true);
+						if (currentTask.getCompleted() &&  currentTask.getTaskReward()!=0.0d) {
 							taskRewards += currentTask.getTaskReward();
-							this.scheduleRepo.save(thisDay);
+
+							if(!currentTask.getPaidFor()){
+								currentTask.setPaidFor(true);
+								this.scheduleRepo.save(thisDay);
+							}
 						}
 					}
 				}
@@ -47,16 +52,16 @@ public class SalaryService {
 		return taskRewards;
 	}
 	
-	public double estimateSalary(String nationalID, Double payPerHour) {
+	public double estimateSalary(Employee employee) {
 		double salary = 0;
-		salary+=calculateWorkHours(nationalID) * payPerHour;
-		salary+=getTaskRewardBonus(nationalID);
+		salary+=calculateWorkHours(employee) * employee.getPayPerHour();
+		salary+=getTaskRewardBonus(employee);
 
 		return salary;
 	}
 
 	// Calculate work hours for this month
-	public double calculateWorkHours(String nationalID) {
+	public double calculateWorkHours(Employee employee) {
 		double hours = 0;
 
 		LocalDate date = LocalDate.now();
@@ -65,7 +70,7 @@ public class SalaryService {
 		for (int i = 1; i < elapsedDays.size(); i++) {
 			Day thisDay = elapsedDays.get(i);
 			for (EmployeeDailyReference edr : thisDay.getEmployees()) {
-				if (edr.getNationalID().equals(nationalID)) {
+				if (edr.getNationalID().equals(employee.getNationalID())) {
 					Duration shiftLength =  Duration.between(edr.getWorkTime()[0], edr.getWorkTime()[1]);
 					hours += (double)shiftLength.toHours();
 				}

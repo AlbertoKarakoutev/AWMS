@@ -34,6 +34,17 @@ public class IndexController {
         } catch (IOException e) {
             e.printStackTrace();
             return "notFound";
+        } catch (Exception e){
+            return "internalServerError";
+        }
+    }
+
+    @GetMapping({ "/login" })
+    public String login() {
+        try {
+            return "login";
+        } catch (Exception e){
+            return "internalServerError";
         }
     }
 

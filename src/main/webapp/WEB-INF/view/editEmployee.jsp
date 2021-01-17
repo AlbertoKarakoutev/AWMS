@@ -70,9 +70,9 @@
                             <small id="ibanHelp" class="form-text text-muted">Employee's IBAN.</small>
                         </div>
                         <div class="form-group">
-                            <label for="salaryEmployee">Salary</label>
-                            <input value="${employee.getSalary()}" type="tel" name="salary" class="form-control" id="salaryEmployee" aria-describedby="salaryEmployee" placeholder="Salary" required>
-                            <small id="salaryHelp" class="form-text text-muted">Employee's salary.</small>
+                            <label for="payPerHourEmployee">Employee's pay per hour</label>
+                            <input value="${employee.getPayPerHour()}" type="number" step="0.1" name="payPerHour" class="form-control" id="payPerHourEmployee" aria-describedby="payPerHourEmployee" placeholder="Pay Per Hour" required>
+                            <small id="salaryHelp" class="form-text text-muted">Employee's pay per hour.</small>
                         </div>
                         <div class="form-group">
                             <label for="roleEmployee">Role</label>

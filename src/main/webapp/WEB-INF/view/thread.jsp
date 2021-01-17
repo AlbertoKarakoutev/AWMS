@@ -54,11 +54,11 @@
                         </div>
                         <div class="d-flex mt-3 text-right align-items-center">
                             <c:if test="${thread.getIssuerID().equals(employeeID)}">
-                                <a href="/forum/thread/${thread.getID()}/edit" class="btn btn-dark btn-md mx-2">
+                                <a href="/forum/thread/${thread.getID()}/edit" class="btn btn-dark btn-md ml-auto">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
                                 <c:if test="${thread.getAnswered() == false}">
-                                    <form action="${thread.getID()}/answered" method="post">
+                                    <form action="${thread.getID()}/answered" method="post" class="m-0">
                                         <input type="submit" class="btn btn-dark btn-md mx-2" value="Mark as answered" />
                                     </form>
                                 </c:if>

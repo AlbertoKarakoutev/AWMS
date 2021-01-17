@@ -28,6 +28,7 @@ public class Employee {
 	private String accessLevel;
 	private String phoneNumber;
 	private double salary;
+	private double payPerHour;
 	private int[] workWeek = new int[2];
 	//Should be in the form ("start":Date, "end":Date, "paid":boolean)
 	private List<Map<String, Object>> leaves = new ArrayList<>();
@@ -47,7 +48,8 @@ public class Employee {
 	}
 
 	public Employee(String nationalID, String firstName, String lastName, String password, String email,
-					String iban, String accessLevel, String department, int level, String phoneNumber, double salary, int[] workWeek) {
+					String iban, String accessLevel, String department, int level, String phoneNumber,
+					double salary, int[] workWeek, double payPerHour) {
 		this.nationalID = nationalID;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -60,6 +62,7 @@ public class Employee {
 		this.phoneNumber = phoneNumber;
 		this.salary = salary;
 		this.workWeek = workWeek;
+		this.payPerHour = payPerHour;
 	}
 
 	// Get employee information
@@ -125,18 +128,24 @@ public class Employee {
 		return this.workWeek;
 	}
 
+	public double getPayPerHour() {
+		return payPerHour;
+	}
+
 	public List<Map<String, Object>> getLeaves(){
 		return this.leaves;
 	}
-	
+
 	public List<Notification> getNotifications(){
 		return this.notifications;
 	}
-	
+
 	public List<Doc> getPersonalDocuments() {
 		return this.personalDocuments;
 	}
-	
+
+	public void setId(String id) { this.id = id; }
+
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
@@ -169,7 +178,7 @@ public class Employee {
 		this.level = level;
 		setAccessLevel(department + Integer.toString(level));
 	}
-	
+
 	public void setDepartment(String department) {
 		this.department = department;
 		setAccessLevel(department + Integer.toString(level));
@@ -178,27 +187,31 @@ public class Employee {
 	public void setSalary(double salary) {
 		this.salary = salary;
 	}
-	
+
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
+	}
+
+	public void setPayPerHour(double payPerHour) {
+		this.payPerHour = payPerHour;
 	}
 
 	public void setNationalID(String nationalID) {
 		this.nationalID = nationalID;
 	}
-	
+
 	public void setWorkWeek(int[] workWeek) {
 		this.workWeek = workWeek;
 	}
-	
+
 	public void setLeaves(List<Map<String, Object>> leaves) {
 		this.leaves = leaves;
 	}
-	
+
 	public void setNotifications(List<Notification> notifications) {
 		this.notifications = notifications;
 	}
-	
+
 	public void setPersonalDocuments(List<Doc> privateDocuments) {
 		this.personalDocuments = privateDocuments;
 	}

@@ -37,9 +37,9 @@ public class SalaryController {
 		try {
 			Employee employee = employeeService.getEmployee(employeeDetails.getID());
 
-			double workHours = this.salaryService.calculateWorkHours(employee.getNationalID());
-			double salary = salaryService.estimateSalary(employee.getNationalID(), PAY_PER_HOUR);
-			double taskRewards = salary - workHours * PAY_PER_HOUR;
+			double workHours = this.salaryService.calculateWorkHours(employee);
+			double salary = salaryService.estimateSalary(employee);
+			double taskRewards = salary - workHours * employee.getPayPerHour();
 
 			this.employeeService.updateSalary(salary, employee);
 
@@ -47,7 +47,7 @@ public class SalaryController {
 			model.addAttribute("salary", salary);
 			model.addAttribute("taskRewards", taskRewards);
 			model.addAttribute("nationalID", employee.getNationalID());
-			model.addAttribute("payPerHour", PAY_PER_HOUR);
+			model.addAttribute("payPerHour", employee.getPayPerHour());
 			injectLoggedInEmployeeInfo(model, employeeDetails, employee);
 
 			return "salary";

@@ -3,7 +3,6 @@ package com.company.awms.data.schedule;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
 public class Task {
 
 	@Id
