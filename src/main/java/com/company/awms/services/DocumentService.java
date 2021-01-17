@@ -77,7 +77,7 @@ public class DocumentService {
 
 	// Access to all private documents info
 	public List<DocInfoDTO> getPersonalDocumentsInfo(String employeeID) throws IOException {
-		List<DocInfoDTO> privateDocumentsInfo = new ArrayList<>();
+		List<DocInfoDTO> personalDocumentsInfo = new ArrayList<>();
 		Employee employee = getEmployee(employeeID);
 
 		List<Doc> personalDocuments = employee.getPersonalDocuments();
@@ -85,10 +85,10 @@ public class DocumentService {
 		for (int i = 0; i < personalDocuments.size(); i++) {
 			DocInfoDTO documentInfo = new DocInfoDTO(Integer.toString(i), personalDocuments.get(i).getName(), personalDocuments.get(i).getSize(), personalDocuments.get(i).getType(), personalDocuments.get(i).getUploaderID(),
 					employee.getFirstName() + " " + employee.getLastName());
-			privateDocumentsInfo.add(documentInfo);
+			personalDocumentsInfo.add(documentInfo);
 		}
 
-		return privateDocumentsInfo;
+		return personalDocumentsInfo;
 	}
 
 	private Doc createNewDoc(MultipartFile file, String ownerID, Employee owner) throws IOException {
@@ -150,7 +150,7 @@ public class DocumentService {
 			throw new IOException("Admin not found!");
 		}
 		if (!downloaderID.equals(adminOptional.get().getID()) && !downloaderID.equals(ownerID)) {
-			throw new IllegalAccessException("not authorized");
+			throw new IllegalAccessException("Document not accessible!");
 		}
 
 		List<Doc> personalDocuments = owner.getPersonalDocuments();
