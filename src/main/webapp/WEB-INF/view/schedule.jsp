@@ -26,7 +26,7 @@
 	List<Task>[] tasks = (List<Task>[])request.getAttribute("tasks");
 	YearMonth yearMonth = (YearMonth)request.getAttribute("month");
 	LocalDate thisMonth = LocalDate.now().withYear(yearMonth.getYear()).withMonth(yearMonth.getMonthValue());
-	int offset = thisMonth.withDayOfMonth(1).getDayOfWeek().getValue(); %>
+	int offset = thisMonth.withDayOfMonth(1).getDayOfWeek().getValue()-1; %>
     
     <div class="panel">
         <nav class="navigation">
@@ -71,7 +71,7 @@
 								    <c:set var="i" value="<%=i%>" />
 
 								    <div class="col-md-1 p-0">
-                   						<%if(i>=offset && i <= thisMonth.lengthOfMonth()){%>
+                   						<%if(i>=offset && i < thisMonth.lengthOfMonth()){%>
 		             	     	 	        <button class='day-box' data-toggle="modal" data-target="#employeeModal${i}"></button>				
 		                 	  		    	<div class='modal fade' id="employeeModal${i}" tabindex="-1" role="dialog" aria-labelledby="EmployeeModal${i}" aria-hidden="true">
 		                         	  		    <div class='modal-dialog modal-dialog-centered modal-xl' role="document">
@@ -95,10 +95,11 @@
                                                                 </thead>
                                                                 <tbody id="body<%=i%>">
 				                    	    		          	    <%String day = "";%>
-				                    	    		          	    <%if(sle[i-offset] != null){%>
-				                    	    		          	    <%day = thisMonth.withDayOfMonth(i-offset).toString();%>
-				                    	    		          	    	<%for(int j = 0; j < sle[i-offset].size(); j++){
-				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset].get(j);%>
+				                    	    		          	    <%if(sle[i-offset+1] != null){%>
+				                    	    		          	    	<%System.out.println(i-offset); %>
+				                    	    		          	    	<%day = thisMonth.withDayOfMonth(i-offset+1).toString();%>
+				                    	    		          	    	<%for(int j = 0; j < sle[i-offset+1].size(); j++){
+				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset+1].get(j);%>
 																    				<tr id="<%=i%>-<%=thisEDR.getNationalID()%>">
 	                                                                                    <th scope="row">
 																						    <h4><%= thisEDR.getFirstName() %> <%=thisEDR.getLastName() %></h4>
@@ -133,7 +134,7 @@
 															    </tbody>
 		                      		                        </table>
 															</div>
-		                          	  	    	         	<%if(tasks[i-offset] != null){%>
+		                          	  	    	         	<%if(tasks[i-offset+1] != null){%>
 		                    	    	 		        	   	<table class="table">
 			                    	    	 		        	   	<thead>
 	                                                                    <tr>
@@ -145,18 +146,18 @@
 	                                                                </thead>
 	                                                                <tbody>
 				                            		        			<c:set var="day" value="init"/>
-				                        	    	        			<%for(int index = 0; index < tasks[i-offset].size();index++){%>
+				                        	    	        			<%for(int index = 0; index < tasks[i-offset+1].size();index++){%>
 				                        	    	        				<tr>
 				                        	    	        					<th scope="row">
-																					<h4><b></b><c:out value="<%=tasks[i-offset].get(index).getTaskTitle()%>"/></h4>
+																					<h4><b></b><c:out value="<%=tasks[i-offset+1].get(index).getTaskTitle()%>"/></h4>
 																				</th>
 																				<td>
-									                                            	<h4><c:out value="<%=tasks[i-offset].get(index).getTaskBody()%>"/></h4>
+									                                            	<h4><c:out value="<%=tasks[i-offset+1].get(index).getTaskBody()%>"/></h4>
 									                                            </td>
 									                                            <td>
-									                                            	<h4><c:out value="<%=tasks[i-offset].get(index).getTaskReward()%>"/></h4>
+									                                            	<h4><c:out value="<%=tasks[i-offset+1].get(index).getTaskReward()%>"/></h4>
 									                                            </td>
-									                                            <%if(!tasks[i-offset].get(index).getCompleted()){%>
+									                                            <%if(!tasks[i-offset+1].get(index).getCompleted()){%>
 										                                            <td>
 										                                            	<a class="btn btn-dark" href="/schedule/taskComplete/?taskNum=<%=index%>&date=<%=day%>">Mark as Complete</a>
 										    	    	        					</td>

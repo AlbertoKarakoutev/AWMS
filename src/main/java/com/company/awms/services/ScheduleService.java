@@ -378,10 +378,10 @@ public class ScheduleService {
 
 	@SuppressWarnings("unchecked")
 	public List<EmployeeDailyReference>[] viewSchedule(Employee viewer, YearMonth month) throws IOException {
-		int monthLength = LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).lengthOfMonth();
+		int monthLength = month.lengthOfMonth();
 		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[monthLength + 1];
 		for (int i = 1; i <= monthLength; i++) {
-			Day thisDay = getDay(LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).withDayOfMonth(i));
+			Day thisDay = getDay(month.atDay(i));
 			if (thisDay.getEmployees().isEmpty()) {
 				continue;
 			}
@@ -410,14 +410,15 @@ public class ScheduleService {
 
 	@SuppressWarnings("unchecked")
 	public List<Task>[] viewTasks(Employee employee, YearMonth month) throws IOException {
-		int monthLength = LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).lengthOfMonth();
-		List<Task>[] tasks = new ArrayList[monthLength];
-		for (int i = 0; i < monthLength; i++) {
-			Day taskDay = getDay(LocalDate.now().withYear(month.getYear()).withMonth(month.getMonthValue()).withDayOfMonth(i + 1));
+		int monthLength = month.lengthOfMonth();
+		List<Task>[] tasks = new ArrayList[monthLength+1];
+		for (int i = 1; i <= monthLength; i++) {
+			Day taskDay = getDay(month.atDay(i));
 
 			EmployeeDailyReference thisEDR = null;
 
-			edrLoop: for (EmployeeDailyReference edr : taskDay.getEmployees()) {
+			edrLoop:
+			for (EmployeeDailyReference edr : taskDay.getEmployees()) {
 				if (edr.getNationalID().equals(employee.getNationalID())) {
 					thisEDR = edr;
 					break edrLoop;
@@ -654,6 +655,8 @@ public class ScheduleService {
 			for (Day day : month) {
 				if (day.getDate().getDayOfWeek() != DayOfWeek.SUNDAY && day.getDate().getDayOfWeek() != DayOfWeek.SATURDAY) {
 					if (!isLeaveDay(employee, day)) {
+						System.out.println(day.getDate() + "is a work day for " + employee.getFirstName());
+
 						addWorkDay(employee.getNationalID(), day.getDate().toString(), false, null, null);
 					}
 				}
@@ -715,9 +718,6 @@ public class ScheduleService {
 			return null;
 		}
 		thisDepartment = (JSONObject) departments.get(department);
-		if(thisDepartment == null) {
-			throw new Exception("Department not found");
-		}
 		
 		return thisDepartment;
 	}

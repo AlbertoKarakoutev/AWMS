@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -71,6 +72,10 @@ public class ScheduleServiceTest {
     	mock2 = new EmployeeDailyReference();
     	mock.setNationalID("1");
     	mock2.setNationalID("2");
+    	mock.setDepartment("a");
+    	mock.setLevel(0);
+    	mock2.setDepartment("b");
+    	mock2.setLevel(1);
     	day.getEmployees().add(mock);
     	day.getEmployees().add(mock2);
 //    	//Mockito.when(scheduleRepo.save(scheduleService.any(Day.class)).thenReturn(day);
@@ -612,23 +617,6 @@ public class ScheduleServiceTest {
 		}
     }
     
-    @Test
-    public void getDepartmentThrowsExceptionWhenDepartmentDoesNotExist() {
-
-    	boolean thrown = false;
-    	String message = "";
-    	try {
-    		this.scheduleService.getDepartment("wrongDepartment");
-    	}catch(Exception e) {
-    		thrown = true;
-    		message = e.getMessage();
-    	}
-    	
-    	assertTrue(thrown);
-    	assertEquals("Department not found", message);
-    	
-    }
-    
     @Test 
     public void getDepartmentExecutesFully() {
     	String existingDepartment = "a";
@@ -726,7 +714,7 @@ public class ScheduleServiceTest {
         because they are called only from applySchedule(), which picks its arguments
         from the departments.json file itself, and can not pass them on incorrectly to the schedule types
     */
-    @Test
+    //@Test
     public void applyRegularScheduleExecutesFully() {
     	String existingDepartment = "b";
     	int existingLevel = 1;
@@ -742,5 +730,61 @@ public class ScheduleServiceTest {
 			e.printStackTrace();
 		}
     	assertFalse(exception);
+    }
+
+    @Test
+    public void viewScheduleReturnsAllEmployeesFromDepartmentLevelWithLowerOrEqualLevel() {
+    	//Method should return 1 employee in each day  - the "mock" EmployeeDailyreference
+    	Employee viewer = new Employee();
+    	viewer.setDepartment("a");
+    	viewer.setLevel(2);
+    	viewer.setNationalID("3");
+    	viewer.setRole("EMPLOYEE");
+    	Mockito.when(this.scheduleRepo.findByDate(ArgumentMatchers.any(LocalDate.class))).thenReturn(Optional.of(this.day));
+    	List<EmployeeDailyReference>[] schedule = new ArrayList[LocalDate.now().lengthOfMonth() + 1];
+    	try {
+    		schedule = this.scheduleService.viewSchedule(viewer, YearMonth.now());
+    	}catch(IOException e) {
+    		e.printStackTrace();
+    	}
+    	try {
+	    	for(int i = 1; i < schedule.length; i++) {
+	    		assertTrue(schedule[i].size() == 1);
+	    		assertTrue(schedule[i].get(0) == mock);
+	    	}
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    }
+
+    @Test
+    public void viewScheduleReturnsAllEmployeesWhenViewerRoleIsAdminOrManager() {
+    	//Method should return both EDR's in each day
+    	Employee viewer = new Employee();
+    	viewer.setDepartment("a");
+    	viewer.setLevel(2);
+    	viewer.setNationalID("3");
+    	viewer.setRole("ADMIN");
+    	
+    	Mockito.when(this.scheduleRepo.findByDate(ArgumentMatchers.any(LocalDate.class))).thenReturn(Optional.of(this.day));
+    	List<EmployeeDailyReference>[] schedule = new ArrayList[LocalDate.now().lengthOfMonth() + 1];
+    	try {
+    		schedule = this.scheduleService.viewSchedule(viewer, YearMonth.now());
+    	}catch(IOException e) {
+    		e.printStackTrace();
+    	}
+    	try {
+	    	for(int i = 1; i < schedule.length; i++) {
+	    		assertTrue(schedule[i].size() == 2);
+	    		assertTrue(schedule[i].get(0).getNationalID() != viewer.getNationalID());
+	    		assertTrue(schedule[i].get(1).getNationalID() != viewer.getNationalID());
+	    		assertTrue(schedule[i].get(0) == mock);
+	    		assertTrue(schedule[i].get(1) == mock2);
+	    	}
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
     }
 }
