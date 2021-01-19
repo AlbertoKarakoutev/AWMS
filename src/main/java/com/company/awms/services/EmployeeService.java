@@ -177,8 +177,6 @@ public class EmployeeService {
 		
 		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been approved";
 		notify(employeeID, message, false);
-		
-		employeeRepo.save(employee);
 	}
 	
 	public void denyLeave(String employeeID, String startDateStr, String endDateStr) throws IOException {

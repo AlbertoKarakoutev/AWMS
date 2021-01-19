@@ -34,13 +34,13 @@
 		                    <form action="/employee/requestLeave">
 		                        <div class="form-group">
 		                        	<div class="md-form">
-		  								<input placeholder="Start date..." type="text" name="startDate" id="startDate" class="form-control datepicker" required>
+		  								<input placeholder="Start date..." type="date" name="startDate" id="startDate" class="form-control datepicker" required>
 									  	<small id="startDate" class="form-text text-muted">YYYY-MM-DD</small>
 									</div>
 		                        </div>
 		                        <div class="form-group">
 		                        	<div class="md-form">
-		  								<input placeholder="End date..." type="text" name="endDate" id="endDate" class="form-control datepicker" required>
+		  								<input placeholder="End date..." type="date" name="endDate" id="endDate" class="form-control datepicker" required>
 		  								<small id="endDate" class="form-text text-muted">YYYY-MM-DD</small>
 									</div>
 		                        </div>
