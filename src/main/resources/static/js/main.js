@@ -25,4 +25,12 @@ $(document).ready(function() {
             });
         }
     });
+
+    // $('#login').submit(function(e) {
+    //     var response = grecaptcha.getResponse();
+    //     if(response.length == 0) {
+    //         e.preventDefault();
+    //         alert('Please prove that you are not a robot.')
+    //     }
+    // });
 });

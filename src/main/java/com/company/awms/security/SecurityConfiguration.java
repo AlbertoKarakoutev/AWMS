@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -25,6 +26,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+<<<<<<< Updated upstream
 		http.authorizeRequests()
 				.antMatchers("/login").permitAll()
 				.antMatchers("/").authenticated()
@@ -38,10 +40,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				//.and().formLogin().loginPage("/login").defaultSuccessUrl("/")
 				.and().logout().logoutSuccessUrl("/login")
 				.and().requiresChannel().anyRequest().requiresSecure();
+=======
+		http.addFilterBefore(new CaptchaAuthenticationFilter("/login", "/login?error"),
+				UsernamePasswordAuthenticationFilter.class);
+
+		http.authorizeRequests().antMatchers("/login").permitAll().antMatchers("/").authenticated()
+				.antMatchers("/document/**").authenticated().antMatchers("/schedule/**").authenticated()
+				.antMatchers("/forum/**").authenticated().antMatchers("/salary/**").authenticated()
+				.antMatchers("/contacts/**").authenticated().antMatchers("/admin/**").hasAuthority("ADMIN").and().csrf()
+				.disable().formLogin().defaultSuccessUrl("/").and().formLogin().loginPage("/login")
+				.defaultSuccessUrl("/").and().logout().logoutSuccessUrl("/login").and().requiresChannel().anyRequest()
+				.requiresSecure();
+>>>>>>> Stashed changes
 	}
 
 	@Bean
-	public PasswordEncoder getPasswordEncoder(){
+	public PasswordEncoder getPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 }

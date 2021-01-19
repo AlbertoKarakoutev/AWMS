@@ -30,12 +30,13 @@ public class Employee {
 	private double salary;
 	private double payPerHour;
 	private int[] workWeek = new int[2];
-	//Should be in the form ("start":Date, "end":Date, "paid":boolean)
+	// Should be in the form ("start":Date, "end":Date, "paid":boolean)
 	private List<Map<String, Object>> leaves = new ArrayList<>();
 	private List<Notification> notifications = new ArrayList<>();
 	private List<Doc> personalDocuments = new ArrayList<>();
 
-	public Employee() {}
+	public Employee() {
+	}
 
 	public Employee(String nationalID) {
 		this.nationalID = nationalID;
@@ -47,9 +48,9 @@ public class Employee {
 		this.nationalID = nationalID;
 	}
 
-	public Employee(String nationalID, String firstName, String lastName, String password, String email,
-					String iban, String accessLevel, String department, int level, String phoneNumber,
-					double salary, int[] workWeek, double payPerHour) {
+	public Employee(String nationalID, String firstName, String lastName, String password, String email, String iban,
+			String accessLevel, String department, int level, String phoneNumber, double salary, int[] workWeek,
+			double payPerHour) {
 		this.nationalID = nationalID;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -68,8 +69,9 @@ public class Employee {
 	// Get employee information
 	@Override
 	public String toString() {
-		return String.format("Employee ID: %s %nName: %s %s %nNational ID: %s %nE-mail: %s %nAccess Level: %s %nDepartment: %s %nLevel: %s %nIBAN: %s %nPhone number: %s", id, firstName,
-				lastName, nationalID, email, accessLevel, department, level, iban, phoneNumber);
+		return String.format(
+				"Employee ID: %s %nName: %s %s %nNational ID: %s %nE-mail: %s %nAccess Level: %s %nDepartment: %s %nLevel: %s %nIBAN: %s %nPhone number: %s",
+				id, firstName, lastName, nationalID, email, accessLevel, department, level, iban, phoneNumber);
 	}
 
 	public String getID() {
@@ -107,7 +109,7 @@ public class Employee {
 	public int getLevel() {
 		return this.level;
 	}
-	
+
 	public String getDepartment() {
 		return department;
 	}
@@ -132,11 +134,11 @@ public class Employee {
 		return payPerHour;
 	}
 
-	public List<Map<String, Object>> getLeaves(){
+	public List<Map<String, Object>> getLeaves() {
 		return this.leaves;
 	}
 
-	public List<Notification> getNotifications(){
+	public List<Notification> getNotifications() {
 		return this.notifications;
 	}
 

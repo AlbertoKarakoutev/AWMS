@@ -33,16 +33,16 @@ public class ForumService {
         this.employeeRepo = employeeRepo;
     }
 
-    public ForumThread getThread(String threadID) throws IOException{
+    public ForumThread getThread(String threadID) throws IOException {
         Optional<ForumThread> thread = this.forumThreadRepo.findById(threadID);
 
-        if(thread.isEmpty()){
+        if (thread.isEmpty()) {
             throw new IOException("Thread not found!");
         }
 
         return thread.get();
     }
-    
+
     public ThreadReplyDTO getThreadWithRepliesByID(String threadID) throws IOException {
         ForumThread thread = getThread(threadID);
 
@@ -84,46 +84,46 @@ public class ForumService {
     }
 
     public ForumThread addNewThread(EmployeeDetails employeeDetails, String title, String body) {
-        ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(),
-                false, employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+        ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(), false,
+                employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 
         Employee uploader = employeeRepo.findById(employeeDetails.getID()).get();
 
         List<Employee> sameDepartmentEmployees = employeeRepo.findByDepartment(uploader.getDepartment());
         List<Object> notificationData = new ArrayList<>();
-        
-        
+
         notificationData.add("new-thread");
-		notificationData.add(uploader.getID());
-		notificationData.add(newThread);
-		String message = uploader.getFirstName() + " " + uploader.getLastName() + " has uploaded a new topic in the Forum, called \""+newThread.getTitle() + "\"." ;
-		for(Employee notified : sameDepartmentEmployees) {
-			notified.getNotifications().add(new Notification(message, notificationData));
-			employeeRepo.save(notified);
-		}
-		
-		this.forumThreadRepo.save(newThread);
-        
+        notificationData.add(uploader.getID());
+        notificationData.add(newThread);
+        String message = uploader.getFirstName() + " " + uploader.getLastName()
+                + " has uploaded a new topic in the Forum, called \"" + newThread.getTitle() + "\".";
+        for (Employee notified : sameDepartmentEmployees) {
+            notified.getNotifications().add(new Notification(message, notificationData));
+            employeeRepo.save(notified);
+        }
+
+        this.forumThreadRepo.save(newThread);
+
         return newThread;
     }
 
     public void addNewReply(EmployeeDetails employeeDetails, String body, String threadID) {
         ForumReply newReply = new ForumReply(threadID, employeeDetails.getID(), body, LocalDateTime.now(),
                 employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-        
+
         Employee replier = employeeRepo.findById(employeeDetails.getID()).get();
         ForumThread answered = forumThreadRepo.findById(threadID).get();
         List<Object> notificationData = new ArrayList<>();
         notificationData.add("new-reply");
-		notificationData.add(replier.getID());
-		notificationData.add(newReply);
-		String message = replier.getFirstName() + " " + replier.getLastName() + " has added a reply on the thread \""+answered.getTitle()+"\" you uploaded.";
-		Employee issuer = employeeRepo.findById(answered.getIssuerID()).get();
-		issuer.getNotifications().add(new Notification(message, notificationData));
-		employeeRepo.save(issuer);
-		System.out.println("Reply added by " + replier.getFirstName() + " to " + issuer.getFirstName());
-		
-        
+        notificationData.add(replier.getID());
+        notificationData.add(newReply);
+        String message = replier.getFirstName() + " " + replier.getLastName() + " has added a reply on the thread \""
+                + answered.getTitle() + "\" you uploaded.";
+        Employee issuer = employeeRepo.findById(answered.getIssuerID()).get();
+        issuer.getNotifications().add(new Notification(message, notificationData));
+        employeeRepo.save(issuer);
+        System.out.println("Reply added by " + replier.getFirstName() + " to " + issuer.getFirstName());
+
         this.forumReplyRepo.save(newReply);
     }
 
@@ -134,7 +134,8 @@ public class ForumService {
     }
 
     public ForumThread editThread(String body, String title, ForumThread oldThread) {
-        //We don't update the issuerID, time and isAnswered because they are presumed to be the same.
+        // We don't update the issuerID, time and isAnswered because they are presumed
+        // to be the same.
         oldThread.setBody(body);
         oldThread.setTitle(title);
         oldThread.setDateTime(LocalDateTime.now());

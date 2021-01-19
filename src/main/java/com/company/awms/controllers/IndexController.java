@@ -14,7 +14,7 @@ import com.company.awms.services.EmployeeService;
 
 @Controller
 public class IndexController {
- 
+
     private EmployeeService employeeService;
 
     @Autowired
@@ -34,7 +34,7 @@ public class IndexController {
         } catch (IOException e) {
             e.printStackTrace();
             return "notFound";
-        } catch (Exception e){
+        } catch (Exception e) {
             return "internalServerError";
         }
     }
@@ -43,23 +43,23 @@ public class IndexController {
     public String login() {
         try {
             return "login";
-        } catch (Exception e){
+        } catch (Exception e) {
             return "internalServerError";
         }
     }
 
     private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
-		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-		model.addAttribute("employeeEmail", employeeDetails.getUsername());
-		model.addAttribute("employeeID", employeeDetails.getID());
-		Employee user = employeeService.getEmployee(employeeDetails.getID());
-		int unread = 0;
-		for(int i = 0; i < user.getNotifications().size(); i++) {
-			if(!user.getNotifications().get(i).getRead()) {
-				unread++;
-			}
-		}
-		model.addAttribute("notifications", user.getNotifications());
-		model.addAttribute("unread", unread);
-	}
+        model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+        model.addAttribute("employeeEmail", employeeDetails.getUsername());
+        model.addAttribute("employeeID", employeeDetails.getID());
+        Employee user = employeeService.getEmployee(employeeDetails.getID());
+        int unread = 0;
+        for (int i = 0; i < user.getNotifications().size(); i++) {
+            if (!user.getNotifications().get(i).getRead()) {
+                unread++;
+            }
+        }
+        model.addAttribute("notifications", user.getNotifications());
+        model.addAttribute("unread", unread);
+    }
 }

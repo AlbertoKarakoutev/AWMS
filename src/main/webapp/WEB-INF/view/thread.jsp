@@ -44,7 +44,7 @@
                                 </div>
                             </c:if>
                             <div class="card-body">
-                                <c:out value="${thread.getBody()}" escapeXml="false" />
+                                <c:out value="${thread.getBody()}" />
                             </div>
                             <c:if test="${not empty thread.getDateTime()}">
                                 <div class="card-footer text-muted">
@@ -76,7 +76,7 @@
                                     </div>
                                 </c:if>
                                 <div class="card-body">
-                                    <c:out value="${reply.getBody()}" escapeXml="false" />
+                                    <c:out value="${reply.getBody()}" />
                                 </div>
                                 <c:if test="${not empty reply.getDateTime()}">
                                     <div class="card-footer text-muted">
