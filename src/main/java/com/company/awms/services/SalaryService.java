@@ -31,7 +31,7 @@ public class SalaryService {
 		LocalDate date = LocalDate.now();
 		List<Day> elapsedDays = getElapsedDays(date);
 
-		for (int i = 1; i < elapsedDays.size(); i++) {
+		for (int i = 0; i < elapsedDays.size(); i++) {
 			Day thisDay = elapsedDays.get(i);
 			for (EmployeeDailyReference edr : thisDay.getEmployees()) {
 				if (edr.getNationalID().equals(employee.getNationalID())) {
@@ -67,7 +67,7 @@ public class SalaryService {
 		LocalDate date = LocalDate.now();
 		List<Day> elapsedDays = getElapsedDays(date);
 
-		for (int i = 1; i < elapsedDays.size(); i++) {
+		for (int i = 0; i < elapsedDays.size(); i++) {
 			Day thisDay = elapsedDays.get(i);
 			for (EmployeeDailyReference edr : thisDay.getEmployees()) {
 				if (edr.getNationalID().equals(employee.getNationalID())) {
@@ -83,6 +83,6 @@ public class SalaryService {
 	private List<Day> getElapsedDays(LocalDate date){
 		LocalDate firstDay = date.withDayOfMonth(1);
 		LocalDate lastDay = date.withDayOfMonth(date.getDayOfMonth());
-		return this.scheduleRepo.findAllByDateBetween(firstDay, lastDay);
+		return this.scheduleRepo.findAllByDateBetween(firstDay.minusDays(1), lastDay.plusDays(1));
 	}
 }
