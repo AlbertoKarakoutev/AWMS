@@ -69,9 +69,9 @@
 						    <div class="row seven-cols">
 								<%for(int i = 0; i <= 34; i++){%>
 								    <c:set var="i" value="<%=i%>" />
-
 								    <div class="col-md-1 p-0">
-                   						<%if(i>=offset && i < thisMonth.lengthOfMonth()){%>
+                   						<%if(i>=offset && i < thisMonth.lengthOfMonth()+(offset)){%>
+                   						
 		             	     	 	        <button class='day-box' data-toggle="modal" data-target="#employeeModal${i}"></button>				
 		                 	  		    	<div class='modal fade' id="employeeModal${i}" tabindex="-1" role="dialog" aria-labelledby="EmployeeModal${i}" aria-hidden="true">
 		                         	  		    <div class='modal-dialog modal-dialog-centered modal-xl' role="document">
@@ -96,7 +96,6 @@
                                                                 <tbody id="body<%=i%>">
 				                    	    		          	    <%String day = "";%>
 				                    	    		          	    <%if(sle[i-offset+1] != null){%>
-				                    	    		          	    	<%System.out.println(i-offset); %>
 				                    	    		          	    	<%day = thisMonth.withDayOfMonth(i-offset+1).toString();%>
 				                    	    		          	    	<%for(int j = 0; j < sle[i-offset+1].size(); j++){
 				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset+1].get(j);%>

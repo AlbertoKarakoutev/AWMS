@@ -156,7 +156,7 @@ public class DocumentService {
 		List<Doc> personalDocuments = owner.getPersonalDocuments();
 
 		if (personalDocuments.size() <= documentID) {
-			throw new IOException("Document with id " + documentID + " doesn't exists");
+			throw new IOException("Document with id " + documentID + " doesn't exist");
 		}
 
 		return personalDocuments.get(documentID);
