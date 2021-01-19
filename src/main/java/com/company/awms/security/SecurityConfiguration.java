@@ -26,21 +26,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-<<<<<<< Updated upstream
-		http.authorizeRequests()
-				.antMatchers("/login").permitAll()
-				.antMatchers("/").authenticated()
-				.antMatchers("/document/**").authenticated()
-				.antMatchers("/schedule/**").authenticated()
-				.antMatchers("/forum/**").authenticated()
-				.antMatchers("/salary/**").authenticated()
-				.antMatchers("/contacts/**").authenticated()
-				.antMatchers("/admin/**").hasAuthority("ADMIN")
-				.and().csrf().disable().formLogin().defaultSuccessUrl("/")
-				//.and().formLogin().loginPage("/login").defaultSuccessUrl("/")
-				.and().logout().logoutSuccessUrl("/login")
-				.and().requiresChannel().anyRequest().requiresSecure();
-=======
 		http.addFilterBefore(new CaptchaAuthenticationFilter("/login", "/login?error"),
 				UsernamePasswordAuthenticationFilter.class);
 
@@ -51,7 +36,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.disable().formLogin().defaultSuccessUrl("/").and().formLogin().loginPage("/login")
 				.defaultSuccessUrl("/").and().logout().logoutSuccessUrl("/login").and().requiresChannel().anyRequest()
 				.requiresSecure();
->>>>>>> Stashed changes
 	}
 
 	@Bean
