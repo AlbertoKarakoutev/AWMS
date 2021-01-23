@@ -70,6 +70,10 @@ public class Doc {
 		return type;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getUploaderID() {
 		return uploaderID;
 	}

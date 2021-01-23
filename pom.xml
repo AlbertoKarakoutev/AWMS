@@ -109,17 +109,21 @@
 			<version>1.1.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/net.tanesha.recaptcha4j/recaptcha4j -->
-<dependency>
-    <groupId>net.tanesha.recaptcha4j</groupId>
-    <artifactId>recaptcha4j</artifactId>
-    <version>0.0.7</version>
-</dependency>
-<!-- https://mvnrepository.com/artifact/org.json/json -->
-<dependency>
-    <groupId>org.json</groupId>
-    <artifactId>json</artifactId>
-    <version>20201115</version>
-</dependency>
+		<dependency>
+    		<groupId>net.tanesha.recaptcha4j</groupId>
+    		<artifactId>recaptcha4j</artifactId>
+    		<version>0.0.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+    		<groupId>org.json</groupId>
+    		<artifactId>json</artifactId>
+    		<version>20201115</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
 
 	</dependencies>
 

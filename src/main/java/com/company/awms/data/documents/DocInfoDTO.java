@@ -1,6 +1,7 @@
 package com.company.awms.data.documents;
 
 public class DocInfoDTO {
+
     private String id;
     private String name;
     private double size;

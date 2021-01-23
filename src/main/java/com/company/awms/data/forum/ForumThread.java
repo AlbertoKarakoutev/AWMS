@@ -19,7 +19,7 @@ public class ForumThread {
 	private boolean isAnswered;
 
 	public ForumThread() {}
-	
+
 	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered, String issuerName) {
 		this.issuerID = issuerID;
 		this.issuerName = issuerName;
@@ -55,6 +55,10 @@ public class ForumThread {
 
 	public boolean getAnswered() {
 		return isAnswered;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public void setIssuerID(String issuerID) {

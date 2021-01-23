@@ -24,12 +24,20 @@ public class Day {
 		this.date = date;
 	}
 
+	public String getID() {
+		return this.id;
+	}
+
 	public LocalDate getDate() {
 		return date;
 	}
 
 	public List<EmployeeDailyReference> getEmployees() {
 		return employees;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public void setDate(LocalDate date) {
@@ -39,12 +47,8 @@ public class Day {
 	public void setEmployees(List<EmployeeDailyReference> employees) {
 		this.employees = employees;
 	}
-	
+
 	public void addEmployee(EmployeeDailyReference edr) {
 		this.employees.add(edr);
-	}
-
-	public String getID() {
-		return this.id;
 	}
 }

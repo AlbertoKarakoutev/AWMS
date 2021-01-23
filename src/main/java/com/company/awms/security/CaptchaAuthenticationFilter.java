@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 public class CaptchaAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+
     private String processUrl;
 
     public CaptchaAuthenticationFilter(String defautFilterProcessesUrl, String failureUrl) {

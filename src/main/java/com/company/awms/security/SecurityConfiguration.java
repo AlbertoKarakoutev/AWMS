@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
 	private final UserDetailsService userDetailsService;
 
 	public SecurityConfiguration(@Qualifier("employeeDetailsService") UserDetailsService userDetailsService) {

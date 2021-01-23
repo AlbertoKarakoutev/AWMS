@@ -22,6 +22,7 @@ import com.company.awms.util.ForumComparator;
 
 @Service
 public class ForumService {
+
     private ForumThreadRepo forumThreadRepo;
     private ForumReplyRepo forumReplyRepo;
     private EmployeeRepo employeeRepo;

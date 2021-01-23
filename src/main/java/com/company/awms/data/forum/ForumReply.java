@@ -51,6 +51,10 @@ public class ForumReply {
 		return issuerName;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public void setIssuerID(String issuerID) {
 		this.issuerID = issuerID;
 	}
