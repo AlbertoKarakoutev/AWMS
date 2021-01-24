@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 import com.company.awms.data.schedule.Task;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
 public class EmployeeDailyReference {
 
+	@JsonIgnore
 	private LocalTime[] workTime;
 	private String firstName;
 	private String lastName;
@@ -44,7 +46,8 @@ public class EmployeeDailyReference {
 	public String getNationalID() {
 		return this.nationalID;
 	}
-	
+
+	@JsonIgnore
 	public String getWorkTimeInfo() {
 		return String.format("%s - %s", workTime[0], workTime[1]);
 	}

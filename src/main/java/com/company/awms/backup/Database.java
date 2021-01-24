@@ -16,7 +16,9 @@ public class Database {
     private List<Employee> employees;
     private List<Day> days;
 
-    Database(List<Doc> documents, List<ForumThread> threads, List<ForumReply> replies, List<Employee> employees,
+    public Database(){}
+
+    public Database(List<Doc> documents, List<ForumThread> threads, List<ForumReply> replies, List<Employee> employees,
              List<Day> days) {
         this.documents = documents;
         this.threads = threads;

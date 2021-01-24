@@ -4,17 +4,20 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.company.awms.data.employees.EmployeeDailyReference;
 
 @Document
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Day {
 	
 	@Id
 	private String id;
-
+	@JsonIgnore
 	private LocalDate date;
 	private List<EmployeeDailyReference> employees = new ArrayList<>();
 

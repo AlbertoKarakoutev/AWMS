@@ -2,10 +2,13 @@ package com.company.awms.data.forum;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ForumReply {
 
 	@Id
@@ -15,6 +18,7 @@ public class ForumReply {
 	private String issuerID;
 	private String issuerName;
 	private String body;
+	@JsonIgnore
 	private LocalDateTime dateTime;
 	
 	public ForumReply() {}

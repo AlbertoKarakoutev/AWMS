@@ -1,11 +1,14 @@
 package com.company.awms.data.employees;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class Notification {
 
 	private String message;
+	@JsonIgnore
 	private LocalDateTime dateTime;
 	private List<Object> data;
 	private boolean read = false;

@@ -7,6 +7,7 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -30,14 +31,10 @@ public class BackupService {
         this.folderZipper = folderZipper;
     }
 
-    @Scheduled(fixedRate = 20 * 1000)
+    @Scheduled(fixedRate = 60 * 1000)
+    //@Scheduled(fixedRate = 36000 * 1000)
     public void generateBackup(){
-        String today = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDateTime.now());
-        Path backupFolderPath = Paths.get("backup").toAbsolutePath();
-        String inputFolder = backupFolderPath.toFile().getParentFile().toString();
-
-        saveToGithub(today, inputFolder);/*
-        System.out.println("Generating Backup...");
+        System.out.println("Checking for backup...");
         try {
             String today = DateTimeFormatter.ofPattern("dd-MM-yyyy").format(LocalDateTime.now());
             Path backupFolderPath = Paths.get("backup").toAbsolutePath();
@@ -46,6 +43,7 @@ public class BackupService {
             boolean isAlreadyCreated = getIsAlreadyCreated(backupFolder, today);
 
             if(!isAlreadyCreated){
+                System.out.println("Generating Backup...");
                 System.out.println("Saving Json...");
                 Path databaseFilePath = Paths.get(backupFolder.toString(), today, "database.json");
                 String json = this.dataParser.parseToJSON();
@@ -59,12 +57,14 @@ public class BackupService {
                 System.out.println("File Zipped!");
 
                 System.out.println("Pushing to github...");
-                saveToGithub();
+                saveToGithub(today, inputFolder);
                 System.out.println("Pushed Successfully!");
+            } else {
+                System.out.println("Backup is available!");
             }
         } catch (Exception e){
             e.printStackTrace();
-        }*/
+        }
     }
 
     private boolean getIsAlreadyCreated(File backupFolder, String today){
@@ -95,20 +95,14 @@ public class BackupService {
     private void saveToGithub(String today, String inputFolder){
         try {
             Repository localRepo = new FileRepository(inputFolder + "/.git");
-            System.out.println(localRepo.getDirectory());
             Git git = new Git(localRepo);
-            System.out.println("Opened git repo");
-            getStatus(git);
+            String oldBranch = localRepo.getBranch();
             git.checkout().setCreateBranch(false).setName("backup").call();
-            System.out.println("Checkout to backup");
-            getStatus(git);
             git.add().addFilepattern(".").call();
-            System.out.println("Staged all files");
-            getStatus(git);
+            git.add().setUpdate(true).addFilepattern(".").call();
             git.commit().setMessage("backup " + today).call();
-            System.out.println("Committed with message: \"backup " + today +"\"");
-            getStatus(git);
-            git.push();
+            git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider("awmsbot", "NqkakwaSiParola1")).call();
+            git.checkout().setCreateBranch(false).setName(oldBranch).call();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,9 +124,5 @@ public class BackupService {
         for (String untrack : untracked) {
             System.out.println("Untracked: " + untrack);
         }
-    }
-    //Dangerous! Do it on a dummy database only!
-    public void overwriteDatabase(){
-        //TODO:
     }
 }

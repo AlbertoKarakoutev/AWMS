@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,6 +12,7 @@ import com.company.awms.data.documents.Doc;
 
 //Main employee class
 @Document
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee {
 
 	@Id
