@@ -108,6 +108,7 @@ public class BackupService {
             git.commit().setMessage("backup " + today).call();
             System.out.println("Committed with message: \"backup " + today +"\"");
             getStatus(git);
+            git.push();
         } catch (Exception e) {
             e.printStackTrace();
         }
