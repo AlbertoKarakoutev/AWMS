@@ -382,7 +382,7 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void addTaskThrowsIOExceptionWhenDateIsWrong(){
+    public void addTaskThrowsExceptionWhenDateIsWrong(){
     	String data = "date=wrongDate \nreceiverNationalID=1 \ntitle=title \nbody=body \nreward=1 ";
 
     	boolean thrown = false;
@@ -490,7 +490,7 @@ public class ScheduleServiceTest {
     }
     
     @Test
-    public void markTaskAsCompleteThrowsIOExceptionWhenNationalIDIsWrong() {
+    public void markTaskAsCompleteThrowsIOExceptionWhenIDIsWrong() {
     	String date = "2020-01-01";
     	String taskNumber = "1";
     	Mockito.when(this.scheduleRepo.findByDate(LocalDate.parse(date))).thenReturn(Optional.of(this.day));
@@ -498,7 +498,7 @@ public class ScheduleServiceTest {
     	String message ="";
     	
     	try {
-    		this.scheduleService.markTaskAsComplete("1", taskNumber, date);
+    		this.scheduleService.markTaskAsComplete("wrongID", taskNumber, date);
     	}catch(Exception e) {
         	thrown = true;
         	message = e.getMessage();
@@ -585,7 +585,7 @@ public class ScheduleServiceTest {
     }
     
     @Test
-    public void getDepartmentThrowsExceptionWhenDepartmentsJSONFileIsWrong() {
+    public void getDepartmentReturnsNullWhenDepartmentsJSONFileIsWrong() {
     	List<String> JSONData = null;
     	FileWriter mockFR;
     	String existingDepartment = "a";
