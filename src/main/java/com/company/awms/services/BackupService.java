@@ -1,5 +1,6 @@
 package com.company.awms.services;
 
+import com.company.awms.backup.Credentials;
 import com.company.awms.backup.DataParser;
 import com.company.awms.backup.FolderZipper;
 import org.eclipse.jgit.api.Git;
@@ -31,8 +32,8 @@ public class BackupService {
         this.folderZipper = folderZipper;
     }
 
-    @Scheduled(fixedRate = 60 * 1000)
-    //@Scheduled(fixedRate = 36000 * 1000)
+    //@Scheduled(fixedRate = 60 * 1000)
+    @Scheduled(fixedRate = 86400 * 1000)
     public void generateBackup(){
         System.out.println("Checking for backup...");
         try {
@@ -101,7 +102,7 @@ public class BackupService {
             git.add().addFilepattern(".").call();
             git.add().setUpdate(true).addFilepattern(".").call();
             git.commit().setMessage("backup " + today).call();
-            git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider("awmsbot", "NqkakwaSiParola1")).call();
+            git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(Credentials.USERNAME, Credentials.PASSWORD)).call();
             git.checkout().setCreateBranch(false).setName(oldBranch).call();
         } catch (Exception e) {
             e.printStackTrace();

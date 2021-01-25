@@ -12,7 +12,6 @@ import com.company.awms.data.documents.Doc;
 
 //Main employee class
 @Document
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee {
 
 	@Id

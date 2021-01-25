@@ -8,7 +8,6 @@ import java.util.List;
 public class Notification {
 
 	private String message;
-	@JsonIgnore
 	private LocalDateTime dateTime;
 	private List<Object> data;
 	private boolean read = false;

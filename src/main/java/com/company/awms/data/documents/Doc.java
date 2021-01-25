@@ -13,14 +13,12 @@ public class Doc {
 
 	@Id
 	private String id;
-	@JsonIgnore
 	private Binary data;
 	private int level;
 	private String department;
 	private String name;
 	private String type;
 	private String uploaderID;
-	@JsonIgnore
 	private LocalDateTime uploadDateTime;
 	private List<String> downloaderIDs = new ArrayList<>();
 	private long size;

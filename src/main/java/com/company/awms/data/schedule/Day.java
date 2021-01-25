@@ -12,12 +12,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.company.awms.data.employees.EmployeeDailyReference;
 
 @Document
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Day {
 	
 	@Id
 	private String id;
-	@JsonIgnore
 	private LocalDate date;
 	private List<EmployeeDailyReference> employees = new ArrayList<>();
 
