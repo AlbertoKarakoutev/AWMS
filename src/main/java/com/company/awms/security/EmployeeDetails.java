@@ -14,6 +14,7 @@ public class EmployeeDetails implements UserDetails {
     private String password;
     private String role;
     private String ID;
+    private String nationalID;
     private String firstName;
     private String lastName;
 
@@ -24,6 +25,7 @@ public class EmployeeDetails implements UserDetails {
         this.ID = employee.getID();
         this.firstName = employee.getFirstName();
         this.lastName = employee.getLastName();
+        this.nationalID = employee.getNationalID();
     }
 
     @Override
@@ -45,6 +47,10 @@ public class EmployeeDetails implements UserDetails {
     
     public String getRole() {
     	return this.role;
+    }
+    
+    public String getNationalID() {
+    	return this.nationalID;
     }
 
     @Override

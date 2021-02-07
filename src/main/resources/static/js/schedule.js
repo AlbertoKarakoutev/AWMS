@@ -2,16 +2,26 @@ var now = new Date();
 var numberOfDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
 var btns = document.getElementsByClassName("day-box");
 for(let i = 0; i <= numberOfDays; i++){
-	btns[i].textContent = i+1;
+	btns[i].textContent = i+1
 }
 
 function datePrompt(nationalID, receiverDate){
-	let requesterDate = prompt("Enter date for the shift you wish to swap in the format /YYYY-MM-DD/", "2020-12-10");
-	if(requesterDate!=null){
-		let req = new XMLHttpRequest();
-		req.open("GET", "/schedule/swapRequest/?receiverNationalID="+String(nationalID)+"&requesterDate="+requesterDate+"&receiverDate="+receiverDate, true);
-		req.send();
+	let receiverNationalIDElem = document.getElementById("receiverNationalID");
+	let receiverDateElem = document.getElementById("receiverDate");
+	receiverNationalIDElem.value = String(nationalID);
+	receiverDateElem.value = String(receiverDate);
+}
+
+function sendSwapRequest(){
+	let receiverNationalID = document.getElementById("receiverNationalID").value;
+	let receiverDate = document.getElementById("receiverDate").value;
+	let requesterDate = document.getElementById("receiverDate").value;
+	let req = new XMLHttpRequest();
+	req.open("GET", "/schedule/swapRequest/?receiverNationalID="+receiverNationalID+"&receiverDate="+receiverDate+"&requesterDate="+requesterDate, true);
+	req.onreadystatechange = function(){
+		if(req.status==200)alert("Successfully sent a swap request!")
 	}
+	req.send();
 }
 
 function deleteWorkDay(modalID, nationalID, date){

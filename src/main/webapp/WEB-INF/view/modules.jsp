@@ -28,7 +28,7 @@
                     <h1 class="ty-page-title">Active Modules</h1>
                 </header>
                 <div class="my-3 d-flex flex-row-reverse">
-                    <button class="btn btn-dark module-update">Update</button>
+                    <button class="btn btn-dark module-update" id="updateModules">Update</button>
                 </div>
                 <table class="table">
                     <thead>
@@ -39,19 +39,19 @@
                     </thead>
                     <tbody>
                         <%Map<String, Boolean> modules = (Map<String, Boolean>)request.getAttribute("modules");
-                        for(Map.Entry<String, Boolean> module : modules.entrySet()){ %>
-                                <tr>
-                                    <td class="col-11">
-						                <h4 class="module-name"><%=module.getKey()%></h4>
-					                </td>
-                	                <td class="col-1">
-                                        <div class="text-center">
-                                            <c:set var="check" value="<%= (boolean)(modules.get(module.getKey())) %>" />
-                                            <input type="checkbox" id="<%=module.getKey()%>" name="<%=module.getKey()%>" ${check ? "checked" : ""}>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <%}%>
+                        for(Map.Entry<String, Boolean> module : modules.entrySet()){%>
+                           <tr>
+                               <td class="col-11">
+						                					<h4 class="module-name"><%=module.getKey()%></h4>
+					                				</td>
+                	               <td class="col-1">
+                                   <div class="text-center">
+                                   			<c:set var="check" value="<%=(boolean)(modules.get(module.getKey())) %>" />
+                                   			<input type="checkbox" id="<%=module.getKey()%>" name="<%=module.getKey()%>" ${check ? "checked" : ""} <%if(!module.getKey().equals("Salary")){%>disabled="disabled"<%}%>>
+                                   </div>
+                                </td>
+                           </tr>
+                        <%}%>
                         
                     </tbody>
                 </table>
@@ -62,7 +62,7 @@
             </section>
         </section>
     </div>
-<script type="module" src="/js/modules.js"></script>
 <script type="module" src="/js/main.js"></script>
+<script type="module" src="/js/modules.js"></script>
 </body>
 </html>

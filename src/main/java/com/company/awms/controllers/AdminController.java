@@ -328,7 +328,6 @@ public class AdminController {
 		String updatedActivitiesFormatted = updatedActives.substring(19, updatedActives.length() - 2).replaceAll("\\\\", "");
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Boolean> actives = mapper.readValue(updatedActivitiesFormatted, HashMap.class);
-
 		for (String key : actives.keySet()) {
 			try {
 				Class<?> controller = Class.forName("com.company.awms.controllers." + key + "Controller");
@@ -378,17 +377,15 @@ public class AdminController {
 	}
 
 	@PostMapping(value = "/departments/set", consumes = "application/json")
-	public String setDepartment(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestBody Object departmentObj) throws ParseException {
-	
-
+	public  ResponseEntity<String> setDepartment(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestBody Object departmentObj) throws ParseException {
 		try {
 			scheduleService.setDepartment(departmentObj);
 			Map<String, String> departmentDTOs = getDepartmentDTOs();
 			model.addAttribute("departments", departmentDTOs);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			return "redirect:/admin/departments";
+			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
-			return "internalServerError";
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
