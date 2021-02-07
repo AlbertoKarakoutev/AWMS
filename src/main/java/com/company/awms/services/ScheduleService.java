@@ -385,7 +385,7 @@ public class ScheduleService {
 				continue;
 			}
 			if (viewer.getRole().equals("ADMIN") || viewer.getRole().equals("MANAGER")) {
-				sameLevelEmployees[i][0] = thisDay.getEmployees();
+				sameLevelEmployees[0][i] = thisDay.getEmployees();
 				continue;
 			} else {
 				for (int j = 0; j < thisDay.getEmployees().size(); j++) {

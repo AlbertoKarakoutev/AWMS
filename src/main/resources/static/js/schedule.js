@@ -2,7 +2,8 @@ var now = new Date();
 var numberOfDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
 var btns = document.getElementsByClassName("day-box");
 for(let i = 0; i <= numberOfDays; i++){
-	btns[i].textContent = i+1
+	let content = btns[i].innerHTML;
+	btns[i].innerHTML = (i+1) + content;
 }
 
 function datePrompt(nationalID, receiverDate){

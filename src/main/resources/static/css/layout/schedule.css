@@ -96,6 +96,22 @@
 	animation: border 1s 1;
 }
 
+.work-day{
+	position:relative;
+	display:flex;
+	background-color:var(--primary-color);
+	padding-top:20px;
+	margin-top:-3%;
+	margin-bottom:-17%;
+	height:20%;
+	width:100%;
+	transition:0.8s background;
+}
+
+.day-box:hover .work-day{
+	background:var(--secondary-color);
+}
+
 .content::-webkit-scrollbar {
     width: 10px;
     }
