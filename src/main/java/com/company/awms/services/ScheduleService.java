@@ -377,34 +377,61 @@ public class ScheduleService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<EmployeeDailyReference>[] viewSchedule(Employee viewer, YearMonth month) throws IOException {
-		int monthLength = month.lengthOfMonth();
-		List<EmployeeDailyReference>[] sameLevelEmployees = new ArrayList[monthLength + 1];
-		for (int i = 1; i <= monthLength; i++) {
+	public List<EmployeeDailyReference>[][] viewSchedule(Employee viewer, YearMonth month) throws IOException {
+		List<EmployeeDailyReference>[][] sameLevelEmployees = new ArrayList[2][32];
+		for (int i = 1; i <= month.lengthOfMonth(); i++) {
 			Day thisDay = getDay(month.atDay(i));
 			if (thisDay.getEmployees().isEmpty()) {
 				continue;
 			}
 			if (viewer.getRole().equals("ADMIN") || viewer.getRole().equals("MANAGER")) {
-				sameLevelEmployees[i] = thisDay.getEmployees();
+				sameLevelEmployees[0][i] = thisDay.getEmployees();
 				continue;
 			} else {
 				for (int j = 0; j < thisDay.getEmployees().size(); j++) {
 					EmployeeDailyReference employee = thisDay.getEmployees().get(j);
 					if ((employee.getDepartment().equals(viewer.getDepartment()) && employee.getLevel() <= viewer.getLevel())) {
-						if (!employee.getNationalID().equals(viewer.getNationalID())) {
-							if (sameLevelEmployees[i] != null) {
-								sameLevelEmployees[i].add(thisDay.getEmployees().get(j));
-							} else {
-								List<EmployeeDailyReference> singleEDR = new ArrayList<EmployeeDailyReference>();
-								singleEDR.add(thisDay.getEmployees().get(j));
-								sameLevelEmployees[i] = singleEDR;
-							}
+						if (sameLevelEmployees[0][i] != null) {
+							sameLevelEmployees[0][i].add(thisDay.getEmployees().get(j));
+						} else {
+							List<EmployeeDailyReference> singleEDR = new ArrayList<EmployeeDailyReference>();
+							singleEDR.add(thisDay.getEmployees().get(j));
+							sameLevelEmployees[0][i] = singleEDR;
 						}
+						
 					}
 				}
 			}
 		}
+		
+		YearMonth otherMonth = YearMonth.now();
+		
+		if(month.equals(YearMonth.now())) {
+			otherMonth = month.plusMonths(1);
+		}else {
+			otherMonth = month.minusMonths(1);
+		}
+		
+		int otherMonthLength = otherMonth.lengthOfMonth();
+		
+		dayLoop:
+		for (int i = 1; i <= otherMonthLength; i++) {
+			Day thisDay = getDay(otherMonth.atDay(i));
+			if (thisDay.getEmployees().isEmpty()) {
+				continue;
+			}
+			for (int j = 0; j < thisDay.getEmployees().size(); j++) {
+				EmployeeDailyReference employee = thisDay.getEmployees().get(j);
+				if (employee.getNationalID().equals(viewer.getNationalID())){
+					List<EmployeeDailyReference> singleEDR = new ArrayList<EmployeeDailyReference>();
+					singleEDR.add(thisDay.getEmployees().get(j));
+					sameLevelEmployees[1][i] = singleEDR;
+					continue dayLoop;
+				}
+			}
+		}
+		
+		
 		return sameLevelEmployees;
 	}
 

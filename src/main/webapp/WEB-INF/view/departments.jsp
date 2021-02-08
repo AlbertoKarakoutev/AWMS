@@ -58,7 +58,7 @@
             </section>
         </section>
     </div>
-<script type="module" src="/js/departments.js"></script>
 <script type="module" src="/js/main.js"></script>
+<script type="module" src="/js/departments.js"></script>
 </body>
 </html>

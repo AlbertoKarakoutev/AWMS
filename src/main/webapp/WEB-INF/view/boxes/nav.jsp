@@ -27,7 +27,7 @@
 			</li>
 			<li class="vertical-item"><a href="/contacts" title="Contacts">Contacts</a>
 			</li>
-			<li class="vertical-item"><a
+			<li class="vertical-item schedule"><a
 				href="/schedule/?month=<%=YearMonth.now().toString()%>"
 				title="Working Shedule">Schedule</a></li>
 			<li class="vertical-item"><a href="/employee/leaves" title="Leaves">Leaves</a>
@@ -61,14 +61,12 @@
 					</div>
 				</div>
 			</li>
-			<%
-				if (AdminController.getActivesMethod().get("Salary")) {
-			%>
-			<li class="vertical-item"><a href="/salary" title="Salary">Salary</a></li>
-			<%
-				}
-			%>
-			<sec:authentication property="principal.authorities" var="role" />
+			<%if(AdminController.getActivesMethod().get("Salary")){%>
+				<li class="vertical-item Salary" style="display:inline"><a href="/salary" title="Salary">Salary</a></li>
+			<%}else{%>
+				<li class="vertical-item Salary" style="display:none"><a href="/salary" title="Salary">Salary</a></li>
+			<%}%>
+			<sec:authentication property="principal.authorities" var="role"/>
 			<c:if test="${role == '[ADMIN]'}">
 				<li class="vertical-item"><a href="/admin/employee/all"
 					title="Employees">Employees</a></li>

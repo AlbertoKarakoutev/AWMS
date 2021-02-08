@@ -6,6 +6,8 @@ import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,11 +40,15 @@ public class ScheduleController {
 	}
 
 	@GetMapping("/swapRequest")
-	public void swapRequest(@AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String receiverNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
+	public ResponseEntity<String> swapRequest(@AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String receiverNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
 		try {
 			scheduleService.swapRequest(employeeDetails.getID(),receiverNationalID, requesterDate, receiverDate);
-		} catch (Exception e) {
+			return new ResponseEntity<String>(HttpStatus.OK);
+		} catch(IOException e1) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		}catch (Exception e) {
 			e.printStackTrace();
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -121,7 +127,7 @@ public class ScheduleController {
 		try {
 
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
-			List<EmployeeDailyReference>[] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee, monthChecked);
+			List<EmployeeDailyReference>[][] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee, monthChecked);
 			List<Task>[] tasks = this.scheduleService.viewTasks(authenticatedEmployee, monthChecked);
 			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
 			model.addAttribute("month", monthChecked);
@@ -142,6 +148,7 @@ public class ScheduleController {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());
 		model.addAttribute("employeeID", employeeDetails.getID());
+		model.addAttribute("employeeNationalID", employeeDetails.getNationalID());
 		Employee user = employeeService.getEmployee(employeeDetails.getID());
 		int unread = 0;
 		for(int i = 0; i < user.getNotifications().size(); i++) {

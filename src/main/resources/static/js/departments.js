@@ -117,7 +117,7 @@ add.onclick = function () {
 		+ "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='text' id='Daily hours"+levelCounter+"'/><small class='form-text text-muted'>Department's open hours</small><br>"
 		+ "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length"+levelCounter+"'/><small class='form-text text-muted'>Each employee's shift length</small><br>"
 		+ "<select class='data-field form-control' id='Work on weekends"+levelCounter+"'/><option value='true' selected>Yes</option><option value='false'>No</option></select>"
-		+	"<small class='form-text text-muted'>Do the employees work on the weekends</small><br>"
+		+ "<small class='form-text text-muted'>Do the employees work on the weekends</small><br>"
 		+ "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monthly work days"+levelCounter+"'/><small class='form-text text-muted'>Work days per month</small><br>"
 		+ "<input class='data-field form-control' placeholder='Number of employees' type='number' id='Employees per shift"+levelCounter+"'/><small class='form-text text-muted'>Number of employees for each shift</small><br>"
 		+ "<input class='data-field form-control' placeholder='Hours' type='number' id='Break between shifts"+levelCounter+"'/><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";

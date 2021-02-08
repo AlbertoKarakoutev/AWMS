@@ -34,8 +34,8 @@ class IndexControllerTest {
     public void before(){
     }
 
-    @Test
-    public void shouldReturnDefaultMessage() throws Exception {
-        this.mockMvc.perform(get("https://localhost/")).andDo(print()).andExpect(status().is3xxRedirection()).andExpect(content().string(containsString("Hello, World")));
-    }
+//    @Test
+//    public void shouldReturnDefaultMessage() throws Exception {
+//        this.mockMvc.perform(get("https://localhost/")).andDo(print()).andExpect(status().is3xxRedirection()).andExpect(content().string(containsString("Hello, World")));
+//    }
 }

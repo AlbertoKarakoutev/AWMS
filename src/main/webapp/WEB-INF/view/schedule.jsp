@@ -22,7 +22,7 @@
 <body>
 	<sec:authentication property="principal.authorities" var="role" />
 	
-	<%List<EmployeeDailyReference>[] sle = (List<EmployeeDailyReference>[])request.getAttribute("sameLevelEmployees");
+	<%List<EmployeeDailyReference>[][] sle = (List<EmployeeDailyReference>[][])request.getAttribute("sameLevelEmployees");
 	List<Task>[] tasks = (List<Task>[])request.getAttribute("tasks");
 	YearMonth yearMonth = (YearMonth)request.getAttribute("month");
 	LocalDate thisMonth = LocalDate.now().withYear(yearMonth.getYear()).withMonth(yearMonth.getMonthValue());
@@ -37,7 +37,7 @@
                 <%@include file="boxes/header.jsp" %>
             </header>
             <section class="content">
-			    <div class="p-4">
+			    <div id="mainBody" class="p-4">
 			        <header class="py-3">
                         <h1 class="ty-page-title"><%=yearMonth.getMonth()%> <%=yearMonth.getYear()%></h1>
                     </header>
@@ -65,12 +65,64 @@
 		    					<h3 class="text-center">Sunday</h3>
 		    				</div>
 		    			</div>
+		    			<div id='swap-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>
+					        <div class='modal-dialog modal-dialog-centered modal-xl' role='document'>
+								<div class='modal-content'>
+									<div class='modal-header'>
+										<h5 class='modal-title'>Swap Shifts</h5>
+										<button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+						                	<span aria-hidden='true'><i class='fas fa-times'></i></span>
+						                </button>
+									</div>
+									<div class='modal-body'>
+										<form method="GET" action="/schedule/swapRequest">
+											<div class="form-group">
+					                        	<div class="md-form">
+													<select name="requesterDate" id="dates" class="form-control">
+														<%for(int j = 0; j < 2; j++){ 
+															for(int i = 1; i < sle[j].length+1; i++){
+																LocalDate targetDate;
+																if(j==0){
+																	if(i > yearMonth.lengthOfMonth())continue;
+																	targetDate = thisMonth.withDayOfMonth(i);
+																}else{
+																	if(yearMonth.equals(YearMonth.now())){		
+																		if(i > thisMonth.plusMonths(1).lengthOfMonth())break;
+																		targetDate = thisMonth.plusMonths(1).withDayOfMonth(i);
+																	}else{
+																		if(i > thisMonth.minusMonths(1).lengthOfMonth())break;
+																		targetDate = thisMonth.minusMonths(1).withDayOfMonth(i);
+																	}
+																}
+																if(targetDate.isBefore(LocalDate.now()))continue;
+																if(sle[j][i]!=null){
+
+																	for(EmployeeDailyReference edr : sle[j][i]){
+																		if(edr.getNationalID().equals((String)request.getAttribute("employeeNationalID"))){%>
+																			<option value="<%=targetDate.toString()%>"><%=targetDate.toString()%></option>
+																		<%break;
+														}}}}}%>
+													</select>
+												</div>
+					                        </div>
+					                        <small class='form-text text-muted'>Select the date, which you wish to switch.</small><br>
+											<input type="hidden" id="receiverNationalID" name="receiverNationalID">
+											<input type="hidden" id="receiverDate" name="receiverDate">
+										</form>
+										<button class="btn btn-dark" data-dismiss="modal" onclick="sendSwapRequest()">Send request!</button>
+									</div>
+									<div class='modal-footer'>
+										
+									</div>
+								</div>
+							</div>
+						</div>
 						<div class="mt-2">
 						    <div class="row seven-cols">
 								<%for(int i = 0; i <= 34; i++){%>
 								    <c:set var="i" value="<%=i%>" />
 								    <div class="col-md-1 p-0">
-                   						<%if(i>=offset && i < thisMonth.lengthOfMonth()+(offset)){%>
+                   						<%if(i>=offset && i < thisMonth.lengthOfMonth()+offset){%>
                    						
 		             	     	 	        <button class='day-box' data-toggle="modal" data-target="#employeeModal${i}"></button>				
 		                 	  		    	<div class='modal fade' id="employeeModal${i}" tabindex="-1" role="dialog" aria-labelledby="EmployeeModal${i}" aria-hidden="true">
@@ -95,11 +147,15 @@
                                                                 </thead>
                                                                 <tbody id="body<%=i%>">
 				                    	    		          	    <%String day = "";%>
-				                    	    		          	    <%if(sle[i-offset+1] != null){%>
+				                    	    		          	    <%if(sle[0][i-offset+1] != null){%>
 				                    	    		          	    	<%day = thisMonth.withDayOfMonth(i-offset+1).toString();%>
-				                    	    		          	    	<%for(int j = 0; j < sle[i-offset+1].size(); j++){
-				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[i-offset+1].get(j);%>
+				                    	    		          	    	<%for(int j = 0; j < sle[0][i-offset+1].size(); j++){
+				                     		 	  	          	    		EmployeeDailyReference thisEDR = sle[0][i-offset+1].get(j);
+				                     		 	  	          	    			if(request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID())){%>	
+																    				<tr style="background-color:#999999" id="<%=i%>-<%=thisEDR.getNationalID()%>">
+																    			<%}else{%>
 																    				<tr id="<%=i%>-<%=thisEDR.getNationalID()%>">
+																    			<%}%>
 	                                                                                    <th scope="row">
 																						    <h4><%= thisEDR.getFirstName() %> <%=thisEDR.getLastName() %></h4>
 																						</th>
@@ -107,9 +163,11 @@
 									                                                        <h4><%= thisEDR.getWorkTimeInfo() %></h4>
 									                                                    </td>
 																						<c:if test="${role == '[EMPLOYEE]'}">
-		                                                                                    <td>
-									                                                            <button class="btn btn-dark" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
-										                                                    </td>
+																							<%if(!request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID()) && LocalDate.parse(day).isAfter(LocalDate.now())){ %>
+			                                                                                    <td>
+										                                                            <button class="btn btn-dark" data-dismiss="modal" data-toggle="modal" data-target="#swap-modal" onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap Shifts</button>
+											                                                    </td>
+										                                                    <%}%>
 									                                                    </c:if>
 									                                                    <c:if test="${role == '[ADMIN]'}">
 									                                                    	<td>
@@ -133,7 +191,7 @@
 															    </tbody>
 		                      		                        </table>
 															</div>
-		                          	  	    	         	<%if(tasks[i-offset+1] != null){%>
+		                          	  	    	         	<%if(tasks[i-offset+1] != null && tasks[i-offset+1].size()>0){%>
 		                    	    	 		        	   	<table class="table">
 			                    	    	 		        	   	<thead>
 	                                                                    <tr>

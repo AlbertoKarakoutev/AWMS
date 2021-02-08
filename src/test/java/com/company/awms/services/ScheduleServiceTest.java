@@ -382,7 +382,7 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void addTaskThrowsIOExceptionWhenDateIsWrong(){
+    public void addTaskThrowsExceptionWhenDateIsWrong(){
     	String data = "date=wrongDate \nreceiverNationalID=1 \ntitle=title \nbody=body \nreward=1 ";
 
     	boolean thrown = false;
@@ -490,7 +490,7 @@ public class ScheduleServiceTest {
     }
     
     @Test
-    public void markTaskAsCompleteThrowsIOExceptionWhenNationalIDIsWrong() {
+    public void markTaskAsCompleteThrowsIOExceptionWhenIDIsWrong() {
     	String date = "2020-01-01";
     	String taskNumber = "1";
     	Mockito.when(this.scheduleRepo.findByDate(LocalDate.parse(date))).thenReturn(Optional.of(this.day));
@@ -498,7 +498,7 @@ public class ScheduleServiceTest {
     	String message ="";
     	
     	try {
-    		this.scheduleService.markTaskAsComplete("1", taskNumber, date);
+    		this.scheduleService.markTaskAsComplete("wrongID", taskNumber, date);
     	}catch(Exception e) {
         	thrown = true;
         	message = e.getMessage();
@@ -585,7 +585,7 @@ public class ScheduleServiceTest {
     }
     
     @Test
-    public void getDepartmentThrowsExceptionWhenDepartmentsJSONFileIsWrong() {
+    public void getDepartmentReturnsNullWhenDepartmentsJSONFileIsWrong() {
     	List<String> JSONData = null;
     	FileWriter mockFR;
     	String existingDepartment = "a";
@@ -741,7 +741,7 @@ public class ScheduleServiceTest {
     	viewer.setNationalID("3");
     	viewer.setRole("EMPLOYEE");
     	Mockito.when(this.scheduleRepo.findByDate(ArgumentMatchers.any(LocalDate.class))).thenReturn(Optional.of(this.day));
-    	List<EmployeeDailyReference>[] schedule = new ArrayList[LocalDate.now().lengthOfMonth() + 1];
+    	List<EmployeeDailyReference>[][] schedule = new ArrayList[2][LocalDate.now().lengthOfMonth() + 1];
     	try {
     		schedule = this.scheduleService.viewSchedule(viewer, YearMonth.now());
     	}catch(IOException e) {
@@ -749,8 +749,8 @@ public class ScheduleServiceTest {
     	}
     	try {
 	    	for(int i = 1; i < schedule.length; i++) {
-	    		assertTrue(schedule[i].size() == 1);
-	    		assertTrue(schedule[i].get(0) == mock);
+	    		assertTrue(schedule[0][i].size() == 1);
+	    		assertTrue(schedule[0][i].get(0) == mock);
 	    	}
     	}catch(Exception e) {
     		e.printStackTrace();
@@ -768,7 +768,7 @@ public class ScheduleServiceTest {
     	viewer.setRole("ADMIN");
     	
     	Mockito.when(this.scheduleRepo.findByDate(ArgumentMatchers.any(LocalDate.class))).thenReturn(Optional.of(this.day));
-    	List<EmployeeDailyReference>[] schedule = new ArrayList[LocalDate.now().lengthOfMonth() + 1];
+    	List<EmployeeDailyReference>[][] schedule = new ArrayList[2][LocalDate.now().lengthOfMonth() + 1];
     	try {
     		schedule = this.scheduleService.viewSchedule(viewer, YearMonth.now());
     	}catch(IOException e) {
@@ -776,11 +776,11 @@ public class ScheduleServiceTest {
     	}
     	try {
 	    	for(int i = 1; i < schedule.length; i++) {
-	    		assertTrue(schedule[i].size() == 2);
-	    		assertTrue(schedule[i].get(0).getNationalID() != viewer.getNationalID());
-	    		assertTrue(schedule[i].get(1).getNationalID() != viewer.getNationalID());
-	    		assertTrue(schedule[i].get(0) == mock);
-	    		assertTrue(schedule[i].get(1) == mock2);
+	    		assertTrue(schedule[0][i].size() == 2);
+	    		assertTrue(schedule[0][i].get(0).getNationalID() != viewer.getNationalID());
+	    		assertTrue(schedule[0][i].get(1).getNationalID() != viewer.getNationalID());
+	    		assertTrue(schedule[0][i].get(0) == mock);
+	    		assertTrue(schedule[0][i].get(1) == mock2);
 	    	}
     	}catch(Exception e) {
     		e.printStackTrace();
