@@ -22,7 +22,7 @@
 		List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
 		boolean allRead = true;
 		if (notifications.size() > 0) {
-			for (int i = 0; i < notifications.size(); i++) {
+			for (int i = notifications.size()-1; i >= 0; i--) {
 				Notification notification = notifications.get(i);
 				if (notification.getRead() == false) {
 			allRead = false;
@@ -67,7 +67,24 @@
 							</form>
 							<form action="/admin/employee/denyLeave?noteNum=<%=Integer.toString(i)%>&employeeID=<%=notification.getData().get(1)%>&paid=<%=notification.getData().get(4)%>&startDate=<%=startDate%>&endDate=<%=endDate%>"
 								method="POST">
-								<input type="submit" class="btn btn-success btn-sm" id="deny" value="Deny"/>
+								<input type="submit" class="btn-danger btn btn-sm" id="deny" value="Deny"/>
+							</form>
+						</div>
+					</div>
+				<%break;
+				case "task-payment-request":%>
+					<div class="dropdown-item border-bottom">
+						<a href="/schedule/?month=<%=YearMonth.now()%>"
+							class="text-decoration-none text-justify"> <span
+							class="badge badge-secondary"><%=notification.getDateTime().toString().replace("T", " ").substring(0, 16)%></span>
+							<br> <%=notification.getMessage()%>
+						</a>
+						<div class="d-flex">
+							<form action="/schedule/approveTask?dateStr=<%=notification.getData().get(3)%>&taskNum=<%=notification.getData().get(2)%>&employeeID=<%=notification.getData().get(1)%>" method="POST">
+								<input type="submit" class="btn btn-success btn-sm" id="approve" value="Approve"/>
+							</form>
+							<form action="/schedule/resetTask?dateStr=<%=notification.getData().get(3)%>&taskNum=<%=notification.getData().get(2)%>&employeeID=<%=notification.getData().get(1)%>" method="POST">
+								<input type="submit" class="btn-danger btn btn-sm" id="Reset" value="Reset"/>
 							</form>
 						</div>
 					</div>

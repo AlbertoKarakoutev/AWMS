@@ -114,6 +114,29 @@ public class ScheduleController {
 		}
 	}
 	
+	@PostMapping("/approveTask")
+	public String approveTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String dateStr, @RequestParam String taskNum, @RequestParam String employeeID) {
+		try {
+			this.scheduleService.approveTask(dateStr, employeeID, taskNum, employeeDetails.getID());
+			
+			return "redirect:/schedule/?month="+YearMonth.now();
+		}catch(Exception e) {
+			e.printStackTrace();
+			return "internalServerError";
+		}
+	}
+	
+	@PostMapping("/resetTask")
+	public String resetTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String dateStr, @RequestParam String taskNum, @RequestParam String employeeID) {
+		try {
+			this.scheduleService.resetTask(dateStr, employeeID, taskNum, employeeDetails.getID());
+			
+			return "redirect:/schedule/?month="+YearMonth.now();
+		}catch(Exception e) {
+			return "internalServerError";
+		}
+	}
+	
 	@GetMapping("")
 	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam YearMonth month) {
 		if (!active) {

@@ -268,14 +268,19 @@ public class ScheduleService {
 					throw new NullPointerException("Task doesn't exist");
 				}
 				Task task = edr.getTasks().get(Integer.parseInt(taskNum));
-				if (!task.getCompleted())
-					task.setCompleted(true);
+				if (!task.getCompleted())task.setCompleted(true);
+
+				List<Object> notificationData = new ArrayList<>();
+				notificationData.add("task-payment-request");
+				notificationData.add(employeeID);
+				notificationData.add(taskNum);
+				notificationData.add(dateStr);
+				notificationData.add(task);
+				String message = edr.getFirstName() + " " + edr.getLastName() + " has marked assignment \"" + task.getTaskTitle() + "\" as completed.";
+
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
 				for (Employee manager : managers) {
 					if (manager.getDepartment().equals(edr.getDepartment())) {
-						List<Object> notificationData = new ArrayList<>();
-						notificationData.add("plain-notification");
-						String message = edr.getFirstName() + " " + edr.getLastName() + "has marked assignment \"" + task.getTaskTitle() + "\" as completed.";
 						manager.getNotifications().add(new Notification(message, notificationData));
 						employeeRepo.save(manager);
 					}
@@ -287,6 +292,131 @@ public class ScheduleService {
 
 	}
 
+	public void approveTask(String dateStr, String employeeID, String taskNum, String managerID) throws Exception {
+		Day taskDay = getDay(LocalDate.parse(dateStr));
+		
+		Optional<Employee> employeeOptional = employeeRepo.findById(employeeID);
+		if (employeeOptional.isEmpty()) {
+			throw new IOException("Employee not found");
+		}
+		String employeeNationalID = employeeOptional.get().getNationalID();
+		
+		Optional<Employee> managerOptional = employeeRepo.findById(managerID);
+		if (employeeOptional.isEmpty()) {
+			throw new IOException("Employee not found");
+		}
+		if(!managerOptional.get().getRole().equals("MANAGER")) {
+			throw new Exception("Employee is not a manager!");
+		}
+		
+		for (EmployeeDailyReference edr : taskDay.getEmployees()) {
+			if (edr.getNationalID().equals(employeeNationalID)) {
+				if(!StringUtils.isNumeric(taskNum)) {
+					throw new NumberFormatException("Invalid task number");
+				}
+				if(edr.getTasks().size() <= Integer.parseInt(taskNum)) {
+					throw new NullPointerException("Task doesn't exist");
+				}
+				Task task = edr.getTasks().get(Integer.parseInt(taskNum));
+				if (!task.getPaidFor())task.setPaidFor(true);
+
+				List<Object> notificationData = new ArrayList<>();
+				notificationData.add("plain-notification");
+				String message = "Your have been rewarded for your task  \"" + task.getTaskTitle() + "\"";
+
+				employeeOptional.get().getNotifications().add(new Notification(message, notificationData));
+				
+				employeeRepo.save(employeeOptional.get());
+				
+				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
+				for (Employee manager : managers) {
+					if (manager.getDepartment().equals(edr.getDepartment())) {
+						notificationLoop:
+						for(Notification notification: manager.getNotifications()) {
+							List<Object> data = notification.getData();
+							if(data.size()>4) {
+								boolean titles = ((Task) data.get(4)).getTaskTitle().equals(task.getTaskTitle());
+								boolean bodies = ((Task) data.get(4)).getTaskBody().equals(task.getTaskBody());
+								boolean rewards = ((Task) data.get(4)).getTaskReward() == task.getTaskReward();
+								boolean equal = titles && bodies && rewards;
+								if(equal) {
+									manager.getNotifications().remove(notification);
+									break notificationLoop;
+								}
+							}
+						}
+						employeeRepo.save(manager);
+					}
+				}
+				scheduleRepo.save(taskDay);
+				break;
+			}
+		}
+		
+	}
+	
+	public void resetTask(String dateStr, String employeeID, String taskNum, String managerID) throws Exception {
+Day taskDay = getDay(LocalDate.parse(dateStr));
+		
+		Optional<Employee> employeeOptional = employeeRepo.findById(employeeID);
+		if (employeeOptional.isEmpty()) {
+			throw new IOException("Employee not found");
+		}
+		String employeeNationalID = employeeOptional.get().getNationalID();
+		
+		Optional<Employee> managerOptional = employeeRepo.findById(managerID);
+		if (employeeOptional.isEmpty()) {
+			throw new IOException("Employee not found");
+		}
+		if(!managerOptional.get().getRole().equals("MANAGER")) {
+			throw new Exception("Employee is not a manager!");
+		}
+		
+		for (EmployeeDailyReference edr : taskDay.getEmployees()) {
+			if (edr.getNationalID().equals(employeeNationalID)) {
+				if(!StringUtils.isNumeric(taskNum)) {
+					throw new NumberFormatException("Invalid task number");
+				}
+				if(edr.getTasks().size() <= Integer.parseInt(taskNum)) {
+					throw new NullPointerException("Task doesn't exist");
+				}
+				Task task = edr.getTasks().get(Integer.parseInt(taskNum));
+				if (!task.getPaidFor())task.setCompleted(false);
+
+				List<Object> notificationData = new ArrayList<>();
+				notificationData.add("plain-notification");
+				String message = "Your work on task \"" + task.getTaskTitle() + "\" has not been approved";
+
+				employeeOptional.get().getNotifications().add(new Notification(message, notificationData));
+				
+				employeeRepo.save(employeeOptional.get());
+				
+				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
+				for (Employee manager : managers) {
+					if (manager.getDepartment().equals(edr.getDepartment())) {
+						notificationLoop:
+						for(Notification notification: manager.getNotifications()) {
+							List<Object> data = notification.getData();
+							if(data.size()>4) {
+								boolean titles = ((Task) data.get(4)).getTaskTitle().equals(task.getTaskTitle());
+								boolean bodies = ((Task) data.get(4)).getTaskBody().equals(task.getTaskBody());
+								boolean rewards = ((Task) data.get(4)).getTaskReward() == task.getTaskReward();
+								boolean equal = titles && bodies && rewards;
+								if(equal) {
+									manager.getNotifications().remove(notification);
+									break notificationLoop;
+								}
+							}
+						}
+						employeeRepo.save(manager);
+					}
+				}
+				scheduleRepo.save(taskDay);
+				break;
+			}
+		}
+	}
+	
 	public void addMonthlyDays() {
 		LocalDate date = LocalDate.now().plus(1, ChronoUnit.MONTHS).withDayOfMonth(1);
 		for (int i = 1; i <= date.lengthOfMonth(); i++) {

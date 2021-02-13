@@ -31,7 +31,7 @@
 						    <div class="form-row">
 							    <div class="form-group col-md-5">
 							        <input class="form-control" type="text" name='searchTerm'
-								        id="employeesSearch" placeholder="Search employees..." aria-label="Search mployees...">
+								        id="employeesSearch" placeholder="Search employees..." aria-label="Search employees...">
 								</div>
 								<div class="form-group col-md-5">
                             	    <select class="form-control" name="type" id="departmentEmployee">
@@ -42,7 +42,7 @@
                                         <option selected="E-MAIL">E-MAIL</option>
                                         <option selected="IBAN">IBAN</option>
                                         <option selected="LEVEL">LEVEL</option>
-                                        <option selected="DEPARTMENT">DEPARTMENT</option>
+                                        <option selected="DEPARTMENT">DEPARTMENT CODE</option>
                                         <option selected="ACCESS LEVEL">ACCESS LEVEL</option>
                             	    </select>
                                 </div>
