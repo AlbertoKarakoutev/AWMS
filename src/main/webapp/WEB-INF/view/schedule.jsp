@@ -24,7 +24,7 @@
 	<sec:authentication property="principal.authorities" var="role" />
 
 	<%
-		List<EmployeeDailyReference>[][] sle = (List<EmployeeDailyReference>[][]) request.getAttribute("sameLevelEmployees");
+	List<EmployeeDailyReference>[][] sle = (List<EmployeeDailyReference>[][]) request.getAttribute("sameLevelEmployees");
 	List<Task>[] tasks = (List<Task>[]) request.getAttribute("tasks");
 	YearMonth yearMonth = (YearMonth) request.getAttribute("month");
 	LocalDate thisMonth = LocalDate.now().withYear(yearMonth.getYear()).withMonth(yearMonth.getMonthValue());
@@ -110,17 +110,10 @@
 																if (sle[j][i] != null) {
 
 															for (EmployeeDailyReference edr : sle[j][i]) {
-																if (edr.getNationalID().equals((String) request.getAttribute("employeeNationalID"))) {
-														%>
-														<option value="<%=targetDate.toString()%>"><%=targetDate.toString()%></option>
-														<%
-															break;
-														}
-														}
-														}
-														}
-														}
-														%>
+																if (edr.getNationalID().equals((String) request.getAttribute("employeeNationalID"))) {%>
+																	<option value="<%=targetDate.toString()%>"><%=targetDate.toString()%></option>
+																<%break;
+															}}}}}%>
 													</select>
 												</div>
 											</div>
@@ -179,60 +172,68 @@
 															<tbody id="body<%=i%>">
 																<%String day = "";
 																if (sle[0][i - offset + 1] != null) {
+																	boolean shiftInDay = false;
+																	for(int j = 0; j < sle[0][i - offset + 1].size(); j++){
+																		if (request.getAttribute("employeeNationalID").equals(sle[0][i - offset + 1].get(j).getNationalID())) {
+																			shiftInDay = true;
+																			break;
+																		}
+																	}
 																	day = thisMonth.withDayOfMonth(i - offset + 1).toString();
 																	for (int j = 0; j < sle[0][i - offset + 1].size(); j++) {
-																		EmployeeDailyReference thisEDR = sle[0][i - offset + 1].get(j);
-																		if (request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID())) {%>
+																		EmployeeDailyReference thisEDR = sle[0][i - offset + 1].get(j);%>
+																		<%if (request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID())) {%>
 																			<tr style="background-color: #999999" id="<%=i%>-<%=thisEDR.getNationalID()%>">
 																		<%}else{%>
 																			<tr id="<%=i%>-<%=thisEDR.getNationalID()%>">
-																	  <%}%>
+																	  	<%}%>
 																	<th scope="row">
-																		<h4><%=thisEDR.getFirstName()%>
-																			<%=thisEDR.getLastName()%></h4>
+																		<h4><%=thisEDR.getFirstName()%><%=thisEDR.getLastName()%></h4>
 																	</th>
 																	<td>
 																		<h4><%=thisEDR.getWorkTimeInfo()%></h4>
 																	</td>
 																	<c:if test="${role == '[EMPLOYEE]'}">
-																		<%if (!request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID()) && LocalDate.parse(day).isAfter(LocalDate.now())) {
-																		%>
-																		<td>
-																			<button class="btn btn-dark" data-dismiss="modal"
-																				data-toggle="modal" data-target="#swap-modal"
-																				onclick='swapRequestData("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap
-																				Shifts</button>
-																		</td>
-																		<%
-																			}
-																		%>
+																		<%if(!request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID()) && LocalDate.parse(day).isAfter(LocalDate.now()) && !shiftInDay){%>
+																			<td>
+																				<button class="btn btn-dark" data-dismiss="modal"
+																					data-toggle="modal" data-target="#swap-modal"
+																					onclick='swapRequestData("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap
+																					Shifts</button>
+																			</td>
+																		<%}%>
 																	</c:if>
 																	<c:if test="${role == '[ADMIN]'}">
-																		<td>
-																			<button class="btn btn-dark"
-																				onclick='deleteWorkDay("<%=i%>","<%=thisEDR.getNationalID()%>", "<%=day%>")'>Delete</button>
-																		</td>
+																		<%if (LocalDate.parse(day).isAfter(LocalDate.now())) {%>
+																			<td>
+																				<button class="btn btn-dark"
+																					onclick='deleteWorkDay("<%=i%>","<%=thisEDR.getNationalID()%>", "<%=day%>")'>Delete</button>
+																			</td>
+																		<%}%>
 																	</c:if>
 																	<c:if test="${role == '[MANAGER]'}">
-																		<td>
-																			<button class="btn btn-dark"
-																				onclick='getTaskData("<%=i%>", "<%=thisEDR.getNationalID()%>","<%=day%>")'>Add
-																				a Task</button>
-																		</td>
+																		<%if (LocalDate.parse(day).isAfter(LocalDate.now())) {%>
+																			<td>
+																				<button class="btn btn-dark"
+																					onclick='getTaskData("<%=i%>", "<%=thisEDR.getNationalID()%>","<%=day%>")'>Add
+																					a Task</button>
+																			</td>
+																		<%}%>
 																	</c:if>
 																	<%}%>
 																	</tr>
 																	<c:if test="${role == '[ADMIN]'}">
-																		<tr id="addWorkDayButton">
-																		<th></th>
-																			<td>
-																				<button class="btn btn-dark"
-																					onclick='getWorkDayData("<%=i%>", "<%=day%>")'>Add
-																				</button>
-																			</td>
-																			
-																		<td></td>
-																		</tr>
+																		<%if (LocalDate.parse(day).isAfter(LocalDate.now())) {%>
+																			<tr id="addWorkDayButton">
+																				<th></th>
+																					<td>
+																						<button class="btn btn-dark"
+																							onclick='getWorkDayData("<%=i%>", "<%=day%>")'>Add
+																						</button>
+																					</td>
+																				<td></td>
+																			</tr>
+																		<%}%>
 																	</c:if>
 																<%
 																	}

@@ -175,7 +175,7 @@ public class ScheduleServiceTest {
     	
     	try {
     		scheduleService.deleteWorkDay(id, date);
-       	} catch (IOException e) {
+       	} catch(Exception e) {
        		e.printStackTrace();
        	}
 
@@ -300,7 +300,7 @@ public class ScheduleServiceTest {
     }
     
     @Test
-    public void swapRequestThrowsIOExceptionWhenReceiverNationalIdIsWrong() {
+    public void swapRequestThrowsExceptionWhenReceiverNationalIdIsWrong() {
     	String id = "1";
     	String date = "2020-01-01";
     	
@@ -311,7 +311,7 @@ public class ScheduleServiceTest {
     	
     	try {
         	scheduleService.swapRequest(id, "wrongID", date, date);
-        }catch(IOException e) {
+        }catch(Exception e) {
         	thrown = true;
         	message = e.getMessage();
         }
@@ -321,7 +321,7 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void swapRequestThrowsIOExceptionWhenRequesterIdIsWrong() {
+    public void swapRequestThrowsExceptionWhenRequesterIdIsWrong() {
     	String id = "1";
     	String date = "2020-01-01";
     	
@@ -332,7 +332,7 @@ public class ScheduleServiceTest {
     	
     	try {
         	scheduleService.swapRequest("wrongID", id, date, date);
-        }catch(IOException e) {
+        }catch(Exception e) {
         	thrown = true;
         	message = e.getMessage();
         }
@@ -373,7 +373,7 @@ public class ScheduleServiceTest {
     	
     	try {
     		scheduleService.swapRequest(id, id, date, date);
-       	} catch (IOException e) {
+       	} catch (Exception e) {
        		e.printStackTrace();
        	}
 

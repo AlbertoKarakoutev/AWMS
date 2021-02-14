@@ -177,7 +177,6 @@ public class AdminController {
 		try {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			employeeService.approveLeave(employeeID, Boolean.parseBoolean(paid), startDate, endDate);
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
 			return "redirect:/";
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -190,7 +189,6 @@ public class AdminController {
 		try {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			employeeService.denyLeave(employeeID, startDate, endDate);
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
 			return "redirect:/";
 		} catch (Exception e) {
 			e.printStackTrace();

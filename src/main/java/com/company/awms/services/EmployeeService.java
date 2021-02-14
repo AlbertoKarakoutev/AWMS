@@ -3,6 +3,7 @@ package com.company.awms.services;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -140,11 +141,10 @@ public class EmployeeService {
 	}
 
 	public Boolean requestLeave(String employeeID, boolean paid, String startDate, String endDate) throws IOException {
-		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
-		if(adminOptional.isEmpty()) {
+		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
+		if(admins.size() < 1) {
 			throw new IOException();
 		}
-		Employee admin = adminOptional.get();
 		Employee employee = getEmployee(employeeID);
 		
 		List<Object> notificationData = new ArrayList<>();
@@ -158,9 +158,12 @@ public class EmployeeService {
         	paidStr = "un" + paidStr;
         }
 		String message = employee.getFirstName() + " " + employee.getLastName() + " has requested a "+ paidStr +" leave in the period from "+ startDate + " to " + endDate;
-		admin.getNotifications().add(new Notification(message, notificationData));
+		
+		for(Employee admin : admins) {
+			admin.getNotifications().add(new Notification(message, notificationData));
+			employeeRepo.save(admin);
+		}
 		        
-		employeeRepo.save(admin);
 		return paid;
 	}
 	
@@ -175,12 +178,46 @@ public class EmployeeService {
 		leave.put("paid", paid);
 		employee.getLeaves().add(leave);
 		
+		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
+		if(admins.size() < 1) {
+			throw new IOException();
+		}
+		
+		for(Employee admin : admins) {
+			notificationLoop:
+			for(Notification notification : admin.getNotifications()) {
+				if(notification.getData().size()<5)continue;
+				if(notification.getData().get(1).equals(employeeID) && notification.getData().get(2).toString().equals(startDateStr) && notification.getData().get(3).toString().equals(endDateStr)) {
+					admin.getNotifications().remove(notification);
+					break notificationLoop;
+				}
+			}
+			employeeRepo.save(admin);
+		}
+		
+		employeeRepo.save(employee);
+		
 		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been approved";
 		notify(employeeID, message, false);
 	}
 	
 	public void denyLeave(String employeeID, String startDateStr, String endDateStr) throws IOException {
 		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been denied.";
+		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
+		if(admins.size() < 1) {
+			throw new IOException();
+		}
+		for(Employee admin : admins) {
+			notificationLoop:
+			for(Notification notification : admin.getNotifications()) {
+				if(notification.getData().size()<5)continue;
+				if(notification.getData().get(1).equals(employeeID) && notification.getData().get(2).toString().equals(startDateStr) && notification.getData().get(3).toString().equals(endDateStr)) {
+					admin.getNotifications().remove(notification);
+					break notificationLoop;
+				}
+			}
+			employeeRepo.save(admin);
+		}
 		notify(employeeID, message, false);
 	}
 	

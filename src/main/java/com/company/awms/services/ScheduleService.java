@@ -68,6 +68,7 @@ public class ScheduleService {
 		}catch(Exception e) {}
 		
 		Day currentDay;
+		
 		LocalTime[] workTime = new LocalTime[2];
 
 		int[] workTimeJSON;
@@ -104,9 +105,10 @@ public class ScheduleService {
 			workTime[0] = startShift;
 			workTime[1] = endShift;
 		}
-		
-		currentDay = getDay(LocalDate.parse(dateStr));
 
+		 currentDay = getDay(LocalDate.parse(dateStr));
+		if(currentDay.getDate().isBefore(LocalDate.now()))throw new Exception("This date has already passed!");
+		
 		if (currentDay.getEmployees() != null) {
 			currentDay.addEmployee(employee);
 		} else {
@@ -118,8 +120,9 @@ public class ScheduleService {
 		scheduleRepo.save(currentDay);
 	}
 
-	public void deleteWorkDay(String employeeNationalID, String date) throws IOException {
+	public void deleteWorkDay(String employeeNationalID, String date) throws Exception {
 		Day selectedDay = getDay(LocalDate.parse(date));
+		if(selectedDay.getDate().isBefore(LocalDate.now()))throw new Exception("This date had already passed!");
 		for (EmployeeDailyReference edr : selectedDay.getEmployees()) {
 			if (edr.getNationalID().equals(employeeNationalID)) {
 				selectedDay.getEmployees().remove(edr);
@@ -187,7 +190,7 @@ public class ScheduleService {
 		scheduleRepo.save(receiverDay);
 	}
 
-	public void swapRequest(String requesterID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException {
+	public void swapRequest(String requesterID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws Exception {
 		List<Object> notificationData = new ArrayList<>();
 
 		Optional<Employee> requesterOptional = employeeRepo.findById(requesterID);
@@ -202,6 +205,14 @@ public class ScheduleService {
 		}
 		Employee receiver = receiverOptional.get();
 
+		if(LocalDate.parse(requesterDateParam).isBefore(LocalDate.now()) || LocalDate.parse(receiverDateParam).isBefore(LocalDate.now()))throw new Exception("This date had already passed!");
+		Day receiverDay = getDay(LocalDate.parse(receiverDateParam));
+		for(EmployeeDailyReference edr : receiverDay.getEmployees()) {
+			if(requester.getNationalID().equals(edr.getNationalID())) {
+				throw new Exception("The requester already has a shift in that day!");
+			}
+		}
+		
 		notificationData.add("swap-request");
 		notificationData.add(requester.getNationalID());
 		notificationData.add(LocalDate.parse(requesterDateParam));
@@ -226,6 +237,8 @@ public class ScheduleService {
 		}
 		
 		Day currentDay = getDay(LocalDate.parse(newInfo.get("date")));
+		
+		if(currentDay.getDate().isBefore(LocalDate.now()))throw new Exception("This date has already passed!");
 		
 		Task task;
 		for (EmployeeDailyReference edr : currentDay.getEmployees()) {

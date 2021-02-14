@@ -38,11 +38,6 @@ public class SalaryService {
 					for(Task currentTask : edr.getTasks()) {
 						if (currentTask.getCompleted() &&  currentTask.getTaskReward()!=0.0d) {
 							taskRewards += currentTask.getTaskReward();
-
-							if(!currentTask.getPaidFor()){
-								currentTask.setPaidFor(true);
-								this.scheduleRepo.save(thisDay);
-							}
 						}
 					}
 				}
@@ -73,6 +68,7 @@ public class SalaryService {
 				if (edr.getNationalID().equals(employee.getNationalID())) {
 					Duration shiftLength =  Duration.between(edr.getWorkTime()[0], edr.getWorkTime()[1]);
 					hours += (double)shiftLength.toHours();
+					continue;
 				}
 			}
 		}
