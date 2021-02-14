@@ -130,7 +130,7 @@
 												type="hidden" id="receiverDate" name="receiverDate">
 										</form>
 										<button class="btn btn-dark" data-dismiss="modal"
-											onclick="sendSwapRequest()">Send request!</button>
+											onclick='sendSwapRequest()'>Send request!</button>
 									</div>
 									<div class='modal-footer'></div>
 								</div>
@@ -200,7 +200,7 @@
 																		<td>
 																			<button class="btn btn-dark" data-dismiss="modal"
 																				data-toggle="modal" data-target="#swap-modal"
-																				onclick='datePrompt("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap
+																				onclick='swapRequestData("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap
 																				Shifts</button>
 																		</td>
 																		<%
@@ -216,19 +216,24 @@
 																	<c:if test="${role == '[MANAGER]'}">
 																		<td>
 																			<button class="btn btn-dark"
-																				onclick='getTaskInput("<%=i%>", "<%=thisEDR.getNationalID()%>","<%=day%>")'>Add
+																				onclick='getTaskData("<%=i%>", "<%=thisEDR.getNationalID()%>","<%=day%>")'>Add
 																				a Task</button>
 																		</td>
 																	</c:if>
 																	<%}%>
+																	</tr>
 																	<c:if test="${role == '[ADMIN]'}">
-																		<td>
-																			<button class="btn btn-dark"
-																				onclick='getInput("<%=i%>", "<%=day%>")'>Add
-																			</button>
-																		</td>
+																		<tr id="addWorkDayButton">
+																		<th></th>
+																			<td>
+																				<button class="btn btn-dark"
+																					onclick='getWorkDayData("<%=i%>", "<%=day%>")'>Add
+																				</button>
+																			</td>
+																			
+																		<td></td>
+																		</tr>
 																	</c:if>
-																</tr>
 																<%
 																	}
 																%>
@@ -273,19 +278,19 @@
 																			value="<%=tasks[i - offset + 1].get(index).getTaskReward()%>" />
 																	</h4>
 																</td>
-																<%
-																	if (!tasks[i - offset + 1].get(index).getCompleted()) {
-																%>
-																<td><a class="btn btn-dark"
-																	href="/schedule/taskComplete/?taskNum=<%=index%>&date=<%=day%>">Mark
-																		as Complete</a></td>
-																<%
-																	} else {
-																%>
-																<td><i class="fas fa-check-circle"></i></td>
-																<%
-																	}
-																%>
+																
+																<td id="status">
+																<%if (!tasks[i - offset + 1].get(index).getCompleted()) {%>
+																	<button class="btn btn-dark" onclick='markTaskAsComplete("<%=index%>", "<%=day%>")'>Mark as Complete</button>
+																<%} else {
+																	if(tasks[i-offset+1].get(index).getPaidFor()){%>
+																		<i class="btn fas fa-lg fa-check"></i>
+																		<i class="btn fas fa-lg fa-comment-dollar"></i>
+																	<%}else{%>
+																		<i class="btn fas fa-lg fa-check"></i>
+																	<%}
+																}%>
+																</td>
 															</tr>
 															<%
 																}

@@ -210,23 +210,26 @@ public class AdminController {
 
 	// Schedule methods
 	@GetMapping(value = "/schedule/add")
-	public void addWorkDay(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String employeeNationalID, @RequestParam String date, @RequestParam String startShift, @RequestParam String endShift) {
+	public ResponseEntity<String> addWorkDay(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String employeeNationalID, @RequestParam String date, @RequestParam String startShift, @RequestParam String endShift) {
 		try {
 			scheduleService.addWorkDay(employeeNationalID, date, true, startShift, endShift);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
+			return  new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
-			e.printStackTrace();
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@GetMapping("/schedule/delete")
-	public void deleteWorkDay(Model model, @RequestParam String employeeNationalID, @RequestParam String date, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	public ResponseEntity<String> deleteWorkDay(Model model, @RequestParam String employeeNationalID, @RequestParam String date, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
 		try {
-
 			this.scheduleService.deleteWorkDay(employeeNationalID, date);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			model.addAttribute(YearMonth.now());
+			
+			return  new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

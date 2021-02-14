@@ -221,7 +221,7 @@ public class ScheduleService {
 		}
 		Map<String, String> newInfo = new HashMap<>();
 		for (String field : dataValues) {
-			field = field.substring(0, field.length() - 1);
+			field = field.substring(0, field.length());
 			newInfo.put(field.split("=")[0], field.split("=")[1]);
 		}
 		

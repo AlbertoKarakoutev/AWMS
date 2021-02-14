@@ -88,29 +88,28 @@ public class ScheduleController {
 	}
 
 	@PostMapping("/addTask")
-	public String addTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestBody String data) {
+	public ResponseEntity<String> addTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestBody String data) {
 		if(!employeeDetails.getRole().equals("MANAGER")){
-			return "notAuthorized";
+			return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
 		}
 		try {
 			scheduleService.addTask(data);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			return "redirect:/schedule/?month="+YearMonth.now();
+			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return "internalServerError";
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@GetMapping("taskComplete")
-	public String markTaskAsComplete(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails,  @RequestParam String taskNum,  @RequestParam String date) {
+	public ResponseEntity<String> markTaskAsComplete(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails,  @RequestParam String taskNum,  @RequestParam String date) {
 		try {
 			scheduleService.markTaskAsComplete(employeeDetails.getID(), taskNum, date);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			return "redirect:/schedule/?month="+YearMonth.now();
+			return new ResponseEntity<String>(HttpStatus.OK);
 		}catch(Exception e) {
 			e.printStackTrace();
-			return "internalServerError";
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
