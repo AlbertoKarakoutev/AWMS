@@ -51,6 +51,6 @@ for(var i = 1; i <= nextMonthLength; i++){
 }
 awms.day.insertMany(days);
 awms.createCollection("doc", null);
-awms.employees.insertOne(admin);
+awms.employee.insertOne(admin);
 awms.createCollection("forumReply", null);
 awms.createCollection("forumThread", null);
