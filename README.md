@@ -1,21 +1,34 @@
 # AWMS - Administrative worker management system
 Software, intended for a functional and utilised company worflow. It incomporates an array of useful tools and modules, which help every company employee understand and manage their individual work. The package offers 5 main sub-systems:
 
-# Schedule 
+# Deployment:
+### Please follow the steps to initialize the system correctly!
+*   Database - Navigate to the project folder. In the Mongo Shell, run ***load("mongo.js")*** to initialize the database. One administrator account is created with the credentials:
+    > e-mail: admin@gmail.com  
+    > Password: admin
+*   Module Manager - Run the *ModuleManager.jar* file in the system's base directory. Install or remove any modules you wish. The modules should follow the following schematic:
+    * Zip Archive: \<ModuleName\>.zip (Uppercase)  
+        * Folder: \<ModuleName\> (Uppercase)  
+            * Folder: \<moduleName\> (Lowercase)  
+                * \<ModuleName\>Controller.java (Uppercase, containing all the endpoints of the network components)  
+                * \<ModuleName\>Service.java (Uppercase, containing all the business logic of the module)  
+                * \<moduleName\>.jsp (Lowercase, being the JSP view file of the module)
+                * (Optional) Folder: data (Containing any repos and POJO classes for the module)  
+                ___The database would need to be updated if new POJOs and repos are added as a module!___
+     
+
+## Schedule 
 *   A system-wide scheduling service, offering functionality for viewing and changing individual work schedules, as well as calculating the optimal company work-day distribution. It encorporates the department-level(DL) limitations which filter the viewable and editable values of the programme depending on the employee DL status.
 
-# Documents
+## Documents
 *   A centralized document database and repository, working as a company archive. It is DL-limited and presents users with the option to view, upload and download specific work related files.
 
-# Forum
+## Forum
 *   The forum encapsulates user discussions, equiped with thread information and the functionallity to view and answer on specific topics. It is a company gathering point, which lets employees get their questions answered and help their coleagues.
     
-# Employee
+## Employee
 *   Employees have a unique system page, containing all the key information they need, and have in the system, so that it allows for an easier access if needed. Additionally, it contains all personal company-related documents at their disposal.
     
-# Salary
-*   If the company philosophy would allow it, the employees are able to estimate their monthly salary by the provided algorythm. It works on the basis of calculating their monthly completed tasks, as well as the solid stable they get paid by the hour.
-  
 .  
 .  
 . 
