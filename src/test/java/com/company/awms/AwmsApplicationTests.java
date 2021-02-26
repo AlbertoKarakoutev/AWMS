@@ -2,9 +2,6 @@ package com.company.awms;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.company.awms.controllers.IndexController;
-import com.company.awms.data.employees.EmployeeRepo;
-import com.company.awms.services.EmployeeService;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import static org.hamcrest.Matchers.containsString;
@@ -19,12 +16,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.company.awms.modules.base.IndexController;
+import com.company.awms.modules.base.admin.AdminController;
+import com.company.awms.modules.base.employees.EmployeeService;
+import com.company.awms.modules.base.employees.data.EmployeeRepo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import com.company.awms.controllers.AdminController;
 
 @WebMvcTest(IndexController.class)
 @RunWith(SpringRunner.class)

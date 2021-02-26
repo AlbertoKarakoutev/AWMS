@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@page import="com.company.awms.data.employees.Notification"%>
-<%@page import="com.company.awms.data.forum.ForumThread"%>
-<%@page import="com.company.awms.data.forum.ForumReply"%>
+<%@page import="com.company.awms.modules.base.employees.data.Notification"%>
+<%@page import="com.company.awms.modules.base.forum.data.ForumThread"%>
+<%@page import="com.company.awms.modules.base.forum.data.ForumReply"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.time.*"%>

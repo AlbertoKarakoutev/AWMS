@@ -1,9 +1,10 @@
 package com.company.awms.security;
 
-import com.company.awms.data.employees.Employee;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.company.awms.modules.base.employees.data.Employee;
 
 import java.util.Collection;
 import java.util.Collections;

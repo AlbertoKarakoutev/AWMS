@@ -1,12 +1,13 @@
 package com.company.awms.security;
 
-import com.company.awms.data.employees.Employee;
-import com.company.awms.data.employees.EmployeeRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import com.company.awms.modules.base.employees.data.Employee;
+import com.company.awms.modules.base.employees.data.EmployeeRepo;
 
 import java.util.Optional;
 

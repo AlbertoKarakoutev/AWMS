@@ -1,10 +1,5 @@
 package com.company.awms.services;
 
-import com.company.awms.data.documents.DocInfoDTO;
-import com.company.awms.data.documents.DocumentRepo;
-import com.company.awms.data.employees.Employee;
-import com.company.awms.data.employees.EmployeeRepo;
-import com.company.awms.data.documents.Doc;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +10,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.company.awms.modules.base.documents.DocumentService;
+import com.company.awms.modules.base.documents.data.Doc;
+import com.company.awms.modules.base.documents.data.DocInfoDTO;
+import com.company.awms.modules.base.documents.data.DocumentRepo;
+import com.company.awms.modules.base.employees.data.Employee;
+import com.company.awms.modules.base.employees.data.EmployeeRepo;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -38,12 +38,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.company.awms.data.employees.Employee;
-import com.company.awms.data.employees.EmployeeDailyReference;
-import com.company.awms.data.employees.EmployeeRepo;
-import com.company.awms.data.schedule.Day;
-import com.company.awms.data.schedule.ScheduleRepo;
-import com.company.awms.data.schedule.Task;
+import com.company.awms.modules.base.employees.data.Employee;
+import com.company.awms.modules.base.employees.data.EmployeeDailyReference;
+import com.company.awms.modules.base.employees.data.EmployeeRepo;
+import com.company.awms.modules.base.schedule.ScheduleService;
+import com.company.awms.modules.base.schedule.data.Day;
+import com.company.awms.modules.base.schedule.data.ScheduleRepo;
+import com.company.awms.modules.base.schedule.data.Task;
 
 
 @SpringBootTest

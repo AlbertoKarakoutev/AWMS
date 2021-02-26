@@ -2,7 +2,7 @@ package com.company.awms.util;
 
 import java.util.Comparator;
 
-import com.company.awms.data.forum.ForumThread;
+import com.company.awms.modules.base.forum.data.ForumThread;
 
 public class ForumComparator implements Comparator<ForumThread>{
     @Override
