@@ -6,7 +6,7 @@ Software, intended for a functional and utilised company worflow. It incomporate
 *   Database - Navigate to the project folder. In the Mongo Shell, run ***load("mongo.js")*** to initialize the database. One administrator account is created with the credentials:
     > e-mail: admin@gmail.com  
     > Password: admin
-*   Module Manager - Run the *ModuleManager.jar* file in the system's base directory. Install or remove any modules you wish. The modules should follow the following schematic:
+*   Module Manager - Run the *ModuleManager.jar* file in the system's base directory. Install or remove any modules you wish from the [modules](https://github.com/albertokarakoutev/AWMS---Modules) repository. The modules should follow the following schematic:
     * Zip Archive: \<ModuleName\>.zip (Uppercase)  
         * Folder: \<ModuleName\> (Uppercase)  
             * Folder: \<moduleName\> (Lowercase)  
