@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
 import org.json.JSONObject;
 
@@ -27,7 +28,6 @@ public class CaptchaAuthenticationFilter extends AbstractAuthenticationProcessin
     public CaptchaAuthenticationFilter(String defautFilterProcessesUrl, String failureUrl) {
         super(defautFilterProcessesUrl);
         this.processUrl = defautFilterProcessesUrl;
-
         setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler(failureUrl));
     }
 
@@ -36,7 +36,7 @@ public class CaptchaAuthenticationFilter extends AbstractAuthenticationProcessin
             throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-
+        
         if (this.processUrl.equals(req.getServletPath()) && "POST".equalsIgnoreCase(req.getMethod())) {
             try {
                 String url = "https://www.google.com/recaptcha/api/siteverify",
@@ -63,7 +63,7 @@ public class CaptchaAuthenticationFilter extends AbstractAuthenticationProcessin
                 JSONObject json = new JSONObject(sb.toString());
                 resHttp.close();
                 if (!json.getBoolean("success")) {
-                    String u = "https://localhost:8443";
+                    String u = "https://"+InetAddress.getLocalHost().getHostName()+":8443";
                     res.reset();
                     res.setStatus(HttpServletResponse.SC_FOUND);
                     res.setHeader("Location", u);
