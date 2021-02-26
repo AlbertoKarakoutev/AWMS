@@ -297,8 +297,8 @@ public class AdminController {
 		try{
 			System.out.println(baseModuleDir.listFiles(File::isDirectory)[0]);
 		}catch(Exception e) {
-			baseModuleDir = new File("target/awms-0.0.1-SNAPSHOT/WEB-INF/classes/com/company/awms/modules/base");
-			extModuleDir = new File("target/awms-0.0.1-SNAPSHOT/WEB-INF/classes/com/company/awms/modules/ext");
+			baseModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/base");
+			extModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/ext");
 		}
 
 		File[] baseModules = baseModuleDir.listFiles(File::isDirectory);
@@ -382,8 +382,8 @@ public class AdminController {
 			try{
 				System.out.println(baseModuleDir.listFiles(File::isDirectory)[0]);
 			}catch(Exception e) {
-				baseModuleDir = new File("target/awms-0.0.1-SNAPSHOT/WEB-INF/classes/com/company/awms/modules/base");
-				extModuleDir = new File("target/awms-0.0.1-SNAPSHOT/WEB-INF/classes/com/company/awms/modules/ext");
+				baseModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/base");
+				extModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/ext");
 			}
 
 			File[] baseModules = baseModuleDir.listFiles(File::isDirectory);

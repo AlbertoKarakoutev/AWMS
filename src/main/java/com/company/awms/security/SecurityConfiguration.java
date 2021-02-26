@@ -26,8 +26,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.addFilterBefore(new CaptchaAuthenticationFilter("/login", "/login?error"),
-				UsernamePasswordAuthenticationFilter.class);
+//		http.addFilterBefore(new CaptchaAuthenticationFilter("/login", "/login?error"),
+//				UsernamePasswordAuthenticationFilter.class);
 
 		http.authorizeRequests().antMatchers("/login").permitAll().antMatchers("/").authenticated()
 				.antMatchers("/document/**").authenticated().antMatchers("/schedule/**").authenticated()
