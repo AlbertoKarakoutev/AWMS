@@ -14,8 +14,9 @@ Software, intended for a functional and utilised company worflow. It incomporate
                 * \<ModuleName\>Service.java (Uppercase, containing all the business logic of the module)  
                 * \<moduleName\>.jsp (Lowercase, being the JSP view file of the module)
                 * (Optional) Folder: data (Containing any repos and POJO classes for the module)  
-                ___The database would need to be updated if new POJOs and repos are added as a module!___
-*   Run - Navigate to the system's base directory. Go into the _target_ folder. Open a shell and run ***java -jar awms-0.0.1-SNAPSHOT.war***     
+                __The database would need to be updated if new POJOs and repos are added as a module!__
+                __Please ensure that the system is not currently running while working with the Module Manager to avoid bugs and system crashes!__
+*   Run - Navigate to the system's base directory. Go into the _target_ folder. Open a shell and run ***java -jar awms-1.0.0.war***     
 
 ## Schedule 
 *   A system-wide scheduling service, offering functionality for viewing and changing individual work schedules, as well as calculating the optimal company work-day distribution. It encorporates the department-level(DL) limitations which filter the viewable and editable values of the programme depending on the employee DL status.
