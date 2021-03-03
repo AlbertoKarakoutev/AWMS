@@ -39,11 +39,7 @@ if(now.getMonth()==12){
         nextMonthYear = now.getFullYear();
 }
 var nextMonthLength = new Date(nextMonthYear, nextMonth+1, 0).getDate();
-print(nextMonthYear);
-print(nextMonth);
-print(nextMonthLength);
 for(var i = 1; i <= nextMonthLength; i++){
-        print(new Date(nextMonthYear, nextMonth, i));
         days[i+monthLength] = {"date": {"$date": new Date(nextMonthYear, nextMonth, i).toISOString()},
                                 "employees": [],
                                 "_class": "com.company.awms.modules.base.schedule.data.Day"
@@ -51,6 +47,6 @@ for(var i = 1; i <= nextMonthLength; i++){
 }
 awms.day.insertMany(days);
 awms.createCollection("doc", null);
-awms.employees.insertOne(admin);
+awms.employee.insertOne(admin);
 awms.createCollection("forumReply", null);
 awms.createCollection("forumThread", null);
