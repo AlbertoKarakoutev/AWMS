@@ -1,5 +1,5 @@
-mongo = new Mongo();
-awms = mongo.getDB("awms");
+var mongo = new Mongo();
+var awms = mongo.getDB("awms");
 admin = {
         "email":"admin@gmail.com",
         "password":"$2a$10$h3RzwGbggqh6nSXZyl0g3O/Svw.XUYr/qA1ASTA6mJPCIP82ezErK",
@@ -24,7 +24,7 @@ days = [];
 var now = new Date();
 var monthLength = new Date(now.getFullYear(),now.getMonth()+1, 0).getDate();
 for(var i = 1; i <= monthLength; i++){
-    days[i] = {"date": {"$date": new Date(now.getYear(), now.getMonth(), i).toISOString()},
+    days[i] = {"date":new Date(now.getYear(), now.getMonth(), i),
               "employees": [],
               "_class": "com.company.awms.modules.base.schedule.data.Day"
     }
@@ -40,7 +40,7 @@ if(now.getMonth()==12){
 }
 var nextMonthLength = new Date(nextMonthYear, nextMonth+1, 0).getDate();
 for(var i = 1; i <= nextMonthLength; i++){
-        days[i+monthLength] = {"date": {"$date": new Date(nextMonthYear, nextMonth, i).toISOString()},
+        days[i+monthLength] = {"date":new Date(nextMonthYear, nextMonth, i),
                                 "employees": [],
                                 "_class": "com.company.awms.modules.base.schedule.data.Day"
                                 }

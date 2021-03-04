@@ -554,6 +554,7 @@ Day taskDay = getDay(LocalDate.parse(dateStr));
 	public List<EmployeeDailyReference>[][] viewSchedule(Employee viewer, YearMonth month) throws IOException {
 		List<EmployeeDailyReference>[][] sameLevelEmployees = new ArrayList[2][32];
 		for (int i = 1; i <= month.lengthOfMonth(); i++) {
+			
 			Day thisDay = getDay(month.atDay(i));
 			if (thisDay.getEmployees().isEmpty()) {
 				continue;

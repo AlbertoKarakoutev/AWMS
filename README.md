@@ -8,7 +8,7 @@ Software, intended for a functional and utilised company worflow. It incomporate
     > Password: admin  
     __This operation will set/reset the entire database to its initial state!__  
     
-*   Build - Navigate to the AWMS folder and start a shell. Build with Maven, using the clean and package goals.
+*   Build - Navigate to the AWMS folder and start a shell as a _superuser_. Build with Maven, using the clean and package goals.
   
 *   Module Manager - Run the *ModuleManager.jar* file in the system's base directory. Install or remove any modules you wish from the [modules](https://github.com/albertokarakoutev/AWMS---Modules) repository. The modules should follow the following schematic:
     * Zip Archive: \<ModuleName\>.zip (Uppercase)  
