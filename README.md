@@ -3,10 +3,13 @@ Software, intended for a functional and utilised company worflow. It incomporate
 
 # Deployment:
 ### Please follow the steps to initialize the system correctly!
-*   Database - Navigate to the project folder. In the Mongo Shell, run ***load("mongo.js")*** to initialize the database. One administrator account is created with the credentials:
+*   Database - Navigate to the project folder. In the Mongo Shell, run ***load("mongo.js")*** to initialize the database. One administrator account is created with the credentials:  
     > e-mail: admin@gmail.com  
-    > Password: admin
+    > Password: admin  
+    __This operation will set/reset the entire database to its initial state!__  
+    
 *   Build - Navigate to the AWMS folder and start a shell. Build with Maven, using the clean and package goals.
+  
 *   Module Manager - Run the *ModuleManager.jar* file in the system's base directory. Install or remove any modules you wish from the [modules](https://github.com/albertokarakoutev/AWMS---Modules) repository. The modules should follow the following schematic:
     * Zip Archive: \<ModuleName\>.zip (Uppercase)  
         * Folder: \<ModuleName\> (Uppercase)  
@@ -17,6 +20,7 @@ Software, intended for a functional and utilised company worflow. It incomporate
                 * (Optional) Folder: data (Containing any repos and POJO classes for the module)  
                 __The database would need to be updated if new POJOs and repos are added as a module!__
                 __Please ensure that the system is not currently running while working with the Module Manager to avoid bugs and system crashes!__
+  
 *   Run - Navigate to the system's base directory. Go into the _target_ folder. Open a shell and run ***java -jar awms-1.0.0.war***     
 
 ## Schedule 

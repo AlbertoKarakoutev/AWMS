@@ -45,6 +45,12 @@ for(var i = 1; i <= nextMonthLength; i++){
                                 "_class": "com.company.awms.modules.base.schedule.data.Day"
                                 }
 }
+awms.day.drop();
+awms.doc.drop();
+awms.employee.drop();
+awms.forumReply.drop();
+awms.forumThread.drop();
+
 awms.day.insertMany(days);
 awms.createCollection("doc", null);
 awms.employee.insertOne(admin);
