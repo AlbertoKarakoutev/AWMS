@@ -36,11 +36,7 @@
                         </div>
                         <div class="form-group">
                             <label for="threadContent">Body</label>
-<<<<<<< Updated upstream
-                            <textarea name="body" class="form-control" id="threadContent" rows="8" required>${thread != null ? thread.getBody() : null}</textarea>
-=======
                             <textarea name="body" class="form-control" id="threadContent" rows="8" required>${thread != null ? thread.getBody() : ""}</textarea>
->>>>>>> Stashed changes
                             <small id="threadContentHelp" class="form-text text-muted">Body</small>
                         </div>
                         <button type="submit" class="btn btn-dark">${thread != null ? "Edit": "Create"}</button>
