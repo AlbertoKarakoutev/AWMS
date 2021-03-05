@@ -292,17 +292,16 @@ public class AdminController {
 
 	// Active modules methods
 	public static Map<String, Boolean> getAllModulesStatesLogic() {
-		File baseModuleDir = new File("classes/com/company/awms/modules/base");
-		File extModuleDir  = new File("classes/com/company/awms/modules/ext");
+		File baseModuleDir = new File("classes/com/company/awms/modules/base/");
 		try{
-			System.out.println(baseModuleDir.listFiles(File::isDirectory)[0]);
+			if(baseModuleDir.listFiles(File::isDirectory).length>0) {
+				
+			}
 		}catch(Exception e) {
-			baseModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/base");
-			extModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/ext");
+			baseModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/base/");
 		}
 
 		File[] baseModules = baseModuleDir.listFiles(File::isDirectory);
-		File[] extModules = extModuleDir.listFiles(File::isDirectory);
 		Map<String, Boolean> controllerConditions = new HashMap<>();
 		for (File module : baseModules) {
 			String controller = null;
@@ -321,31 +320,17 @@ public class AdminController {
 				e.printStackTrace();
 			}
 		}
-		if(extModules != null) {
-			for (File module : extModules) {
-				String controller = null;
-				for(File moduleFile : module.listFiles()) {
-					if(moduleFile.getName().contains("Controller")) {
-						controller = moduleFile.getName().split("\\.")[0];
-					}
-				}
-				try {
-					if (!controller.equals("AdminController")) {
-						Class<?> controllerClass = Class.forName("com.company.awms.modules.ext." + module.getName() + "." + controller);
-						Method active = controllerClass.getMethod("getActive");
-						controllerConditions.put(controller.split("Controller")[0], (boolean) active.invoke(null, null));
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+		Iterator<String> extensions = getExtensionModulesStatesLogic().keySet().iterator();
+		while(extensions.hasNext()) {
+			String key = extensions.next();
+			controllerConditions.put(key, getExtensionModulesStatesLogic().get(key));
 		}
 		return controllerConditions;
 	}
 
 	public static Map<String, Boolean> getExtensionModulesStatesLogic(){
 		Map<String, Boolean>  activeExtensions = new  HashMap<String, Boolean> (); 
-		File extModuleDir  = new File("classes/com/company/awms/modules/ext");
+		File extModuleDir  = new File("classes/com/company/awms/modules/ext/");
 		File[] extModules = extModuleDir.listFiles(File::isDirectory);
 		if(extModules != null) {
 			for (File module : extModules) {
@@ -391,13 +376,13 @@ public class AdminController {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Boolean> actives = mapper.readValue(updatedActivitiesFormatted, HashMap.class);
 		for (String key : actives.keySet()) {
-			File baseModuleDir = new File("classes/com/company/awms/modules/base");
-			File extModuleDir  = new File("classes/com/company/awms/modules/ext");
+			File baseModuleDir = new File("classes/com/company/awms/modules/base/");
+			File extModuleDir  = new File("classes/com/company/awms/modules/ext/");
 			try{
 				System.out.println(baseModuleDir.listFiles(File::isDirectory)[0]);
 			}catch(Exception e) {
-				baseModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/base");
-				extModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/ext");
+				baseModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/base/");
+				extModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/ext/");
 			}
 
 			File[] baseModules = baseModuleDir.listFiles(File::isDirectory);

@@ -24,7 +24,7 @@ days = [];
 var now = new Date();
 var monthLength = new Date(now.getFullYear(),now.getMonth()+1, 0).getDate();
 for(var i = 1; i <= monthLength; i++){
-    days[i] = {"date":new Date(now.getYear(), now.getMonth(), i),
+    days[i] = {"date":new Date(now.getFullYear(), now.getMonth(), i),
               "employees": [],
               "_class": "com.company.awms.modules.base.schedule.data.Day"
     }
