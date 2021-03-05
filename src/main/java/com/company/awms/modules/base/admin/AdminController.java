@@ -345,12 +345,26 @@ public class AdminController {
 
 	public static Map<String, Boolean> getExtensionModulesStatesLogic(){
 		Map<String, Boolean>  activeExtensions = new  HashMap<String, Boolean> (); 
-		Iterator<String> map = getAllModulesStatesLogic().keySet().iterator();
-		while(map.hasNext()) {
-			String key = map.next();
-			if(!key.equals("Document") && !key.equals("Schedule") && !key.equals("Employee") && !key.equals("Forum") && !key.equals("Contacts")) {
-				activeExtensions.put(key, getAllModulesStatesLogic().get(key));
-			}	
+		File extModuleDir  = new File("classes/com/company/awms/modules/ext");
+		File[] extModules = extModuleDir.listFiles(File::isDirectory);
+		if(extModules != null) {
+			for (File module : extModules) {
+				String controller = null;
+				for(File moduleFile : module.listFiles()) {
+					if(moduleFile.getName().contains("Controller")) {
+						controller = moduleFile.getName().split("\\.")[0];
+					}
+				}
+				try {
+					if (!controller.equals("AdminController")) {
+						Class<?> controllerClass = Class.forName("com.company.awms.modules.ext." + module.getName() + "." + controller);
+						Method active = controllerClass.getMethod("getActive");
+						activeExtensions.put(controller.split("Controller")[0], (boolean) active.invoke(null, null));
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return activeExtensions;
 	}
