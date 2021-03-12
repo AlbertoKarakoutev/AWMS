@@ -29,9 +29,6 @@
     <label for="passowrd">Password</label>
     <input type="password" class="form-control" id="passowrd" name="password" placeholder="Password">
   </div>
-  <div class="form-group">
-    <div class="g-recaptcha" data-sitekey="6LcTHisaAAAAAOQ7q23JKg1wCdpYD9mJWq7FG4RE"></div>
-  </div>
   <button type="submit" class="btn btn-primary">Login</button>
 </form>
   </div>

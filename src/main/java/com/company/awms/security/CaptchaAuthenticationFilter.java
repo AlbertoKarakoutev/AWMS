@@ -63,7 +63,7 @@ public class CaptchaAuthenticationFilter extends AbstractAuthenticationProcessin
                 JSONObject json = new JSONObject(sb.toString());
                 resHttp.close();
                 if (!json.getBoolean("success")) {
-                    String u = "https://"+InetAddress.getLocalHost().getHostName()+":8443";
+                    String u = "https://"+InetAddress.getLocalHost().getHostAddress()+":8443";
                     res.reset();
                     res.setStatus(HttpServletResponse.SC_FOUND);
                     res.setHeader("Location", u);

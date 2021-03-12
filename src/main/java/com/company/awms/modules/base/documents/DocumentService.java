@@ -49,14 +49,15 @@ public class DocumentService {
 
 		Employee employee = getEmployee(employeeID);
 		List<Doc> departmentDocuments;
+		
+		List<String> adminIDs = new ArrayList<String>();
 
-		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
-
-		if(adminOptional.isEmpty()){
-			throw new IOException("Admin not found!");
+		for(Employee admin : employeeRepo.findAllByRole("ADMIN")) {
+			adminIDs.add(admin.getID());
 		}
+		
 
-		if (employee.getID().equals(adminOptional.get().getID())) {
+		if (adminIDs.contains(employee.getID())) {
 			departmentDocuments = this.documentRepo.findAll();
 			for (Doc document : departmentDocuments) {
 				DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(), document.getType(), document.getUploaderID(), employee.getFirstName() + " " + employee.getLastName());
@@ -144,15 +145,19 @@ public class DocumentService {
 	public Doc downloadPersonalDocument(int documentID, String ownerID, String downloaderID) throws IOException, IllegalAccessException {
 		Employee owner = getEmployee(ownerID);
 
-		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
+		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
 
-		if(adminOptional.isEmpty()){
-			throw new IOException("Admin not found!");
+		if(admins.isEmpty()){
+			throw new IOException("Admins not found!");
 		}
-		if (!downloaderID.equals(adminOptional.get().getID()) && !downloaderID.equals(ownerID)) {
-			throw new IllegalAccessException("Document not accessible!");
+		boolean notPermitted = true;
+		for(Employee admin : admins) {
+			if (downloaderID.equals(admin.getID()) && !downloaderID.equals(ownerID)) {
+				notPermitted = false;
+				break;
+			}
 		}
-
+		if(notPermitted)throw new IllegalAccessException("Document not accessible!");
 		List<Doc> personalDocuments = owner.getPersonalDocuments();
 
 		if (personalDocuments.size() <= documentID) {
@@ -169,17 +174,19 @@ public class DocumentService {
 			throw new IOException("Document not found!");
 		}
 
-		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
+		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
 
-		if(adminOptional.isEmpty()){
-			throw new IOException("Admin not found!");
+		if(admins.isEmpty()){
+			throw new IOException("Admins not found!");
 		}
-
-		if (employeeID.equals(adminOptional.get().getID()) || documentToDelete.get().getUploaderID().equals(employeeID)) {
-			this.documentRepo.deleteById(documentID);
-		} else {
-			throw new IllegalAccessException("You don't have permission to delete document");
+		for(Employee admin : admins) {
+			if (employeeID.equals(admin.getID()) || documentToDelete.get().getUploaderID().equals(employeeID)) {
+				this.documentRepo.deleteById(documentID);
+				return;
+			} 
 		}
+		throw new IllegalAccessException("You don't have permission to delete document");
+		
 	}
 
 	// only admin can delete private documents
@@ -219,14 +226,14 @@ public class DocumentService {
 			return false;
 		}
 
-		Optional<Employee> adminOptional = employeeRepo.findByRole("ADMIN");
+		List<String> adminIDs = new ArrayList<String>();
 
-		if(adminOptional.isEmpty()){
-			throw new IOException("Admin not found!");
+		for(Employee admin : employeeRepo.findAllByRole("ADMIN")) {
+			adminIDs.add(admin.getID());
 		}
 
 		// The Admin always has access
-		if (employeeID.equals(adminOptional.get().getID())) {
+		if (adminIDs.contains(employee.get().getID())) {
 			return true;
 		} else {
 			return department.equals(employee.get().getDepartment()) && level <= employee.get().getLevel();

@@ -1,11 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="com.company.awms.modules.base.employees.data.EmployeeDailyReference"%>
 <%@page import="com.company.awms.modules.base.schedule.data.Task"%>
 <%@page import="java.time.LocalDate"%>
-<%@	taglib prefix="sec"
-	uri="http://www.springframework.org/security/tags"%>
+<%@	taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
@@ -24,7 +22,7 @@
 	<sec:authentication property="principal.authorities" var="role" />
 
 	<%
-	List<EmployeeDailyReference>[][] sle = (List<EmployeeDailyReference>[][]) request.getAttribute("sameLevelEmployees");
+		List<EmployeeDailyReference>[][] sle = (List<EmployeeDailyReference>[][]) request.getAttribute("sameLevelEmployees");
 	List<Task>[] tasks = (List<Task>[]) request.getAttribute("tasks");
 	YearMonth yearMonth = (YearMonth) request.getAttribute("month");
 	LocalDate thisMonth = LocalDate.now().withYear(yearMonth.getYear()).withMonth(yearMonth.getMonthValue());
@@ -69,15 +67,12 @@
 								<h3 class="text-center">Sunday</h3>
 							</div>
 						</div>
-						<div id='swap-modal' class='modal fade' tabindex='-1'
-							role='dialog' aria-hidden='true'>
-							<div class='modal-dialog modal-dialog-centered modal-xl'
-								role='document'>
+						<div id='swap-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>
+							<div class='modal-dialog modal-dialog-centered modal-xl' role='document'>
 								<div class='modal-content'>
 									<div class='modal-header'>
 										<h5 class='modal-title'>Swap Shifts</h5>
-										<button type='button' class='close' data-dismiss='modal'
-											aria-label='Close'>
+										<button type='button' class='close' data-dismiss='modal' aria-label='Close'>
 											<span aria-hidden='true'><i class='fas fa-times'></i></span>
 										</button>
 									</div>
@@ -85,9 +80,9 @@
 										<form method="GET" action="/schedule/swapRequest">
 											<div class="form-group">
 												<div class="md-form">
-													<select name="requesterDate" id="dates"
-														class="form-control">
-														<%for (int j = 0; j < 2; j++) {
+													<select name="requesterDate" id="dates" class="form-control">
+														<%
+															for (int j = 0; j < 2; j++) {
 															for (int i = 1; i < sle[j].length + 1; i++) {
 																LocalDate targetDate;
 																if (j == 0) {
@@ -110,20 +105,26 @@
 																if (sle[j][i] != null) {
 
 															for (EmployeeDailyReference edr : sle[j][i]) {
-																if (edr.getNationalID().equals((String) request.getAttribute("employeeNationalID"))) {%>
-																	<option value="<%=targetDate.toString()%>"><%=targetDate.toString()%></option>
-																<%break;
-															}}}}}%>
+																if (edr.getNationalID().equals((String) request.getAttribute("employeeNationalID"))) {
+														%>
+														<option value="<%=targetDate.toString()%>"><%=targetDate.toString()%></option>
+														<%
+															break;
+														}
+														}
+														}
+														}
+														}
+														%>
 													</select>
 												</div>
 											</div>
-											<small class='form-text text-muted'>Select the date,
-												which you wish to switch.</small><br> <input type="hidden"
-												id="receiverNationalID" name="receiverNationalID"> <input
+											<small class='form-text text-muted'>Select the date, which you wish to switch.</small><br>
+											<input type="hidden" id="receiverNationalID" name="receiverNationalID"> <input
 												type="hidden" id="receiverDate" name="receiverDate">
 										</form>
-										<button class="btn btn-dark" data-dismiss="modal"
-											onclick='sendSwapRequest()'>Send request!</button>
+										<button class="btn btn-dark" data-dismiss="modal" onclick='sendSwapRequest()'>Send
+											request!</button>
 									</div>
 									<div class='modal-footer'></div>
 								</div>
@@ -131,31 +132,36 @@
 						</div>
 						<div class="mt-2">
 							<div class="row seven-cols">
-								<%for (int i = 0; i <= 34; i++) {	%>
+								<%
+									for (int i = 0; i <= 34; i++) {
+								%>
 								<c:set var="i" value="<%=i%>" />
 								<div class="col-md-1 p-0">
-									<%if (i >= offset && i < thisMonth.lengthOfMonth() + offset) {%>
+									<%
+										if (i >= offset && i < thisMonth.lengthOfMonth() + offset) {
+									%>
 									<button class='day-box' data-toggle="modal" data-target="#employeeModal${i}">
-									<%if (sle[0][i - offset + 1] != null) {
-										for (int j = 0; j < sle[0][i - offset + 1].size(); j++) {
-										  EmployeeDailyReference thisEDR = sle[0][i - offset + 1].get(j);
-										  if (request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID())){%>
-												<span class='work-day'></span>
-												<%break;
-											}
+										<%
+											if (sle[0][i - offset + 1] != null) {
+											for (int j = 0; j < sle[0][i - offset + 1].size(); j++) {
+												EmployeeDailyReference thisEDR = sle[0][i - offset + 1].get(j);
+												if (request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID())) {
+										%>
+										<span class='work-day'></span>
+										<%
+											break;
 										}
-									}%>
+										}
+										}
+										%>
 									</button>
-									<div class='modal fade' id="employeeModal${i}" tabindex="-1"
-										role="dialog" aria-labelledby="EmployeeModal${i}"
-										aria-hidden="true">
-										<div class='modal-dialog modal-dialog-centered modal-xl'
-											role="document">
+									<div class='modal fade' id="employeeModal${i}" tabindex="-1" role="dialog"
+										aria-labelledby="EmployeeModal${i}" aria-hidden="true">
+										<div class='modal-dialog modal-dialog-centered modal-xl' role="document">
 											<div class='modal-content'>
 												<div class='modal-header'>
 													<h5 id='EmployeeModal${i}' class="modal-title">Employees</h5>
-													<button type="button" class="close" data-dismiss="modal"
-														aria-label="Close">
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 														<span aria-hidden="true"> <i class="fas fa-times"></i>
 														</span>
 													</button>
@@ -170,75 +176,101 @@
 																</tr>
 															</thead>
 															<tbody id="body<%=i%>">
-																<%String day = "";
+																<%
+																	String day = "";
 																if (sle[0][i - offset + 1] != null) {
 																	boolean shiftInDay = false;
-																	for(int j = 0; j < sle[0][i - offset + 1].size(); j++){
+																	for (int j = 0; j < sle[0][i - offset + 1].size(); j++) {
 																		if (request.getAttribute("employeeNationalID").equals(sle[0][i - offset + 1].get(j).getNationalID())) {
-																			shiftInDay = true;
-																			break;
+																	shiftInDay = true;
+																	break;
 																		}
 																	}
 																	day = thisMonth.withDayOfMonth(i - offset + 1).toString();
 																	for (int j = 0; j < sle[0][i - offset + 1].size(); j++) {
-																		EmployeeDailyReference thisEDR = sle[0][i - offset + 1].get(j);%>
-																		<%if (request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID())) {%>
-																			<tr style="background-color: #999999" id="<%=i%>-<%=thisEDR.getNationalID()%>">
-																		<%}else{%>
-																			<tr id="<%=i%>-<%=thisEDR.getNationalID()%>">
-																	  	<%}%>
+																		EmployeeDailyReference thisEDR = sle[0][i - offset + 1].get(j);
+																%>
+																<%
+																	if (request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID())) {
+																%>
+																<tr style="background-color: #999999" id="<%=i%>-<%=thisEDR.getNationalID()%>">
+																	<%
+																		} else {
+																	%>
+																
+																<tr id="<%=i%>-<%=thisEDR.getNationalID()%>">
+																	<%
+																		}
+																	%>
 																	<th scope="row">
-																		<h4><%=thisEDR.getFirstName()%> <%=thisEDR.getLastName()%></h4>
+																		<h4><%=thisEDR.getFirstName()%>
+																			<%=thisEDR.getLastName()%></h4>
 																	</th>
 																	<td>
 																		<h4><%=thisEDR.getWorkTimeInfo()%></h4>
 																	</td>
 																	<c:if test="${role == '[EMPLOYEE]'}">
-																		<%if(!request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID()) && LocalDate.parse(day).isAfter(LocalDate.now()) && !shiftInDay){%>
-																			<td>
-																				<button class="btn btn-dark" data-dismiss="modal"
-																					data-toggle="modal" data-target="#swap-modal"
-																					onclick='swapRequestData("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap
-																					Shifts</button>
-																			</td>
-																		<%}%>
+																		<%
+																			if (!request.getAttribute("employeeNationalID").equals(thisEDR.getNationalID()) && LocalDate.parse(day).isAfter(LocalDate.now()) && !shiftInDay) {
+																		%>
+																		<td>
+																			<button class="btn btn-dark" data-dismiss="modal" data-toggle="modal"
+																				data-target="#swap-modal"
+																				onclick='swapRequestData("<%=thisEDR.getNationalID()%>", "<%=day%>")'>Swap
+																				Shifts</button>
+																		</td>
+																		<%
+																			}
+																		%>
 																	</c:if>
 																	<c:if test="${role == '[ADMIN]'}">
-																		<%if (LocalDate.parse(day).isAfter(LocalDate.now())) {%>
-																			<td>
-																				<button class="btn btn-dark"
-																					onclick='deleteWorkDay("<%=i%>","<%=thisEDR.getNationalID()%>", "<%=day%>")'>Delete</button>
-																			</td>
-																		<%}%>
+																		<%
+																			if (LocalDate.parse(day).isAfter(LocalDate.now())) {
+																		%>
+																		<td>
+																			<button class="btn btn-dark"
+																				onclick='deleteWorkDay("<%=i%>","<%=thisEDR.getNationalID()%>", "<%=day%>")'>Delete</button>
+																		</td>
+																		<%
+																			}
+																		%>
 																	</c:if>
 																	<c:if test="${role == '[MANAGER]'}">
-																		<%if (LocalDate.parse(day).isAfter(LocalDate.now())) {%>
-																			<td>
-																				<button class="btn btn-dark"
-																					onclick='getTaskData("<%=i%>", "<%=thisEDR.getNationalID()%>","<%=day%>")'>Add
-																					a Task</button>
-																			</td>
-																		<%}%>
+																		<%
+																			if (LocalDate.parse(day).isAfter(LocalDate.now())) {
+																		%>
+																		<td>
+																			<button class="btn btn-dark"
+																				onclick='getTaskData("<%=i%>", "<%=thisEDR.getNationalID()%>","<%=day%>")'>Add
+																				a Task</button>
+																		</td>
+																		<%
+																			}
+																		%>
 																	</c:if>
-																	<%}%>
+																	<%
+																		}
+																	%>
+																</tr>
+																<c:if test="${role == '[ADMIN]'}">
+																	<%
+																		if (LocalDate.parse(day).isAfter(LocalDate.now())) {
+																	%>
+																	<tr id="addWorkDayButton">
+																		<th></th>
+																		<td>
+																			<button class="btn btn-dark" onclick='getWorkDayData("<%=i%>", "<%=day%>")'>Add
+																			</button>
+																		</td>
+																		<td></td>
 																	</tr>
-																	<c:if test="${role == '[ADMIN]'}">
-																		<%if (LocalDate.parse(day).isAfter(LocalDate.now())) {%>
-																			<tr id="addWorkDayButton">
-																				<th></th>
-																					<td>
-																						<button class="btn btn-dark"
-																							onclick='getWorkDayData("<%=i%>", "<%=day%>")'>Add
-																						</button>
-																					</td>
-																				<td></td>
-																			</tr>
-																		<%}%>
-																	</c:if>
+																	<%
+																		}
+																	%>
+																</c:if>
 																<%
 																	}
 																%>
-
 															</tbody>
 														</table>
 													</div>
@@ -263,34 +295,36 @@
 																<th scope="row">
 																	<h4>
 																		<b></b>
-																		<c:out
-																			value="<%=tasks[i - offset + 1].get(index).getTaskTitle()%>" />
+																		<c:out value="<%=tasks[i - offset + 1].get(index).getTaskTitle()%>" />
 																	</h4>
 																</th>
 																<td>
 																	<h4>
-																		<c:out
-																			value="<%=tasks[i - offset + 1].get(index).getTaskBody()%>" />
+																		<c:out value="<%=tasks[i - offset + 1].get(index).getTaskBody()%>" />
 																	</h4>
 																</td>
 																<td>
 																	<h4>
-																		<c:out
-																			value="<%=tasks[i - offset + 1].get(index).getTaskReward()%>" />
+																		<c:out value="<%=tasks[i - offset + 1].get(index).getTaskReward()%>" />
 																	</h4>
 																</td>
-																
+
 																<td id="status">
-																<%if (!tasks[i - offset + 1].get(index).getCompleted()) {%>
-																	<button class="btn btn-dark" onclick='markTaskAsComplete("<%=index%>", "<%=day%>")'>Mark as Complete</button>
-																<%} else {
-																	if(tasks[i-offset+1].get(index).getPaidFor()){%>
-																		<i class="btn fas fa-lg fa-check"></i>
-																		<i class="btn fas fa-lg fa-comment-dollar"></i>
-																	<%}else{%>
-																		<i class="btn fas fa-lg fa-check"></i>
-																	<%}
-																}%>
+																	<%
+																		if (!tasks[i - offset + 1].get(index).getCompleted()) {
+																	%>
+																	<button class="btn btn-dark" onclick='markTaskAsComplete("<%=index%>", "<%=day%>")'>Mark
+																		as Complete</button> <%
+ 	} else {
+ if (tasks[i - offset + 1].get(index).getPaidFor()) {
+ %> <i class="btn fas fa-lg fa-check"></i>
+																	<i class="btn fas fa-lg fa-comment-dollar"></i> <%
+ 	} else {
+ %> <i
+																	class="btn fas fa-lg fa-check"></i> <%
+ 	}
+ }
+ %>
 																</td>
 															</tr>
 															<%
@@ -324,15 +358,13 @@
 					<%
 						if (yearMonth.equals(YearMonth.now())) {
 					%>
-					<a class="btn btn-dark btn-lg"
-						href="/schedule/?month=<%=YearMonth.now().plusMonths(1)%>"> <i
-						class="fas fa-chevron-right"></i>
+					<a class="btn btn-dark btn-lg" href="/schedule/?month=<%=YearMonth.now().plusMonths(1)%>">
+						<i class="fas fa-chevron-right"></i>
 					</a>
 					<%
 						} else {
 					%>
-					<a class="btn btn-dark btn-lg"
-						href="/schedule/?month=<%=YearMonth.now()%>"> <i
+					<a class="btn btn-dark btn-lg" href="/schedule/?month=<%=YearMonth.now()%>"> <i
 						class="fas fa-chevron-left"></i>
 					</a>
 					<%
