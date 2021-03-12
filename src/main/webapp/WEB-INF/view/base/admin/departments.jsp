@@ -32,14 +32,20 @@
 	                </header>
                     <div class="form-group">
 	                <label for="departments">Select Department:</label>
-	                <select id="departments" class="form-control">
 	                <%Map<String, String> departments = (Map<String, String>)request.getAttribute("departments");
 	                if(departments!=null){
-	                	for(Map.Entry<String, String> department : departments.entrySet()){%>
-	                			<option value='<%=department.getKey()%>'> <%=departments.get(department.getKey())%> </option>
+	                	if(departments.entrySet().size()>0){%>
+	        	                <select id="departments" class="form-control">
+		                	<%for(Map.Entry<String, String> department : departments.entrySet()){%>
+		                		<option value='<%=department.getKey()%>'> <%=department.getKey()%> : <%=departments.get(department.getKey())%> </option>
+		                	<%}%>
+		                	</select>
+	                	<%}else{%>
+	                		<select id="departments" class="form-control" disabled>
+	                			<option> No departments available!</option>
+	                		</select>
 	                	<%}
 	                }%>
-                	</select>
                     </div>
                 	<div id="button-content">
                 		<button id="display" class="btn btn-dark m-1">DISPLAY</button>

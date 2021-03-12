@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.company.awms.modules.base.admin.data.*;
+import com.company.awms.modules.base.admin.data.Module;
 import com.company.awms.modules.base.employees.data.Employee;
 import com.company.awms.modules.base.employees.data.EmployeeRepo;
 import com.company.awms.modules.base.employees.data.Notification;
@@ -24,11 +26,13 @@ import com.company.awms.modules.base.employees.data.Notification;
 @Service
 public class EmployeeService {
 	private EmployeeRepo employeeRepo;
+	private ModuleRepo moduleRepo;
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public EmployeeService(EmployeeRepo employeeRepo, PasswordEncoder passwordEncoder) {
+	public EmployeeService(EmployeeRepo employeeRepo, ModuleRepo moduleRepo, PasswordEncoder passwordEncoder) {
 		this.employeeRepo = employeeRepo;
+		this.moduleRepo = moduleRepo;
 		this.passwordEncoder = passwordEncoder;
 	}
 
@@ -331,5 +335,38 @@ public class EmployeeService {
 		notificationData.add("plain-notification");
 		employee.getNotifications().add(new Notification(message, notificationData));
 		employeeRepo.save(employee);
+	}
+
+	public Module getModule(String name) throws IOException {
+		Optional<Module> moduleOptional = moduleRepo.findByName(name);
+		if(moduleOptional.isEmpty()) {
+			throw new IOException();
+		}
+		return moduleOptional.get();
+	}
+	
+	public  List<Module> getAllModules() {
+		return moduleRepo.findAll();
+	}
+	
+
+	public Map<String, Boolean> getExtensionModulesDTOs(){
+		Map<String, Boolean> conditions = new HashMap<String, Boolean>();
+		List<Module> modules = getAllExtensionModules();
+		for(Module module : modules) {
+			StringBuilder moduleName = new StringBuilder(module.getName());
+			moduleName.setCharAt(0, Character.toUpperCase(moduleName.charAt(0)));
+			String name = moduleName.toString();
+			conditions.put(name, module.isActive());
+		}
+		return conditions;
+	}
+	
+	public  List<Module> getAllExtensionModules() {
+		return moduleRepo.findByBase(false);
+	}
+	
+	public void updateModule(Module module) {
+		moduleRepo.save(module);
 	}
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,12 +28,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.company.awms.modules.base.admin.data.*;
+import com.company.awms.modules.base.admin.data.Module;
 import com.company.awms.modules.base.documents.DocumentService;
 import com.company.awms.modules.base.documents.data.DocInfoDTO;
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
 import com.company.awms.modules.base.schedule.ScheduleService;
 import com.company.awms.security.EmployeeDetails;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -291,68 +294,18 @@ public class AdminController {
 	}
 
 	// Active modules methods
-	public static Map<String, Boolean> getAllModulesStatesLogic() {
-		File baseModuleDir = new File("classes/com/company/awms/modules/base/");
-		try{
-			if(baseModuleDir.listFiles(File::isDirectory).length>0) {
-				
-			}
-		}catch(Exception e) {
-			baseModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/base/");
+	public Map<String, Boolean> getAllModulesStatesLogic() {
+		Map<String, Boolean> conditions = new HashMap<String, Boolean>();
+		List<Module> modules = employeeService.getAllModules();
+		for(Module module : modules) {
+			StringBuilder moduleName = new StringBuilder(module.getName());
+			moduleName.setCharAt(0, Character.toUpperCase(moduleName.charAt(0)));
+			String name = moduleName.toString();
+			conditions.put(name, module.isActive());
 		}
-
-		File[] baseModules = baseModuleDir.listFiles(File::isDirectory);
-		Map<String, Boolean> controllerConditions = new HashMap<>();
-		for (File module : baseModules) {
-			String controller = null;
-			for(File moduleFile : module.listFiles()) {
-				if(moduleFile.getName().contains("Controller")) {
-					controller = moduleFile.getName().split("\\.")[0];
-				}
-			}
-			try {
-				if (!controller.equals("AdminController")) {
-					Class<?> controllerClass = Class.forName("com.company.awms.modules.base." + module.getName() + "." + controller);
-					Method active = controllerClass.getMethod("getActive");
-					controllerConditions.put(controller.split("Controller")[0], (boolean) active.invoke(null, null));
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		Iterator<String> extensions = getExtensionModulesStatesLogic().keySet().iterator();
-		while(extensions.hasNext()) {
-			String key = extensions.next();
-			controllerConditions.put(key, getExtensionModulesStatesLogic().get(key));
-		}
-		return controllerConditions;
+		return conditions;
 	}
 
-	public static Map<String, Boolean> getExtensionModulesStatesLogic(){
-		Map<String, Boolean>  activeExtensions = new  HashMap<String, Boolean> (); 
-		File extModuleDir  = new File("classes/com/company/awms/modules/ext/");
-		File[] extModules = extModuleDir.listFiles(File::isDirectory);
-		if(extModules != null) {
-			for (File module : extModules) {
-				String controller = null;
-				for(File moduleFile : module.listFiles()) {
-					if(moduleFile.getName().contains("Controller")) {
-						controller = moduleFile.getName().split("\\.")[0];
-					}
-				}
-				try {
-					if (!controller.equals("AdminController")) {
-						Class<?> controllerClass = Class.forName("com.company.awms.modules.ext." + module.getName() + "." + controller);
-						Method active = controllerClass.getMethod("getActive");
-						activeExtensions.put(controller.split("Controller")[0], (boolean) active.invoke(null, null));
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return activeExtensions;
-	}
 	
 	@GetMapping("/modules")
 	public String getModulesStates(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
@@ -366,70 +319,28 @@ public class AdminController {
 			e.printStackTrace();
 			return "errors/internalServerError";
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
 	@PostMapping(value = "/modules/set", consumes = "application/json")
-	public String setModulesStates(@RequestBody String updatedActives, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws JsonMappingException, JsonProcessingException {
+	public ResponseEntity<String> setModulesStates(@RequestBody String updatedActives, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws IOException {
 		String updatedActivitiesFormatted = updatedActives.substring(19, updatedActives.length() - 2).replaceAll("\\\\", "");
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Boolean> actives = mapper.readValue(updatedActivitiesFormatted, HashMap.class);
 		for (String key : actives.keySet()) {
-			File baseModuleDir = new File("classes/com/company/awms/modules/base/");
-			File extModuleDir  = new File("classes/com/company/awms/modules/ext/");
-			try{
-				System.out.println(baseModuleDir.listFiles(File::isDirectory)[0]);
-			}catch(Exception e) {
-				baseModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/base/");
-				extModuleDir = new File("target/awms-1.0.0/WEB-INF/classes/com/company/awms/modules/ext/");
-			}
-
-			File[] baseModules = baseModuleDir.listFiles(File::isDirectory);
-			File[] extModules = extModuleDir.listFiles(File::isDirectory);
-			for(File baseModule : baseModules) {
-				for(File moduleFile : baseModule.listFiles(File::isFile)) {
-					if(moduleFile.getName().equals(key + "Controller")) {
-						try {
-							Class<?> controller = Class.forName("com.company.awms.modules.base." + baseModule.getName() + "." + moduleFile.getName());
-							Method active = controller.getMethod("setActive", boolean.class);
-							active.invoke(null, actives.get(key));
-						} catch (Exception e) {
-							return "errors/internalServerError";
-						}
-					}
-				}
-			}
-			if(extModules != null) {
-				for(File extModule : extModules) {
-					for(File moduleFile : extModule.listFiles(File::isFile)) {
-						if(moduleFile.getName().contains(key + "Controller")) {
-							try {
-								Class<?> controller = Class.forName("com.company.awms.modules.ext." + extModule.getName() + "." + key + "Controller");
-								Method active = controller.getMethod("setActive", boolean.class);
-								active.invoke(null, actives.get(key));
-							} catch (Exception e) {
-								e.printStackTrace();
-								return "errors/internalServerError";
-							}
-						}
-					}
-				}
-			}
+			Module module = employeeService.getModule(key.toLowerCase());
+			module.setActive(actives.get(key));
+			employeeService.updateModule(module);
 		}
-		return "redirect:/";
+		
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
+	
 	// Department methods
 	private Map<String, String> getDepartmentDTOs() throws Exception {
 		Map<String, String> departmentDTOs = new HashMap<>();
-		for (int i = 97; i < 123; i++) {
-			String departmentCode = Character.toString((char) i);
-			JSONObject department = scheduleService.getDepartment(departmentCode);
-			if (department == null) {
-				continue;
-			}
-			departmentDTOs.put(departmentCode, (String) department.get("Name"));
+		for (Department department : scheduleService.getAllDepartments()) {
+			departmentDTOs.put(Character.toString(department.getDepartmentCode()), department.getName());
 		}
 		return departmentDTOs;
 	}
@@ -441,17 +352,22 @@ public class AdminController {
 			model.addAttribute("departments", departmentDTOs);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return "errors/internalServerError";
 		}
 		return "base/admin/departments";
 	}
 
 	@GetMapping("/departments/view")
-	public ResponseEntity<JSONObject> getDepartment(@RequestParam String departmentCode, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
+	public ResponseEntity<String> getDepartment(@RequestParam String departmentCode, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
 		try {
-			JSONObject department = scheduleService.getDepartment(departmentCode);
-			return new ResponseEntity<>(department, HttpStatus.OK);
+			Department department = scheduleService.getDepartment(departmentCode);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.setSerializationInclusion(Include.ALWAYS);
+			String departmentString = mapper.writeValueAsString(department);
+			return new ResponseEntity<>(departmentString, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -465,21 +381,16 @@ public class AdminController {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PostMapping(value = "/departments/delete", consumes = "application/json")
-	public String deleteDepartments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestBody Object departmentObj) throws ParseException {
+	public String deleteDepartment(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestBody Object departmentObj) throws ParseException {
 
 		JSONObject departmentBody = new JSONObject((Map) departmentObj);
-		String key = null;
-		Set<String> keys = departmentBody.keySet();
-		Iterator<String> keyIterator = keys.iterator();
-		while (keyIterator.hasNext()) {
-			key = keyIterator.next();
-			break;
-		}
+		String key = (String)departmentBody.get("departmentCode");
 		try {
 			Map<String, String> departmentDTOs = getDepartmentDTOs();
 			model.addAttribute("departments", departmentDTOs);
@@ -502,6 +413,8 @@ public class AdminController {
 				unread++;
 			}
 		}
+
+		model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
 		model.addAttribute("notifications", user.getNotifications());
 		model.addAttribute("unread", unread);
 	}

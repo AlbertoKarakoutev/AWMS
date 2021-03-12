@@ -1,5 +1,4 @@
 <%@	page import="java.time.YearMonth"%>
-<%@	page import="com.company.awms.modules.base.admin.AdminController"%>
 <%@	page import="java.util.*"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -63,14 +62,18 @@
 				</div>
 			</li>
 			
-			<%Iterator<String> iterator = AdminController.getExtensionModulesStatesLogic().keySet().iterator();
-			while(iterator.hasNext()){
-				String key = iterator.next();
-				if(AdminController.getExtensionModulesStatesLogic().get(key)){%>
-				<li class="vertical-item <%=key%>" style="display:inline"><a href="/<%=key.toLowerCase()%>" title="<%=key%>"><%=key%></a></li>
-			<%}else{%>
-				<li class="vertical-item <%=key%>" style="display:none"><a href="/<%=key.toLowerCase()%>" title="<%=key%>"><%=key%></a></li>
-			<%}}%>
+			<%
+			Map<String, Boolean> extensionModules = (Map<String, Boolean>)request.getAttribute("extModules");
+			 
+			if(extensionModules.size()>0){
+				Iterator<String> iterator = extensionModules.keySet().iterator();
+				while(iterator.hasNext()){
+					String key = iterator.next();
+					if(extensionModules.get(key)){%>
+						<li class="vertical-item <%=key%>" style="display:inline"><a href="/<%=key.toLowerCase()%>" title="<%=key%>"><%=key%></a></li>
+					<%}else{%>
+						<li class="vertical-item <%=key%>" style="display:none"><a href="/<%=key.toLowerCase()%>" title="<%=key%>"><%=key%></a></li>
+			<%}}}%>
 			
 			<sec:authentication property="principal.authorities" var="role"/>
 			<c:if test="${role == '[ADMIN]'}">

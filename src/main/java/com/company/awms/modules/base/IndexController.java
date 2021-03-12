@@ -60,6 +60,7 @@ public class IndexController {
                 unread++;
             }
         }
+        model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
         model.addAttribute("notifications", user.getNotifications());
         model.addAttribute("unread", unread);
     }

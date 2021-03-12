@@ -45,12 +45,23 @@ for(var i = 1; i <= nextMonthLength; i++){
                                 "_class": "com.company.awms.modules.base.schedule.data.Day"
                                 }
 }
+baseModules = [];
+baseModules[0] = {"name":"schedule", "active":true, "base":true};
+baseModules[1] = {"name":"documents", "active":true, "base":true};
+baseModules[2] = {"name":"employees", "active":true, "base":true};
+baseModules[3] = {"name":"forum", "active":true, "base":true};
+baseModules[4] = {"name":"contacts", "active":true, "base":true};
+
 awms.day.drop();
 awms.doc.drop();
 awms.employee.drop();
 awms.forumReply.drop();
 awms.forumThread.drop();
+awms.department.drop();
+awms.module.drop();
 
+awms.department.createCollection();
+awms.module.insertMany(baseModules);
 awms.day.insertMany(days);
 awms.createCollection("doc", null);
 awms.employee.insertOne(admin);

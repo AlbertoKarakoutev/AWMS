@@ -314,6 +314,7 @@ public class ForumController {
 				unread++;
 			}
 		}
+		model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
 		model.addAttribute("notifications", user.getNotifications());
 		model.addAttribute("unread", unread);
 	}

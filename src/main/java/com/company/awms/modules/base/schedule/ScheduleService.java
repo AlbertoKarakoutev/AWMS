@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.company.awms.modules.base.admin.data.Department;
+import com.company.awms.modules.base.admin.data.DepartmentRepo;
 import com.company.awms.modules.base.employees.data.Employee;
 import com.company.awms.modules.base.employees.data.EmployeeDailyReference;
 import com.company.awms.modules.base.employees.data.EmployeeRepo;
@@ -35,21 +38,23 @@ import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.modules.base.schedule.data.Day;
 import com.company.awms.modules.base.schedule.data.ScheduleRepo;
 import com.company.awms.modules.base.schedule.data.Task;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ScheduleService {
 
 	private ScheduleRepo scheduleRepo;
 	private EmployeeRepo employeeRepo;
-
+	private DepartmentRepo departmentRepo;
+	
 	private static List<Day> nextMonthDays;
 	
 	@Autowired
-	public ScheduleService(ScheduleRepo scheduleRepo, EmployeeRepo employeeRepo) {
+	public ScheduleService(ScheduleRepo scheduleRepo, EmployeeRepo employeeRepo, DepartmentRepo departmentRepo) {
 
 		this.scheduleRepo = scheduleRepo;
 		this.employeeRepo = employeeRepo;
-		
+		this.departmentRepo = departmentRepo;	
 		
 	}
 
@@ -76,27 +81,25 @@ public class ScheduleService {
 		LocalTime[] workTime = new LocalTime[2];
 
 		int[] workTimeJSON;
-		JSONObject employeeLevel = null;
+		Department employeeLevel = null;
 
 		EmployeeDailyReference employee = new EmployeeDailyReference(this.employeeRepo, employeeNationalID);
 		
-		JSONObject thisDepartment = getDepartment(employee.getDepartment());
+		Department thisDepartment = getDepartment(employee.getDepartment());
 		int level = employee.getLevel();
-		if (Boolean.parseBoolean((String) thisDepartment.get("Universal schedule"))) {
-			workTimeJSON = Stream.of(((String) thisDepartment.get("Daily hours")).split(",")).mapToInt(Integer::parseInt).toArray();
+		if (thisDepartment.isUniversalSchedule()) {
+			workTimeJSON = thisDepartment.getDailyHours();
 			employeeLevel = thisDepartment;
 		} else {
-			JSONArray levels = (JSONArray) thisDepartment.get("levels");
-			JSONObject arrayElement = (JSONObject) levels.get(level);
-			employeeLevel = (JSONObject) arrayElement.get(Integer.toString(level));
-			workTimeJSON = Stream.of(((String) employeeLevel.get("Daily hours")).split(",")).mapToInt(Integer::parseInt).toArray();
+			employeeLevel = thisDepartment.getLevel(level);
+			workTimeJSON = employeeLevel.getDailyHours();
 		}
 
 		try {
 			if (!onCall) {
 				LocalTime start = LocalTime.of(workTimeJSON[0], workTimeJSON[1]);
 				workTime[0] = start;
-				LocalTime end = start.plus(Integer.parseInt(employeeLevel.get("Shift length").toString()) + Integer.parseInt(employeeLevel.get("Daily break duration total").toString()), ChronoUnit.HOURS);
+				LocalTime end = start.plus(employeeLevel.getShiftLength() + employeeLevel.getDailyBreakDurationTotal(), ChronoUnit.HOURS);
 				workTime[1] = end;
 			} 
 			employee.setWorkTime(workTime);
@@ -499,12 +502,12 @@ Day taskDay = getDay(LocalDate.parse(dateStr));
 		// Add the employee shifts
 		for (int i = 97; i < 123; i++) {
 			String departmentCode = Character.toString((char) i);
-			JSONObject department = getDepartment(departmentCode);
+			Department department = getDepartment(departmentCode);
 			if (department == null) {
 				continue;
 			}
-			if (Boolean.parseBoolean((String) department.get("Universal schedule"))) {
-				switch ((String) department.get("Schedule type")) {
+			if (department.isUniversalSchedule()) {
+				switch (department.getScheduleType()) {
 				case "Regular":
 					applyRegularSchedule(departmentCode, 0);
 					break;
@@ -519,9 +522,9 @@ Day taskDay = getDay(LocalDate.parse(dateStr));
 					continue;
 				}
 			} else {
-				for (int j = 0; j < ((JSONArray) department.get("levels")).size(); j++) {
-					JSONObject departmentAtLevel = getDepartmentAtLevel(departmentCode, j);
-					switch ((String) departmentAtLevel.get("Schedule type")) {
+				for (int j = 0; j < department.getLevels().size(); j++) {
+					Department departmentAtLevel = getDepartmentAtLevel(departmentCode, j);
+					switch (departmentAtLevel.getScheduleType()) {
 					case "Regular":
 						applyRegularSchedule(departmentCode, j);
 						break;
@@ -636,7 +639,7 @@ Day taskDay = getDay(LocalDate.parse(dateStr));
 	}
 
 	public boolean applyOnCallSchedule(String department, int level) throws Exception {
-		JSONObject thisDepartment = getDepartmentAtLevel(department, level);
+		Department thisDepartment = getDepartmentAtLevel(department, level);
 		if (thisDepartment == null)
 			return false;
 
@@ -649,23 +652,23 @@ Day taskDay = getDay(LocalDate.parse(dateStr));
 		LocalDate month = LocalDate.now().plus(1, ChronoUnit.MONTHS);
 		int lengthOfMonth = YearMonth.of(month.getYear(), month.getMonth()).lengthOfMonth();
 
-		int shiftLength;
-		int breakBetweenShiftsMin;
-		int employeesPerShift;
-		int monthlyWorkDays;
+		Integer shiftLength;
+		Integer breakBetweenShiftsMin;
+		Integer employeesPerShift;
+		Integer monthlyWorkDays;
 		double lengthOfWorkDay;
 		int[] dailyHours;
 		try {
-			dailyHours = Stream.of(((String) thisDepartment.get("Daily hours")).split(",")).mapToInt(Integer::parseInt).toArray();
-			shiftLength = Integer.parseInt((String)thisDepartment.get("Shift length"));
-			breakBetweenShiftsMin = Integer.parseInt((String)thisDepartment.get("Break between shifts"));
+			dailyHours = thisDepartment.getDailyHours();
+			shiftLength = thisDepartment.getShiftLength();
+			breakBetweenShiftsMin = thisDepartment.getBreakBetweenShifts();
 			lengthOfWorkDay = ((double) dailyHours[2] + ((double) dailyHours[3] / 60)) - ((double) dailyHours[0] + ((double) dailyHours[1] / 60));
 			if (lengthOfWorkDay > 23.9) {
 				lengthOfWorkDay = 24;
 			}
-			employeesPerShift = Integer.parseInt((String)thisDepartment.get("Employees per shift"));
+			employeesPerShift = thisDepartment.getEmployeesPerShift();
 
-			monthlyWorkDays = Integer.parseInt((String)thisDepartment.get("Monthly work days"));
+			monthlyWorkDays = thisDepartment.getMonthlyWorkDays();
 
 		} catch (Exception e) {
 			System.out.println("JSON Error");
@@ -869,110 +872,94 @@ Day taskDay = getDay(LocalDate.parse(dateStr));
 		return false;
 	}
 
-	public JSONObject getDepartmentAtLevel(String department, int level) throws Exception {
+	public Department getDepartmentAtLevel(String department, int level) throws Exception {
 
-		JSONObject thisDepartment = getDepartment(department);
-
-		if (!Boolean.parseBoolean((String) thisDepartment.get("Universal schedule"))) {
-			JSONArray levels = (JSONArray) thisDepartment.get("levels");
-			JSONObject thisLevel = null;
-			try {
-				thisLevel = (JSONObject) levels.get(level);
-			}catch(IndexOutOfBoundsException e) {}
-			if(thisLevel == null) {
-				throw new Exception("Level doesn't exist");
-			}
-			thisDepartment = (JSONObject) thisLevel.get(Integer.toString(level));
-		}else {
-			throw new Exception("This department has a universal schedule");
-		}
-
-		return thisDepartment;
+		Department thisDepartment = getDepartment(department);
+		return thisDepartment.getLevel(level);
 	}
 
-	public JSONObject getDepartment(String department) throws Exception {
+	public Department getDepartment(String departmentCode) throws Exception {
 
-		JSONObject thisDepartment = null;
-		JSONObject departments = null;
-		FileReader departmentsJson = null;
-		try {
-			departmentsJson = new FileReader("src/main/resources/departments.json");
-		}catch(FileNotFoundException e) {
+		Optional<Department> department  = departmentRepo.findByDepartmentCode(departmentCode);
+		if(department.isEmpty()) {
 			return null;
-		}
-		try {
-			departments = (JSONObject) new JSONParser().parse(departmentsJson);
-		} catch (Exception e) {
-			return null;
-		}
-		thisDepartment = (JSONObject) departments.get(department);
-		
-		return thisDepartment;
+		}	
+		return department.get();
 	}
 
+	public List<Department> getAllDepartments(){
+		return this.departmentRepo.findAll();
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void setDepartment(Object departmentObj) throws IOException, ParseException {
-		JSONParser parser = new JSONParser();
-		JSONObject department = new JSONObject((Map) departmentObj);
-		JSONObject departments = (JSONObject) parser.parse(new FileReader("src/main/resources/departments.json"));
-
-		String key = null;
-		JSONObject departmentBody = null;
-
-		Set<String> keys = department.keySet();
-		Iterator<String> keyIterator = keys.iterator();
-		while (keyIterator.hasNext()) {
-			key = keyIterator.next();
-			break;
+		JSONObject departmentJSON = new JSONObject((Map<Object, String>) departmentObj);
+		List<Department> departments = departmentRepo.findAll();
+		List<String> dptCodeSet = new ArrayList<String>();
+		for(Department dpt : departments) {
+			dptCodeSet.add(Character.toString(dpt.getDepartmentCode()));
 		}
-		
-		Object obj = department.get(key);
-		departmentBody = (JSONObject) parser.parse((String) obj);
-		key = key.replace("\"", "");
+		String key = (String) departmentJSON.get("departmentCode");
 		// Check if it is a new department
-		if (key.equals("undefined")) {
+		if (key == null || key.equals("")) {
 			// Check if it is the first department
-			if (departments.keySet().size() == 0) {
+			if (dptCodeSet.size() == 0) {
 				key = "a";
 			} else {
 				// Check if the admin has specified a dpt. code
-				key = ((String) departmentBody.get("departmentCode"));
-				if(key!=null) {
-					departmentBody.remove("departmentCode");
-				} else {
-					int firstCode = 97;
-					Set keySet = departments.keySet();
-					while (keySet.contains(String.valueOf(Character.toChars(firstCode)))) {
-						firstCode++;
-					}
-					if (firstCode < 123) {
-						key = String.valueOf(Character.toChars(firstCode)).replace("\"", "");
-					} else {
-						return;
-					}
+				int firstCode = 97;
+				while (dptCodeSet.contains(String.valueOf(Character.toChars(firstCode)))) {
+					firstCode++;
 				}
+				if (firstCode < 123) {
+					key = String.valueOf(Character.toChars(firstCode)).replace("\"", "");
+				} else {
+					return;
+				}
+				
 			}
 		} 
+		Department department;
+		try{
+			Optional<Department> departmentOptional = departmentRepo.findById((String)departmentJSON.get("id"));
+			if(!departmentOptional.isEmpty()) {
+				department = departmentOptional.get();
 
-		departments.put(key, departmentBody);
-		try (FileWriter file = new FileWriter("src/main/resources/departments.json")) {
-			file.write(departments.toJSONString());
-		} catch (IOException e) {
-			e.printStackTrace();
+				department.setName((String)departmentJSON.get("name"));
+				department.setDepartmentCode(key.charAt(0));
+			}else {
+				department = new Department(key.charAt(0), (String)departmentJSON.get("name"), Boolean.parseBoolean((String) departmentJSON.get("universalSchedule")));
+			}
+		}catch(Exception e) {
+			department = new Department(key.charAt(0), (String)departmentJSON.get("name"), Boolean.parseBoolean((String) departmentJSON.get("universalSchedule")));
 		}
+		
+		if(department.isUniversalSchedule()) {
+			try{
+				department.update(departmentJSON);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}else {
+			//for(Object levelObj : (ArrayList)departmentJSON.get("levels")) {
+			for(int i = 0; i <  ((ArrayList)departmentJSON.get("levels")).size(); i++) {
+				Object levelObj = ((ArrayList)departmentJSON.get("levels")).get(i);
+				JSONObject levelJSON = new JSONObject((Map<Object, String>)levelObj);
+				Department level = new Department();
+				level.update(levelJSON);
+				try {
+					department.setLevel(i, level);
+				}catch(Exception e) {
+					department.addLevel(level);
+				}
+			}
+		}
+		departmentRepo.save(department);
 	}
 
-	public void deleteDepartment(String departmentCode) throws IOException, ParseException {
-		String key = departmentCode.replace("\"", "");
-		try {
-			JSONObject allDepartments = (JSONObject) new JSONParser().parse(new FileReader("src/main/resources/departments.json"));
-			allDepartments.remove(key);
-			FileWriter file = new FileWriter("src/main/resources/departments.json");
-			file.write(allDepartments.toJSONString());
-			file.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void deleteDepartment(String departmentCode) throws Exception {
+		Department toBeDeleted = getDepartment(departmentCode);
+		departmentRepo.deleteById(toBeDeleted.getID());
 	}
 
 }

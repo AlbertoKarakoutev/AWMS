@@ -38,6 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.company.awms.modules.base.admin.data.DepartmentRepo;
 import com.company.awms.modules.base.employees.data.Employee;
 import com.company.awms.modules.base.employees.data.EmployeeDailyReference;
 import com.company.awms.modules.base.employees.data.EmployeeRepo;
@@ -61,6 +62,8 @@ public class ScheduleServiceTest {
     private EmployeeRepo employeeRepo;
     @MockBean
     private ScheduleRepo scheduleRepo;
+    @MockBean
+    private DepartmentRepo departmentRepo;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -86,7 +89,7 @@ public class ScheduleServiceTest {
 //    	System.out.println(dayID);
         this.employee = new Employee("1", "Tester", "1234567890", "abcd", "a@a.bg", "4324ffw432", "a0", "a", 0,
                 "0889122334", 1234d, new int[]{ 2, 3 }, 3.4);
-        this.scheduleService = new ScheduleService(this.scheduleRepo, this.employeeRepo);
+        this.scheduleService = new ScheduleService(this.scheduleRepo, this.employeeRepo, this.departmentRepo);
     }
     
     @Test
@@ -583,99 +586,6 @@ public class ScheduleServiceTest {
     	}
     	
     	Mockito.verify(this.employeeRepo, Mockito.times(allEmployees.size())).save(ArgumentMatchers.any(Employee.class));
-    }
-    
-    @Test
-    public void getDepartmentReturnsNullWhenDepartmentsJSONFileIsWrong() {
-    	List<String> JSONData = null;
-    	FileWriter mockFR;
-    	String existingDepartment = "a";
-    	try {
-			JSONData = Files.readAllLines(Paths.get("src/main/resources/departments.json"));
-			
-			mockFR = new FileWriter("src/main/resources/departments.json", true);
-			mockFR.write("a");
-			mockFR.flush();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    	
-    	try {
-			assertEquals(null, this.scheduleService.getDepartment(existingDepartment));
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-    	
-    	try {
-			mockFR = new FileWriter("src/main/resources/departments.json", false);
-			for(String line : JSONData) {
-				mockFR.write(line);
-			}
-			mockFR.flush();
-			mockFR.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    }
-    
-    @Test 
-    public void getDepartmentExecutesFully() {
-    	String existingDepartment = "a";
-    	boolean exception = false;
-    	
-    	try {
-			assertNotEquals(this.scheduleService.getDepartment(existingDepartment), null);
-		} catch (Exception e) {
-			exception = true;
-			e.printStackTrace();
-		}
-    	assertFalse(exception);
-    }
-    
-    @Test 
-    public void getDepartmentAtLevelThrowsExceptionWhenUniversalScheduleIsTrue() {
-    	boolean thrown = false;
-    	String message = "";
-    	try {
-    		this.scheduleService.getDepartmentAtLevel("b", 0);
-    	}catch(Exception e) {
-    		thrown = true;
-    		message = e.getMessage();
-    	}
-    	
-    	assertTrue(thrown);
-    	assertEquals("This department has a universal schedule", message);
-    	
-    }
-    
-    @Test 
-    public void getDepartmentAtLevelThrowsExceptionWhenLevelDoesntExist() {
-    	boolean thrown = false;
-    	String message = "";
-    	try {
-    		this.scheduleService.getDepartmentAtLevel("a", 3);
-    	}catch(Exception e) {
-    		thrown = true;
-    		message = e.getMessage();
-    	}
-    	
-    	assertTrue(thrown);
-    	assertTrue(message.contains("Level doesn't exist") ); 	
-    }
-    
-    @Test 
-    public void getDepartmentAtLevelExecutesFully() {
-    	String existingDepartment = "a";
-    	int existingLevel = 0;
-    	boolean exception = false;
-    	
-    	try {
-			assertNotEquals(this.scheduleService.getDepartmentAtLevel(existingDepartment, existingLevel), null);
-		} catch (Exception e) {
-			exception = true;
-			e.printStackTrace();
-		}
-    	assertFalse(exception);
     }
     
     @Test

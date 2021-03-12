@@ -111,6 +111,8 @@ public class EmployeeController {
 				unread++;
 			}
 		}
+		System.out.println(employeeService.getExtensionModulesDTOs().size());
+		model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
 		model.addAttribute("notifications", user.getNotifications());
 		model.addAttribute("unread", unread);
 	}

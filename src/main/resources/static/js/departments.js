@@ -1,68 +1,90 @@
-var content = document.getElementById("department-content");
-var dptCode;
 var currentData;
+var content = document.getElementById("department-content");
+var levelCounter = 0;
+
 display.onclick = function () {
-	addLevel.style.display = "none";
-	create.style.display = "none";
-	add.style.display = "inline-block";
-	update.style.display = "inline-block";
-	deleteBtn.style.display = "inline-block";
-	content.style.display = "block";
+
 	let departments = document.getElementById("departments");
 	let option = departments.options[departments.selectedIndex].value;
-	dptCode = String(option);
-	let data;
-	let response = fetch("/admin/departments/view/?departmentCode=" + option).then(textData => textData.text()).then((dataStr) => {
-		content.innerHTML = "";
-		data = JSON.parse(dataStr);
-		currentData = data;
-		if (data["Universal schedule"] == "true") {
-			for (var key in data) {
-				content.innerHTML += "<input class='data-field form-control' type='text' id='"+key+"' value='"+ data[key] +"'><small class='form-text text-muted'>"+key+"</small><br>";
-			}
-		} else {
-			content.innerHTML += "<input class='data-field form-control' value='"+data["Name"]+"' type='text' id='Name'/><small class='form-text text-muted'>Employee's name.</small><br>";
-			content.innerHTML += "<input class='data-field form-control' type='text' id='Universal schedule' value='" + data["Universal schedule"] + "' readonly/><small class='form-text text-muted'>Applies for the entire deaprtment</small><br>";
-			
-			let levels = data["levels"];
-			for (let i = 0; i < levels.length; i++) {
-				let level = levels[i][String(i)];
-				content.innerHTML += "<h2><b>Level " + i + "</b></h2></br>";
-				for (var key in level) {
-					content.innerHTML += "<div class='form-group'><label for='" + key + String(i) + "'>" + key + "</label><input class='form-control field-" + String(i) + "' type='text' id='" + key + String(i) + "' value='" + level[key] + "'/></div>";
 
+	addLevel.style.display = "none";
+	create.style.display = "none";
+	if(option !== undefined){
+		update.style.display = "inline-block";
+		deleteBtn.style.display = "inline-block";
+	}
+	add.style.display = "inline-block";
+	
+	levelCounter = 0;
+	
+	let req = new XMLHttpRequest();
+	req.open("GET", "/admin/departments/view/?departmentCode=" + option, true);
+	req.onreadystatechange = function(){
+		if(req.readyState == 4 && req.status==200){
+			let resData = JSON.parse(req.response);
+			currentData = resData;
+			content.innerHTML = "";
+			if (resData["universalSchedule"] == true) {
+				insertForm(resData);
+			} else {
+				globalFields(resData, false);
+				let levels = resData["levels"];
+				for (let i = 0; i < levels.length; i++) {
+					content.innerHTML += "<h2><b>Level " + i + "</b></h2><br>";
+					insertLevelForm(resData, i);
 				}
 			}
+		}else if(req.readyState == 4 && req.status != 200){
+			alert("Something went wrong...")
 		}
-	});
+	}
+	req.send();
 }
 
 update.onclick = function () {
-	if (currentData != null) {
-		for (var key in currentData) {
-			if (key != "levels") {
-				currentData[key] = document.getElementById(String(key)).value;
-			} else {
-				let levels = currentData["levels"];
-				for (let i = 0; i < levels.length; i++) {
-					let level = levels[i][String(i)];
-					for (var levelKey in level) {
-						level[levelKey] = document.getElementById(String(levelKey) + String(i)).value;
+	if(document.getElementById("name").value !== ""){
+		if (currentData != null) {
+			for (var key in currentData) {
+				if (key != "levels") {
+					if(document.getElementById(key)!=null){
+						currentData[key] = document.getElementById(key).value;
 					}
-					levels[i][String(i)] = level;
+				} else {
+					let levels = currentData["levels"];
+					for (let i = 0; i < levels.length; i++) {
+						let level = levels[i];
+						for (var levelKey in level) {
+							if(levelKey!=="levels"&&levelKey!=="id"&&levelKey!=="departmentCode"&&levelKey!="name"&&levelKey!=="universalSchedule"){
+								let value = document.getElementById(String(levelKey) + String(i));
+								if(value!==null){
+									level[levelKey] = document.getElementById(String(levelKey) + String(i)).value;
+								}else{
+									level[levelKey] = "";
+								}
+							}
+						}
+						levels[i] = level;
+					}
+					currentData["levels"] = levels;
 				}
-				currentData["levels"] = levels;
 			}
+	
+			let data = JSON.stringify(currentData);
+			let req = new XMLHttpRequest();
+			req.open("POST", "/admin/departments/set", true);
+			req.setRequestHeader("content-Type", "application/json");
+			req.onreadystatechange = function(){
+				if(req.readyState == 4 && req.status==200){
+					alert("Department " + currentData["name"] +" has been updated!");
+					window.location = "/admin/departments";
+				}else if(req.readyState == 4 && req.status != 200){
+					alert("Something went wrong...")
+				}
+			}
+			req.send(data);
 		}
-
-		let data = JSON.stringify(currentData);
-		let dataObject = {};
-		dataObject['"' + dptCode + '"'] = data;
-		let dataJSON = JSON.stringify(dataObject);
-		let req = new XMLHttpRequest();
-		req.open("POST", "/admin/departments/set", true);
-		req.setRequestHeader("Content-Type", "application/json");
-		req.send(dataJSON);
+	}else{
+		alert("Name can not be empty!");
 	}
 }
 
@@ -70,7 +92,9 @@ deleteBtn.onclick = function () {
 	if (currentData != null) {
 		for (var key in currentData) {
 			if (key != "levels") {
-				currentData[key] = document.getElementById(String(key)).value;
+				if(document.getElementById(key)!=null){
+					currentData[key] = document.getElementById(key).value;
+				}
 			} else {
 				let levels = currentData["levels"];
 				for (let i = 0; i < levels.length; i++) {
@@ -78,133 +102,244 @@ deleteBtn.onclick = function () {
 					for (var levelKey in level) {
 						level[levelKey] = document.getElementById(String(levelKey) + String(i)).value;
 					}
-					levels[i][String(i)] = level;
+					levels[i] = level;
 				}
 				currentData["levels"] = levels;
 			}
 		}
 
 		let data = JSON.stringify(currentData);
-		let dataObject = {};
-		dataObject['"' + dptCode + '"'] = data;
-		let dataJSON = JSON.stringify(dataObject);
 		let req = new XMLHttpRequest();
 		req.open("POST", "/admin/departments/delete", true);
-		req.setRequestHeader("Content-Type", "application/json");
-		req.send(dataJSON);
-		window.location.assign("/admin/departments");
+		req.setRequestHeader("content-Type", "application/json");
+		req.onreadystatechange = function(){
+			if(req.readyState == 4 && req.status==200){
+				alert("Successfully deleted department " + currentData["name"] +"!");
+				window.location = "/admin/departments";
+				
+			}else if(req.readyState == 4 && req.status != 200){
+				alert("Something went wrong...")
+			}
+		}
+		req.send(data);
 	}
 }
 
-var levelCounter = 0;
 add.onclick = function () {
+	
 	update.style.display = "none";
 	deleteBtn.style.display = "none";
 	
 	let multilevel = confirm("Do you want to create a multi-level department");
-	if(content.innerHTML != ""){
-		content.innerHTML = "";
-	}
+	content.innerHTML = "";
 	if (multilevel) {
 		addLevel.style.display = "inline-block";
 		add.style.display = "none";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Name' type='text' id='Name' required><small class='form-text text-muted'>Department name</small><br>"
-		+ "<input class='data-field form-control' type='text' id='Universal schedule' value='false' readonly/><small class='form-text text-muted'>Information applies for the entire deaprtment</small><br>"
-		+ "<input class='data-field form-control' placeholder='Code' type='text' id='departmentCode'/><small class='form-text text-muted'>Optional: Manually enter the department code</small><br>"
-		+ "<h2><b>Level " + levelCounter + "</b></h2><br><input class='data-field form-control' placeholder='Breaks' type='number' id='Daily break duration total"+levelCounter+"'/><small class='form-text text-muted'>Total break time for the day.</small><br>"
-		+ "<select class='data-field form-control' id='Schedule type"+levelCounter+"'/><option value='Regular' selected>Regular</option><option value='Irregular'>Irregular</option><option value='OnCall'>On Call</option></select>"
-		+ "<small class='form-text text-muted'>Type of scheduling for the department</small><br>"
-		+ "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='text' id='Daily hours"+levelCounter+"'/><small class='form-text text-muted'>Department's open hours</small><br>"
-		+ "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length"+levelCounter+"'/><small class='form-text text-muted'>Each employee's shift length</small><br>"
-		+ "<select class='data-field form-control' id='Work on weekends"+levelCounter+"'/><option value='true' selected>Yes</option><option value='false'>No</option></select>"
-		+ "<small class='form-text text-muted'>Do the employees work on the weekends</small><br>"
-		+ "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monthly work days"+levelCounter+"'/><small class='form-text text-muted'>Work days per month</small><br>"
-		+ "<input class='data-field form-control' placeholder='Number of employees' type='number' id='Employees per shift"+levelCounter+"'/><small class='form-text text-muted'>Number of employees for each shift</small><br>"
-		+ "<input class='data-field form-control' placeholder='Hours' type='number' id='Break between shifts"+levelCounter+"'/><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
-		
-		let refresh = content.innerHTML;
-		content.innerHTML=refresh;
+		globalFields(null, false);
+		content.innerHTML += "<h2><b>Level " + levelCounter + "</b></h2></br>";
+		insertLevelForm(null, levelCounter);
 	} else {
 		create.style.display = "inline-block";
 		add.style.display = "none";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Name' type='text' id='Name' required><small class='form-text text-muted'>Department name.</small><br>";
-		content.innerHTML += "<input class='data-field form-control' type='text' id='Universal schedule' value='true' readonly/><small class='form-text text-muted'>Information applies for the entire deaprtment</small><br>";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Code' type='text' id='departmentCode'/><small class='form-text text-muted'>Optional: Manually enter the department code</small><br>"
-		content.innerHTML += "<input class='data-field form-control' placeholder='Breaks' type='number' id='Daily break duration total'/><small class='form-text text-muted'>Total break time for the day.</small><br>";
-		content.innerHTML += "<select class='data-field form-control' id='Schedule type'><option value='Regular' selected>Regular</option><option value='Irregular'>Irregular</option><option value='OnCall'>On Call</option></select>";
-		content.innerHTML += "<small class='form-text text-muted'>Type of scheduling for the department</small><br>";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='text' id='Daily hours'/><small class='form-text text-muted'>Department's open hours</small><br>";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length'/><small class='form-text text-muted'>Each employee's shift length</small><br>";
-		content.innerHTML += "<select class='data-field form-control' id='Work on weekends'/><option value='true' selected>Yes</option><option value='false'>No</option></select>";
-		content.innerHTML += "<small class='form-text text-muted'>Do the employees work on the weekends</small><br>";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monthly work days'/><small class='form-text text-muted'>Work days per month</small><br>";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Number of employees' type='number' id='Employees per shift'/><small class='form-text text-muted'>Number of employees for each shift</small><br>";
-		content.innerHTML += "<input class='data-field form-control' placeholder='Hours' type='number' id='Break between shifts'/><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
+		insertForm(null);
 	}
 }
 
 addLevel.onclick = function () {
+	let fields = document.getElementsByClassName("data-field");
+	let len = fields.length;
+	let values = [];
+	for(let i = 0; i < len; i++){
+		values[i] = fields[i].value;
+	}
 	levelCounter++;
 	create.style.display = "inline-block";
-	let newFields = "<h2><b>Level " + levelCounter + "</b></h2><br><input class='data-field form-control' placeholder='Breaks' type='number' id='Daily break duration total"+levelCounter+"'/><small class='form-text text-muted'>Total break time for the day.</small><br>"
-		+ "<select class='data-field form-control' id='Schedule type"+levelCounter+"'/><option value='Regular' selected>Regular</option><option value='Irregular'>Irregular</option><option value='OnCall'>On Call</option></select>"
-		+ "<small class='form-text text-muted'>Type of scheduling for the department</small><br>"
-		+ "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='number' id='Daily hours"+levelCounter+"'/><small class='form-text text-muted'>Department's open hours</small><br>"
-		+ "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='Shift length"+levelCounter+"'/><small class='form-text text-muted'>Each employee's shift length</small><br>"
-		+ "<select class='data-field form-control' id='Work on weekends"+levelCounter+"'/><option value='true' selected>Yes</option><option value='false'>No</option></select>"
-		+	"<small class='form-text text-muted'>Do the employees work on the weekends</small><br>"
-		+ "<input class='data-field form-control' placeholder='Number of days' type='number' id='Monthly work days"+levelCounter+"'/><small class='form-text text-muted'>Work days per month</small><br>"
-		+ "<input class='data-field form-control' placeholder='Number of employees' type='number' id='Employees per shift"+levelCounter+"'/><small class='form-text text-muted'>Number of employees for each shift</small><br>"
-		+ "<input class='data-field form-control' placeholder='Hours' type='number' id='Break between shifts"+levelCounter+"'/><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
-	
-	let last = document.getElementById("Break between shifts"+String(levelCounter-1));
-	last.insertAdjacentHTML('afterEnd' , newFields);
+	content.innerHTML += "<h2><b>Level " + String(levelCounter) + "</b></h2><br>";
+	insertLevelForm(null, levelCounter);
+	for(let i = 0; i < len; i++){
+		fields[i].value = values[i] 
+	}
 }
 
 create.onclick = function () {
-	let dataObject = {};
-	let fields = document.getElementsByClassName("data-field");
-	let universal = document.getElementById("Universal schedule").value;
-	if(universal == "true"){
-		for (let i = 0; i < fields.length; i++) {
-			let field = fields[i];
-			if (field.value != "") {
-				dataObject[field.id] = field.value;
-			}
-		}
-	}else{
-		let fieldsArray = Array.from(fields);
-		let fieldsSliced = fieldsArray.slice(2, fieldsArray.length); 
-		dataObject["Name"] = document.getElementById("Name").value;
-		dataObject["Universal schedule"] = document.getElementById("Universal schedule").value;
-		let levels = [];
-		for(let i = 0; i <= levelCounter; i++){
-			
-			let levelObj = {};
-			let levelProperties = {};
-			for(let j = 0; j < fieldsSliced.length; j++){
-				if(fields[j+2].id.includes(String(i))){
-					if(fields[j+2].value != ""){
-						levelProperties[fields[j+2].id.replace(/[0-9]/g, '')] = fields[j+2].value;
-					}
+	if(document.getElementById("name").value !== ""){
+		let dataObject = {};
+		let fields = document.getElementsByClassName("data-field");
+		let universal = document.getElementById("universalSchedule").value;
+		if(universal == "true"){
+			for (let i = 0; i < fields.length; i++) {
+				let field = fields[i];
+				if (field.value != "") {
+					dataObject[field.id] = field.value;
 				}
 			}
-			if(JSON.stringify(levelProperties) !=='{}'){
-				levelObj[String(i)] = levelProperties;
+		}else{
+			dataObject["name"] = document.getElementById("name").value;
+			dataObject["universalSchedule"] = document.getElementById("universalSchedule").value;
+			dataObject["departmentCode"] = document.getElementById("departmentCode").value;
+			let levels = [];
+			for(let i = 0; i <= levelCounter; i++){
+				
+				let levelObj = {};
+				for(let j = 0; j < fields.length; j++){
+					if(fields[j].id.includes(String(i))){
+						levelObj[fields[j].id.replace(/[0-9]/g, '')] = fields[j].value;
+					}
+				}
 				levels[i] = levelObj;
 				
 			}
-			
+			levelCounter = 0;
+			dataObject["levels"]=levels;
 		}
-		levelCounter = 0;
-		dataObject["levels"]=levels;
-		console.log(levels);
+		let data = JSON.stringify(dataObject);
+		let req = new XMLHttpRequest();
+			req.open("POST", "/admin/departments/set", true);
+			req.setRequestHeader("content-Type", "application/json");
+			req.onreadystatechange = function(){
+				if(req.readyState == 4 && req.status==200){
+					alert("Department " + dataObject["name"] +" has been created!");
+					window.location = "/admin/departments";
+				}else if(req.readyState == 4 && req.status != 200){
+					alert("Something went wrong...")
+				}
+			}
+			req.send(data);
+	}else{
+		alert("Name can not be empty!");
 	}
+ }
+
+function globalFields(data, universal){
 	
-	currentData = dataObject;
-	dptCode="undefined";
-	update.click();
+	let dptCode, name;
+	if(data==null){
+		dptCode = name = "";
+	}else{
+		dptCode = data["departmentCode"];
+		name = data["name"];
+	}
+
+	let newForm = "";
+
+	newForm += "<input class='data-field form-control' placeholder='Code' type='text' id='departmentCode' value='"+ dptCode +"'><small class='form-text text-muted'>Optional: Manually enter the department code</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Name' type='text' id='name' value='"+ name +"'><small class='form-text text-muted'>The name of the department</small><br>";
+	
+	newForm += "<select class='data-field form-control' id='universalSchedule' disabled>";
+	let universalTrue = (universal === true) ? "selected" : "";
+	let universalFalse = (universal === false) ? "selected" : "";
+	newForm += "<option value='true' "+universalTrue+">Yes</option>";
+	newForm += "<option value='false' "+universalFalse+">No</option></select>";
+	newForm += "<small class='form-text text-muted'>Information applies for the entire department</small><br>";
+	
+	content.innerHTML = content.innerHTML + newForm;
+
 }
 
+function insertForm(data){
+	globalFields(data, true);
 
+	let breaks, dailyBreaks, shift, employee, monthly, schedule, daily, weekends;
+	if(data === null){
+		breaks=dailyBreaks=shift=employee=monthly=daily="";
+		schedule = weekends = null;
+	}else{
+		breaks = data["breakBetweenShifts"];
+		dailyBreaks = data["dailyBreakDurationTotal"];
+		shift = data["shiftLength"];
+		employee=data["employeesPerShift"];
+		monthly=data["monthlyWorkDays"];
+		daily = data["dailyHours"];
+		schedule = data["scheduleType"];
+		weekends = data["workOnWeekends"];
+	}
+	
+	if(daily===null || daily === undefined)daily = "";
 
+	let newForm = "";
+
+	newForm += "<select class='data-field form-control' id='scheduleType' required>";
+	let regularOption = (schedule === "Regular") ? "selected" : "";
+	let irregularOption = (schedule === "Irregular") ? "selected" : "";
+	let onCallOption = (schedule === "OnCall") ? "selected" : "";
+	if(schedule===null){
+		newForm += "<option value='' selected>Select..</option>";
+	}
+	newForm+="<option value='Regular' "+regularOption+">Regular</option>";
+	newForm+="<option value='Irregular' "+irregularOption+">Irregular</option>";
+	newForm+="<option value='OnCall' "+onCallOption+">On Call</option></select>";
+	newForm += "<small class='form-text text-muted'>Type of scheduling for the department</small><br>";
+		
+	newForm += "<input class='data-field form-control' placeholder='Number of hours' type='number' id='breakBetweenShifts' value='"+ breaks+"'><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Number of hours' type='number' id='dailyBreakDurationTotal' value='"+ dailyBreaks +"'><small class='form-text text-muted'>Break time per day</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='shiftLength' value='"+ shift +"'><small class='form-text text-muted'>Each employee's shift length</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Number of employees' type='number' id='employeesPerShift' value='"+ employee +"'><small class='form-text text-muted'>Number of employees for each shift</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Number of days' type='number' id='monthlyWorkDays' value='"+ monthly +"'><small class='form-text text-muted'>Total monthly work days per employee</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='text' id='dailyHours' value='"+ daily +"'><small class='form-text text-muted'>Department's open hours</small><br>";
+	
+	newForm += "<select class='data-field form-control' id='workOnWeekends'/>";
+	if(weekends===null){
+		newForm += "<option value='' selected>Select..</option>";
+	}
+	let weekendTrue = (weekends === true) ? "selected" : "";
+	let weekendFalse = (weekends === false) ? "selected" : "";
+	newForm += "<option value='true' "+weekendTrue+">Yes</option>";
+	newForm += "<option value='false' "+weekendFalse+">No</option></select>";
+	newForm += "<small class='form-text text-muted'>Do the employees work on the weekends</small><br>";	
+	
+	content.innerHTML = content.innerHTML + newForm;
+
+}
+
+function insertLevelForm(data, counter){
+	let breaks, dailyBreaks, shift, employee, monthly, schedule, daily, weekends;
+	if(data == null){
+		breaks=dailyBreaks=shift=employee=monthly=daily="";
+		schedule = weekends = null;
+	}else{
+		breaks = data["levels"][counter]["breakBetweenShifts"];
+		dailyBreaks = data["levels"][counter]["dailyBreakDurationTotal"];
+		shift = data["levels"][counter]["shiftLength"];
+		employee=data["levels"][counter]["employeesPerShift"];
+		monthly=data["levels"][counter]["monthlyWorkDays"];
+		daily = data["levels"][counter]["dailyHours"];
+		schedule = data["levels"][counter]["scheduleType"];
+		weekends = data["levels"][counter]["workOnWeekends"];
+
+	}
+	if(daily===null || daily === " ")daily = "";
+
+	let newForm = "";
+
+	newForm += "<select class='data-field form-control' id='scheduleType"+counter+"' required>";
+	let regularOption = (schedule === "Regular") ? "selected" : "";
+	let irregularOption = (schedule === "Irregular") ? "selected" : "";
+	let onCallOption = (schedule === "OnCall") ? "selected" : "";
+	if(weekends===null){
+		newForm += "<option value='' selected>Select..</option>";
+	}
+	newForm+="<option value='Regular' "+regularOption+">Regular</option>";
+	newForm+="<option value='Irregular' "+irregularOption+">Irregular</option>";
+	newForm+="<option value='OnCall' "+onCallOption+">On Call</option></select>";
+	newForm += "<small class='form-text text-muted'>Type of scheduling for the department</small><br>";
+		
+	newForm += "<input class='data-field form-control' placeholder='Number of hours' type='number' id='breakBetweenShifts"+counter+"' value='"+ breaks +"'><small class='form-text text-muted'>Minimum break time between an employee\'s shifts</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Number of hours' type='number' id='dailyBreakDurationTotal"+counter+"' value='"+ dailyBreaks +"'><small class='form-text text-muted'>Break time per day</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Length of Shift' type='number' id='shiftLength"+counter+"' value='"+ shift +"'><small class='form-text text-muted'>Each employee's shift length</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Number of employees' type='number' id='employeesPerShift"+counter+"' value='"+ employee +"'><small class='form-text text-muted'>Number of employees for each shift</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Number of days' type='number' id='monthlyWorkDays"+counter+"' value='"+ monthly +"'><small class='form-text text-muted'>Total monthly work days per employee</small><br>";
+	newForm += "<input class='data-field form-control' placeholder='Start-hour, Start-minutes, End-hour, End-minutes' type='text' id='dailyHours"+counter+"' value='"+ daily +"'><small class='form-text text-muted'>Department's open hours</small><br>";
+	
+	newForm += "<select class='data-field form-control' id='workOnWeekends"+counter+"'/>";
+	let weekendTrue = (weekends === true) ? "selected" : "";
+	let weekendFalse = (weekends === false) ? "selected" : "";
+	if(weekends===null){
+		newForm += "<option value='' selected>Select..</option>";
+	}
+	newForm += "<option value='true' "+weekendTrue+">Yes</option>";
+	newForm += "<option value='false' "+weekendFalse+">No</option></select>";
+	newForm += "<small class='form-text text-muted'>Do the employees work on the weekends</small><br>";
+	
+	content.innerHTML += newForm;
+	
+}
