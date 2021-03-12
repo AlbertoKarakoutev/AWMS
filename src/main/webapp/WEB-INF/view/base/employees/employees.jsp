@@ -35,15 +35,15 @@
 								</div>
 								<div class="form-group col-md-4">
                             	    <select class="form-control" name="type" id="departmentEmployee">
-                                        <option selected="NATIONAL ID">NATIONAL ID</option>
-                                        <option selected="FIRST NAME" selected>FIRST NAME</option>
-                                        <option selected="LAST NAME">LAST NAME</option>
-                                        <option selected="ROLE">ROLE</option>
-                                        <option selected="E-MAIL">E-MAIL</option>
-                                        <option selected="IBAN">IBAN</option>
-                                        <option selected="LEVEL">LEVEL</option>
-                                        <option selected="DEPARTMENT">DEPARTMENT CODE</option>
-                                        <option selected="ACCESS LEVEL">ACCESS LEVEL</option>
+                                        <option>NATIONAL ID</option>
+                                        <option selected>FIRST NAME</option>
+                                        <option>LAST NAME</option>
+                                        <option>ROLE</option>
+                                        <option>E-MAIL</option>
+                                        <option>IBAN</option>
+                                        <option>LEVEL</option>
+                                        <option>DEPARTMENT CODE</option>
+                                        <option>ACCESS LEVEL</option>
                             	    </select>
                                 </div>
 							    <div class="form-group col-md-2">

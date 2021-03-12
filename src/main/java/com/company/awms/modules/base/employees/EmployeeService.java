@@ -46,6 +46,20 @@ public class EmployeeService {
 		return employee.get();
 	}
 
+	public List<Employee> getAllEmployeesDTOs(){
+		List<Employee> employees = this.employeeRepo.findAll();
+		List<Employee> employeeDTOs = new ArrayList<Employee>();
+		for(Employee employee : employees) {
+			Employee employeeDTO = new Employee();
+			employeeDTO.setFirstName(employee.getFirstName());
+			employeeDTO.setLastName(employee.getLastName());
+			employeeDTO.setDepartment(employee.getDepartment());
+			employeeDTO.setId(employee.getID());
+			employeeDTOs.add(employeeDTO);
+		}
+		return employeeDTOs;
+	}
+	
 	public List<Employee> getAllEmployees() throws IOException {
 		List<Employee> employees = this.employeeRepo.findAll();
 
@@ -58,7 +72,6 @@ public class EmployeeService {
 
 	public List<Employee> searchEmployees(List<Employee> employees, String searchTerm, String type) {
 		List<Employee> foundEmployees = new ArrayList<>();
-
 		Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
 		Matcher matcher;
 		for (Employee employee : employees) {
@@ -111,7 +124,7 @@ public class EmployeeService {
 					foundEmployees.add(employee);
 				}
 				break;
-			case "DEPARTMENT":
+			case "DEPARTMENT CODE":
 				matcher = pattern.matcher(employee.getDepartment());
 				if(matcher.find()) {
 					foundEmployees.add(employee);

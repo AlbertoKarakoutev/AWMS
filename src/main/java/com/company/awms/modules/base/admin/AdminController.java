@@ -60,7 +60,7 @@ public class AdminController {
 	@GetMapping("/employee/all")
 	public String getEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		try {
-			List<Employee> employees = this.employeeService.getAllEmployees();
+			List<Employee> employees = this.employeeService.getAllEmployeesDTOs();
 			model.addAttribute("employees", employees);
 			model.addAttribute("departments", getDepartmentDTOs());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
