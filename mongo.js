@@ -60,7 +60,7 @@ awms.forumThread.drop();
 awms.department.drop();
 awms.module.drop();
 
-awms.department.createCollection();
+awms.createCollection("department", null);
 awms.module.insertMany(baseModules);
 awms.day.insertMany(days);
 awms.createCollection("doc", null);
