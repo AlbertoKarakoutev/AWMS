@@ -54,6 +54,7 @@ public class DocumentController {
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
             model.addAttribute("documents", documents);
             model.addAttribute("type", "public");
+            
             injectLoggedInEmployeeInfo(model, employeeDetails);
 
             return "base/documents/documents";

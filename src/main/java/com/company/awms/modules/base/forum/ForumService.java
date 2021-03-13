@@ -88,21 +88,37 @@ public class ForumService {
                 employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 
         Employee uploader = employeeRepo.findById(employeeDetails.getID()).get();
-
+        
         List<Employee> sameDepartmentEmployees = employeeRepo.findByDepartment(uploader.getDepartment());
         List<Object> notificationData = new ArrayList<>();
 
+        this.forumThreadRepo.save(newThread);
+         
+        for(Employee admin : employeeRepo.findAllByRole("ADMIN")) {
+        	if(admin.getID().equals(uploader.getID())){
+        		sameDepartmentEmployees = employeeRepo.findAll();
+        		break;
+        	}
+        }
+        
+        ForumThread saved = null;
+        for(ForumThread thread : forumThreadRepo.findByIssuerID(uploader.getID())) {
+        	if(thread.getAnswered()==false && thread.getTitle().equals(newThread.getTitle()) && thread.getBody().equals(newThread.getBody())){
+        		saved = thread;
+        		break;
+        	}
+        }
         notificationData.add("new-thread");
         notificationData.add(uploader.getID());
-        notificationData.add(newThread);
+        notificationData.add(saved.getID());
         String message = uploader.getFirstName() + " " + uploader.getLastName()
-                + " has uploaded a new topic in the Forum, called \"" + newThread.getTitle() + "\".";
+                + " has uploaded a new topic in the Forum, called \"" + saved.getTitle() + "\".";
+        
         for (Employee notified : sameDepartmentEmployees) {
             notified.getNotifications().add(new Notification(message, notificationData));
             employeeRepo.save(notified);
         }
 
-        this.forumThreadRepo.save(newThread);
 
         return newThread;
     }

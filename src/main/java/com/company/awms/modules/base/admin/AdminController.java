@@ -81,6 +81,8 @@ public class AdminController {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "base/employees/employees";
 		} catch (Exception e) {
+
+			e.printStackTrace();
 			return "errors/internalServerError";
 		}
 	}

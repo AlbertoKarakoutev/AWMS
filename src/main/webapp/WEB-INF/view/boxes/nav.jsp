@@ -84,6 +84,11 @@
 				<li class="vertical-item"><a href="/admin/departments"
 					title="Departments">Departments</a></li>
 			</c:if>
+			<sec:authentication property="principal.authorities" var="role"/>
+			<c:if test="${role == '[MANAGER]'}">
+				<li class="vertical-item"><a href="/employee/manager/department/?employeeID=${employeeID}"
+					title="Employees">Employees</a></li>
+			</c:if>
 
 
 

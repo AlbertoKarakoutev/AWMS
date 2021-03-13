@@ -144,7 +144,6 @@ public class DocumentService {
 	// Both Employee and Admin can download a personal document
 	public Doc downloadPersonalDocument(int documentID, String ownerID, String downloaderID) throws IOException, IllegalAccessException {
 		Employee owner = getEmployee(ownerID);
-
 		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
 
 		if(admins.isEmpty()){
@@ -152,7 +151,7 @@ public class DocumentService {
 		}
 		boolean notPermitted = true;
 		for(Employee admin : admins) {
-			if (downloaderID.equals(admin.getID()) && !downloaderID.equals(ownerID)) {
+			if (downloaderID.equals(admin.getID()) || downloaderID.equals(ownerID)) {
 				notPermitted = false;
 				break;
 			}

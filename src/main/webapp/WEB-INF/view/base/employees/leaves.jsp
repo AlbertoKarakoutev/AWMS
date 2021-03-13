@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ page import="java.util.Map" %>
 <html>
 <head>
@@ -12,7 +13,13 @@
     <script src="/webjars/jquery/3.5.1/jquery.js"></script>
     <script src="/webjars/bootstrap/4.5.3/js/bootstrap.bundle.js"></script>
     <script src="/webjars/font-awesome/5.15.1/js/fontawesome.js"></script>
-    <title>Request a Leave</title>
+    <sec:authentication property="principal.authorities" var="role"/>
+    <c:if test="${role == '[employee]'}">
+   	<title>Request a Leave</title>
+    </c:if>
+    <c:if test="${role != '[ADMIN]'}">
+   	<title>${name}'s leaves</title>
+    </c:if>
 </head>
 <body>
 <div class="panel">
@@ -91,9 +98,11 @@
 						                                <%}%>
 						                                </td>
 						                                <c:if test="${name!=null}">
-							                                <th scope="row">
-															    <a class="btn btn-dark btn-sm" href="/admin/employee/deleteLeave/?employeeID=${employeeID}&leave=<%=leaves.indexOf(leave)%>">Delete</a>
-															</th>
+											<c:if test="${role == '[ADMIN]'}">
+								                                <th scope="row">
+													<a class="btn btn-dark btn-sm" href="/admin/employee/deleteLeave/?employeeID=${employeeID}&leave=<%=leaves.indexOf(leave)%>">Delete</a>
+												</th>
+											</c:if>
 						                                </c:if>
 						                           	</tr>
 				                        		<%}

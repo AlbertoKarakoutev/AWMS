@@ -13,7 +13,7 @@
     <script src="/webjars/jquery/3.5.1/jquery.js"></script>
     <script src="/webjars/bootstrap/4.5.3/js/bootstrap.bundle.js"></script>
     <script src="/webjars/font-awesome/5.15.1/js/fontawesome.js"></script> 
-    <title>Тема - ${thread.getTitle()}</title>
+    <title>Thread - ${thread.getTitle()}</title>
 </head>
 <body>
     <div class="panel">

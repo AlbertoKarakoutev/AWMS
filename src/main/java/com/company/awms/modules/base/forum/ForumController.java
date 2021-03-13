@@ -325,7 +325,8 @@ public class ForumController {
 			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
-            model.addAttribute("employee", employee);
+			model.addAttribute("employee", employee);
+			System.out.println(threadID);
             return "redirect:/forum/thread/"+threadID;
 		}catch(Exception e) {
 			return "erorrs/internalServerError";

@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@	taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -51,12 +53,15 @@
 								</div>
 							</div>
 						</form>
-						<div class="w-50 p-2">
-						    <a class="btn btn-danger" href="/admin/schedule/apply" title="Apply schedule">Calculate schedule</a>
-						</div>
-						<div class="p-2">
-						    <a class="btn btn-dark" href="/admin/employee/register" title="Add employee">Add</a>
-						</div>
+						<sec:authentication property="principal.authorities" var="role"/>
+						<c:if test="${role == '[ADMIN]'}">
+							<div class="w-50 p-2">
+							    <a class="btn btn-danger" href="/admin/schedule/apply" title="Apply schedule">Calculate schedule</a>
+							</div>
+							<div class="p-2">
+							    <a class="btn btn-dark" href="/admin/employee/register" title="Add employee">Add</a>
+							</div>
+						</c:if>
 					</div>
 					<div class="table-responsive">
 				    <table class="table">
@@ -65,37 +70,50 @@
                                 <th scope="col">#</th>
                                 <th scope="col">First Name</th>
                                 <th scope="col">Family Name</th>
-                                <th scope="col">Department</th>
-								<th scope="col">Edit</th>
-								<th scope="col">Leaves</th>
+                                <sec:authentication property="principal.authorities" var="role"/>
+				<c:if test="${role == '[ADMIN]'}">
+                                	<th scope="col">Department</th>
+					<th scope="col">Edit</th>
+				</c:if>
+				<th scope="col">Leaves</th>
                             </tr>
                         </thead>
                         <tbody>
                         
                             <c:forEach items="${employees}" var="employee" varStatus="loop">
-							    <tr>
-                                <th scope="row">${loop.index + 1}</th>
-                                <td>
-						            <h4>${employee.getFirstName()}</h4>
-						        </td>
-                                <td>
-								    <h4>${employee.getLastName()}</h4>
-								</td>
-                                <td>
-							        <h4>${departments.get(employee.getDepartment())}</h4>
-								</td>
-								<td>
-								    <a class="btn btn-dark" href="/admin/employee/edit/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
-									    Edit
-									</a>
-								</td>
-								<td>
-								    <a class="btn btn-dark" href="/admin/employee/leaves/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
-									    View Leaves
-									</a>
-								</td>
-                                </tr>
-			                </c:forEach>
+				<tr>
+	                                <th scope="row">${loop.index + 1}</th>
+	                                <td>
+						<h4>${employee.getFirstName()}</h4>
+					</td>
+	                                <td>
+						<h4>${employee.getLastName()}</h4>
+					</td>
+		                                <sec:authentication property="principal.authorities" var="role"/>
+						<c:if test="${role == '[ADMIN]'}">
+	                                		<td>
+								<h4>${departments.get(employee.getDepartment())}</h4>
+							</td>
+							<td>
+							    	<a class="btn btn-dark" href="/admin/employee/edit/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
+									Edit
+								</a>
+							</td>
+							<td>
+								<a class="btn btn-dark" href="/admin/employee/leaves/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
+								    View Leaves
+								</a>
+							</td>
+						</c:if>
+						<c:if test="${role == '[MANAGER]'}">
+							<td>
+								<a class="btn btn-dark" href="/employee/manager/leaves/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
+									  View Leaves
+								</a>
+							</td>
+						</c:if>
+	                        </tr>
+			    </c:forEach>
 					    </tbody>
 					</table>
 					</div>
