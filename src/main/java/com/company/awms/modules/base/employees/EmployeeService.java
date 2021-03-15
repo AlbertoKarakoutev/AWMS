@@ -307,6 +307,10 @@ public class EmployeeService {
 		return employee;
 	}
 
+	public void deleteEmployee(String employeeID) {
+		employeeRepo.deleteById(employeeID);
+	}
+	
 	public Employee updatePassword(String newPassword, String employeeID) throws IOException {
 		Employee employee = getEmployee(employeeID);
 

@@ -113,6 +113,19 @@ public class AdminController {
 		}
 	}
 
+	@GetMapping("/employee/delete/")
+	public String deleteEmployee(@AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String employeeID, Model model){
+		if(!employeeDetails.getRole().equals("ADMIN")) {
+			return "errors/notAuthorized";
+		}
+		try {
+			employeeService.deleteEmployee(employeeID);
+			return "redirect:/admin/employee/all";
+		}catch(Exception e) {
+			return "errors/internalServerError";
+		}
+	}
+	
 	@GetMapping(value = "/personal/{employeeID}")
 	public String getAllPersonalDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, @PathVariable String employeeID, Model model) {
 		try {

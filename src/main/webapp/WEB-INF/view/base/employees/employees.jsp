@@ -17,6 +17,7 @@
 <title>Dashboard</title>
 </head>
 <body>
+	<sec:authentication property="principal.authorities" var="role"/>
 	<div class="panel">
 		<%@include file="../../boxes/nav.jsp"%>
 		<section class="page">
@@ -53,7 +54,7 @@
 								</div>
 							</div>
 						</form>
-						<sec:authentication property="principal.authorities" var="role"/>
+						
 						<c:if test="${role == '[ADMIN]'}">
 							<div class="w-50 p-2">
 							    <a class="btn btn-danger" href="/admin/schedule/apply" title="Apply schedule">Calculate schedule</a>
@@ -70,12 +71,15 @@
                                 <th scope="col">#</th>
                                 <th scope="col">First Name</th>
                                 <th scope="col">Family Name</th>
-                                <sec:authentication property="principal.authorities" var="role"/>
+
 				<c:if test="${role == '[ADMIN]'}">
                                 	<th scope="col">Department</th>
 					<th scope="col">Edit</th>
 				</c:if>
 				<th scope="col">Leaves</th>
+				<c:if test="${role == '[ADMIN]'}">
+					<th scope="col">Delete</th>
+				</c:if>
                             </tr>
                         </thead>
                         <tbody>
@@ -89,7 +93,7 @@
 	                                <td>
 						<h4>${employee.getLastName()}</h4>
 					</td>
-		                                <sec:authentication property="principal.authorities" var="role"/>
+
 						<c:if test="${role == '[ADMIN]'}">
 	                                		<td>
 								<h4>${departments.get(employee.getDepartment())}</h4>
@@ -103,6 +107,9 @@
 								<a class="btn btn-dark" href="/admin/employee/leaves/${employee.getID()}" title="Edit employee ${employee.getFirstName()}">
 								    View Leaves
 								</a>
+							</td>
+							<td>
+								<a class="btn btn-danger" href="/admin/employee/delete/?employeeID=${employee.getID()}">Delete</a>
 							</td>
 						</c:if>
 						<c:if test="${role == '[MANAGER]'}">
