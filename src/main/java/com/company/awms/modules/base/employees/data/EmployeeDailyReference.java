@@ -11,6 +11,7 @@ import com.company.awms.modules.base.schedule.data.Task;
 //A reference to an existing employee, containing his/her work hours for a specific day and tasks, that he has to perform
 public class EmployeeDailyReference {
 
+	private String employeeIDRef;
 	private LocalTime[] workTime;
 	private String firstName;
 	private String lastName;
@@ -29,6 +30,7 @@ public class EmployeeDailyReference {
 		if(employee.isEmpty()) {
 			throw new IOException("Employee not found!");
 		} else {
+			employeeIDRef = employee.get().getID();
 			this.firstName = employee.get().getFirstName();
 			this.lastName = employee.get().getLastName();
 			this.department = employee.get().getDepartment();
@@ -39,6 +41,10 @@ public class EmployeeDailyReference {
 	
 	public void addTask(Task task) {
 		tasks.add(task);
+	}
+	
+	public String getIDRef() {
+		return employeeIDRef;
 	}
 	
 	public String getNationalID() {
@@ -73,6 +79,10 @@ public class EmployeeDailyReference {
 		return this.level;
 	}
 
+	public void setIDRef(String idRef) {
+		employeeIDRef = idRef;
+	}
+	
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}

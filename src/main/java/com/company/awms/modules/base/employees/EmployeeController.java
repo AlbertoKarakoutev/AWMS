@@ -28,9 +28,9 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/manager/department/")
-	public String getDepartmentEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String employeeID) {
+	public String getDepartmentEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String managerID) {
 		try {
-			List<Employee> employees = employeeService.getDepartmentEmployeesDTOs(employeeID);
+			List<Employee> employees = employeeService.getDepartmentEmployeesDTOs(managerID);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			model.addAttribute("employees", employees);
 			return "base/employees/employees";
@@ -74,15 +74,15 @@ public class EmployeeController {
 		return "base/employees/newPassword";
 	}
 
-	@GetMapping("/manager/leaves/{employeeID}")
-	public String getLeavesAsManager(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @PathVariable String employeeID) {
+	@GetMapping("/manager/leaves/{leaveEmployeeID}")
+	public String getLeavesAsManager(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @PathVariable String leaveEmployeeID) {
 		try {
 			if (!employeeDetails.getRole().equals("MANAGER")) {
 				return "errors/notAuthorized";
 			}
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			Employee employee = employeeService.getEmployee(employeeID);
-			model.addAttribute("employeeID", employeeID);
+			Employee employee = employeeService.getEmployee(leaveEmployeeID);
+			model.addAttribute("leaveEmployeeID", leaveEmployeeID);
 			model.addAttribute("leaves", employee.getLeaves());
 			model.addAttribute("name", employee.getFirstName() + " " + employee.getLastName());
 			return "base/employees/leaves";

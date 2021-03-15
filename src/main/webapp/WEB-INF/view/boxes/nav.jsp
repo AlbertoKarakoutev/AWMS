@@ -86,7 +86,7 @@
 			</c:if>
 			<sec:authentication property="principal.authorities" var="role"/>
 			<c:if test="${role == '[MANAGER]'}">
-				<li class="vertical-item"><a href="/employee/manager/department/?employeeID=${employeeID}"
+				<li class="vertical-item"><a href="/employee/manager/department/?managerID=${employeeID}"
 					title="Employees">Employees</a></li>
 			</c:if>
 

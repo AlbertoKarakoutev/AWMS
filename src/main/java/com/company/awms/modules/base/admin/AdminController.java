@@ -219,6 +219,7 @@ public class AdminController {
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return  new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -228,7 +229,6 @@ public class AdminController {
 		try {
 			this.scheduleService.deleteWorkDay(employeeNationalID, date);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
-			model.addAttribute(YearMonth.now());
 			
 			return  new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {

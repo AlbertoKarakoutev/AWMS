@@ -22,12 +22,11 @@ import com.company.awms.modules.base.employees.data.Employee;
 import com.company.awms.modules.base.employees.data.EmployeeDailyReference;
 import com.company.awms.modules.base.schedule.data.Task;
 import com.company.awms.security.EmployeeDetails;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @RequestMapping("/schedule")
 public class ScheduleController {
-
-	private static final boolean active = true;
 
 	private ScheduleService scheduleService;
 	private EmployeeService employeeService;
@@ -46,6 +45,9 @@ public class ScheduleController {
 		} catch(IOException e1) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}catch (Exception e) {
+			if(e.getMessage().equals("The requester already has a shift in that day!")) {
+				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+			}
 			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -53,9 +55,6 @@ public class ScheduleController {
 
 	@GetMapping("/decline")
 	public String declineSwapRequest(Model model, @RequestParam String receiverNationalID, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String date) {
-		if (!active) {
-			return "notFound";
-		}
 
 		try{
 			injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -71,9 +70,6 @@ public class ScheduleController {
 	
 	@PostMapping(value = "/swap")
 	public String acceptSwapRequest(Model model, @RequestParam String noteNum, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
 
 		try {
 			String receiverNationalID = employeeService.getEmployee(employeeDetails.getID()).getNationalID();
@@ -136,10 +132,7 @@ public class ScheduleController {
 	}
 	
 	@GetMapping("")
-	public String viewSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam YearMonth month) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
+	public String getSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam YearMonth month) {
 
 		YearMonth monthChecked = month;
 		if (!monthChecked.equals(YearMonth.now().plusMonths(1)) && !monthChecked.equals(YearMonth.now())) {
@@ -148,11 +141,9 @@ public class ScheduleController {
 		try {
 
 			Employee authenticatedEmployee = this.employeeService.getEmployee(employeeDetails.getID());
-			List<EmployeeDailyReference>[][] sameLevelEmployees = this.scheduleService.viewSchedule(authenticatedEmployee, monthChecked);
-			List<Task>[] tasks = this.scheduleService.viewTasks(authenticatedEmployee, monthChecked);
-			model.addAttribute("sameLevelEmployees", sameLevelEmployees);
+			boolean[] employeeWorkDays = this.scheduleService.getSchedule(authenticatedEmployee, monthChecked);
+			model.addAttribute("employeeWorkDays", employeeWorkDays);
 			model.addAttribute("month", monthChecked);
-			model.addAttribute("tasks", tasks);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/schedule/schedule";
@@ -163,6 +154,56 @@ public class ScheduleController {
 			e.printStackTrace();
 			return "erorrs/internalServerError";
 		}
+	}
+	
+	@GetMapping("/day")
+	public ResponseEntity<String> getDay(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr){
+		try {
+			 injectLoggedInEmployeeInfo(model, employeeDetails);
+			 LocalDate date = LocalDate.parse(dateStr);
+			 ObjectMapper mapper = new ObjectMapper();
+			 String role = " { \"role\" : \"" + employeeDetails.getRole() + "\" , \"employees\" : ";
+			 List<EmployeeDailyReference> day = scheduleService.getDailySchedule(date, employeeDetails.getID());
+			 boolean workDayForEmployee = false;
+			 for(EmployeeDailyReference edr : day) {
+				 if(edr.getNationalID().equals(employeeDetails.getNationalID())){
+					 workDayForEmployee = true;
+					 break;
+				 }
+			 }
+			 return new ResponseEntity<String>(role +mapper.writeValueAsString(day) + ", \"workDayForEmployee\": "+workDayForEmployee+"}", HttpStatus.OK);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/day/tasks")
+	public ResponseEntity<String> getDayTasks(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr){
+		try {
+			 injectLoggedInEmployeeInfo(model, employeeDetails);
+			 LocalDate date = LocalDate.parse(dateStr);
+			 ObjectMapper mapper = new ObjectMapper();
+			 List<Task> dayTasks = scheduleService.getDailyTasks(date, employeeDetails.getID());
+			 return new ResponseEntity<String>(mapper.writeValueAsString(dayTasks), HttpStatus.OK);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/upcoming")
+	public ResponseEntity<String> viewScheduleAfterDate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr, @RequestParam String receiverNationalID){
+		try {
+			 injectLoggedInEmployeeInfo(model, employeeDetails);
+			 ObjectMapper mapper = new ObjectMapper();
+			 List<String> schedule = scheduleService.getScheduleAfterDate(employeeDetails.getID(), dateStr, receiverNationalID);
+			 return new ResponseEntity<String>(mapper.writeValueAsString(schedule), HttpStatus.OK);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	
 	}
 	
 	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
@@ -182,7 +223,4 @@ public class ScheduleController {
 		model.addAttribute("unread", unread);
 	}
 
-	public static boolean getActive() {
-		return active;
-	}
 }

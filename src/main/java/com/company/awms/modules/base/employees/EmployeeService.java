@@ -19,19 +19,24 @@ import org.springframework.stereotype.Service;
 import com.company.awms.modules.base.admin.data.Module;
 import com.company.awms.modules.base.admin.data.ModuleRepo;
 import com.company.awms.modules.base.employees.data.Employee;
+import com.company.awms.modules.base.employees.data.EmployeeDailyReference;
 import com.company.awms.modules.base.employees.data.EmployeeRepo;
 import com.company.awms.modules.base.employees.data.Notification;
+import com.company.awms.modules.base.schedule.data.Day;
+import com.company.awms.modules.base.schedule.data.ScheduleRepo;
 
 @Service
 public class EmployeeService {
 	private EmployeeRepo employeeRepo;
 	private ModuleRepo moduleRepo;
+	private ScheduleRepo scheduleRepo;
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public EmployeeService(EmployeeRepo employeeRepo, ModuleRepo moduleRepo, PasswordEncoder passwordEncoder) {
+	public EmployeeService(EmployeeRepo employeeRepo, ModuleRepo moduleRepo, ScheduleRepo scheduleRepo, PasswordEncoder passwordEncoder) {
 		this.employeeRepo = employeeRepo;
 		this.moduleRepo = moduleRepo;
+		this.scheduleRepo = scheduleRepo;
 		this.passwordEncoder = passwordEncoder;
 	}
 
@@ -77,8 +82,7 @@ public class EmployeeService {
 				notPermitted = false;
 			}
 		}
-		if (notPermitted)
-			throw new IllegalAccessException();
+		if (notPermitted) throw new IllegalAccessException();
 
 		List<Employee> employees = employeeRepo.findByDepartment(downloader.get().getDepartment());
 		List<Employee> employeeDTOs = new ArrayList<Employee>();
@@ -327,6 +331,24 @@ public class EmployeeService {
 		String message = "Your profile information has been updated by the Administrator.";
 		notify(employeeID, message, false);
 
+		List<Day> schedule = scheduleRepo.findAll();
+		dayLoop:
+		for(Day day : schedule) {
+			for(EmployeeDailyReference  edr : day.getEmployees()) {
+				if(edr.getIDRef().equals(employee.getID())) {
+					if(!edr.getDepartment().equals(employee.getDepartment()) || edr.getLevel() != employee.getLevel()) {
+						day.getEmployees().remove(edr);
+						continue dayLoop;
+					}
+					edr.setFirstName(employee.getFirstName());
+					edr.setLastName(employee.getLastName());
+					edr.setNationalID(employee.getNationalID());
+					scheduleRepo.save(day);
+					break;
+				}
+			}
+		}
+		
 		this.employeeRepo.save(employee);
 		return employee;
 	}
@@ -334,7 +356,6 @@ public class EmployeeService {
 	private void setEmployeeInfo(String data, Employee employee) {
 		String[] dataValues = data.split("\\n");
 		Map<String, String> newInfo = new HashMap<>();
-		System.out.println(data);
 		for (String field : dataValues) {
 			field = field.substring(0, field.length() - 1);
 			newInfo.put(field.split("=")[0], field.split("=")[1]);
