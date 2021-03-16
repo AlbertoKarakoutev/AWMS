@@ -1,6 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,8 +24,7 @@
 			<section class="content">
 				<div class="p-4">
 					<header class="py-3">
-						<h1 class="ty-page-title">Welcome, ${employee.getFirstName()}
-							${employee.getLastName()}!</h1>
+						<h1 class="ty-page-title">Welcome, ${employee.getFirstName()} ${employee.getLastName()}!</h1>
 					</header>
 					<div class="py-3">
 						<div class="avatar"></div>
@@ -64,6 +63,33 @@
 						<a class="btn btn-dark" href="/employee/password/new"
 							title="Change Password">Change Password</a>
 					</div>
+					<sec:authentication property="principal.authorities" var="role"/>
+    					<c:if test="${role == '[ADMIN]'}">
+    					
+						<div class="d-flex flex-row">
+							<label><b>Enable/Disable the email notifications with credentials:</b></label>
+						</div>
+						<div class="d-flex">
+							<form action="/admin/email" method="POST" enctype="text/plain">
+								<div class="form-group">
+									<label for="username">Username</label>
+	                            					<input type="text" id="username" name="username" value="${credentials[0]}" aria-describedby="username" class="form-control" placeholder="Username" required>
+	                            				</div>
+	                            				<div class="form-group">
+									<label for="password">Password</label>
+	                            					<input type="text" id="password" name="password" value="${credentials[1]}" aria-describedby="password"class="form-control" placeholder="Password" required>
+	                            				</div>
+								<div class="form-group">
+									<label for="emailNotifications">On/Off</label>
+		                            				<input type="checkbox" id="emailNotifications" name="emailNotifications" aria-describedby="emailNotifications" ${credentials[2] ? "checked" : ""}>
+		                            			</div>
+								<div class="form-group">
+		                            				<input class="btn btn-dark" type="submit" value="Update" class="form-control">
+		                            			</div>
+							
+							</form>
+						</div>
+					</c:if>
 				</div>
 				<footer>
 					<%@include file="../../boxes/footer.jsp"%>

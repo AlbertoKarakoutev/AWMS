@@ -204,16 +204,8 @@ public class ScheduleService {
 	}
 
 	public void declineSwap(String employeeID, LocalDate receiverDate) throws IOException {
-		Optional<Employee> receiverOptional = employeeRepo.findByNationalID(employeeID);
-		if (receiverOptional.isEmpty()) {
-			throw new IOException("No such employee!");
-		}
-		Employee receiver = receiverOptional.get();
-		List<Object> notificationData = new ArrayList<Object>();
-		notificationData.add("plain-notification");
 		String message = "Your swap request for " + receiverDate + " has been declined.";
-		receiver.getNotifications().add(new Notification(message, notificationData));
-		employeeRepo.save(receiver);
+		new Notification(message).add("plain-notification").sendAndSave(employeeID, employeeRepo);
 	}
 
 	public void swapEmployees(String requesterNationalID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException, NullPointerException {
@@ -250,20 +242,16 @@ public class ScheduleService {
 			throw new NullPointerException("No such EDR in those days");
 		}
 
-		List<Object> notificationData = new ArrayList<>();
 		Employee requesterObj = employeeRepo.findByNationalID(requesterNationalID).get();
-		notificationData.add("plain-notification");
 		String message = receiver.getFirstName() + " " + receiver.getLastName() + " has accepted your request to swap his/her " + LocalDate.parse(receiverDateParam) + " shift with your " + LocalDate.parse(requesterDateParam) + " shift.";
-		requesterObj.getNotifications().add(new Notification(message, notificationData));
-		employeeRepo.save(requesterObj);
+		new Notification(message).add("plain-notification").sendAndSave(requesterObj, employeeRepo);
 
 		scheduleRepo.save(requesterDay);
 		scheduleRepo.save(receiverDay);
 	}
 
 	public void swapRequest(String requesterID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws Exception {
-		List<Object> notificationData = new ArrayList<>();
-
+	
 		Optional<Employee> requesterOptional = employeeRepo.findById(requesterID);
 		if (requesterOptional.isEmpty()) {
 			throw new IOException("Requester not found!");
@@ -284,15 +272,9 @@ public class ScheduleService {
 				throw new Exception("The requester already has a shift in that day!");
 			}
 		}
-
-		notificationData.add("swap-request");
-		notificationData.add(requester.getNationalID());
-		notificationData.add(LocalDate.parse(requesterDateParam));
-		notificationData.add(LocalDate.parse(receiverDateParam));
 		String message = "You have received a request from " + requester.getFirstName() + " " + requester.getLastName() + " to swap his/her " + LocalDate.parse(requesterDateParam) + " shift with your " + LocalDate.parse(receiverDateParam)
 				+ " shift.";
-		receiver.getNotifications().add(new Notification(message, notificationData));
-		employeeRepo.save(receiver);
+		new Notification(message).add("swap-request").add(requester.getNationalID()).add(LocalDate.parse(requesterDateParam)).add(LocalDate.parse(receiverDateParam)).sendAndSave(receiver, employeeRepo);
 
 	}
 
@@ -329,11 +311,10 @@ public class ScheduleService {
 					this.scheduleRepo.save(currentDay);
 				}
 				Employee employee = employeeRepo.findByNationalID(newInfo.get("receiverNationalID")).get();
-				List<Object> notificationData = new ArrayList<>();
-				notificationData.add("plain-notification");
+				
 				String message = "You have a new task for " + newInfo.get("date");
-				employee.getNotifications().add(new Notification(message, notificationData));
-				employeeRepo.save(employee);
+				new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
+				
 				return;
 			}
 		}
@@ -360,19 +341,12 @@ public class ScheduleService {
 				if (!task.getCompleted())
 					task.setCompleted(true);
 
-				List<Object> notificationData = new ArrayList<>();
-				notificationData.add("task-payment-request");
-				notificationData.add(employeeID);
-				notificationData.add(taskNum);
-				notificationData.add(dateStr);
-				notificationData.add(task);
 				String message = edr.getFirstName() + " " + edr.getLastName() + " has marked assignment \"" + task.getTaskTitle() + "\" as completed.";
 
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
 				for (Employee manager : managers) {
 					if (manager.getDepartment().equals(edr.getDepartment())) {
-						manager.getNotifications().add(new Notification(message, notificationData));
-						employeeRepo.save(manager);
+						new Notification(message).add("task-payment-request").add(employeeID).add(taskNum).add(dateStr).add(task).sendAndSave(manager, employeeRepo);
 					}
 				}
 				scheduleRepo.save(day);
@@ -415,9 +389,7 @@ public class ScheduleService {
 				notificationData.add("plain-notification");
 				String message = "Your have been rewarded for your task  \"" + task.getTaskTitle() + "\"";
 
-				employeeOptional.get().getNotifications().add(new Notification(message, notificationData));
-
-				employeeRepo.save(employeeOptional.get());
+				new Notification(message).add("plain-notification").sendAndSave(employeeOptional.get(), employeeRepo);
 
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
 				for (Employee manager : managers) {
@@ -474,13 +446,9 @@ public class ScheduleService {
 				if (!task.getPaidFor())
 					task.setCompleted(false);
 
-				List<Object> notificationData = new ArrayList<>();
-				notificationData.add("plain-notification");
 				String message = "Your work on task \"" + task.getTaskTitle() + "\" has not been approved";
 
-				employeeOptional.get().getNotifications().add(new Notification(message, notificationData));
-
-				employeeRepo.save(employeeOptional.get());
+				new Notification(message).add("plain-notification").sendAndSave(employeeOptional.get(), employeeRepo);
 
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
 				for (Employee manager : managers) {
@@ -608,11 +576,10 @@ public class ScheduleService {
 		scheduleRepo.saveAll(nextMonthDays);
 
 		List<Employee> allEmployees = employeeRepo.findAll();
-		List<Object> notificationData = new ArrayList<>();
-		notificationData.add("schedule-update");
+
 		String message = "The schedule for " + YearMonth.from(LocalDate.now().plus(1, ChronoUnit.MONTHS)) + " has been updated.";
 		for (Employee issuer : allEmployees) {
-			issuer.getNotifications().add(new Notification(message, notificationData));
+			new Notification(message).add("schedule-update").sendAndSave(issuer, employeeRepo);
 		}
 	}
 

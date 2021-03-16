@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
 import com.company.awms.modules.base.employees.data.EmployeeDailyReference;
+import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.modules.base.schedule.data.Task;
 import com.company.awms.security.EmployeeDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,7 +60,7 @@ public class ScheduleController {
 		try{
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			Notification.setAsRead(employeeService, employeeDetails.getID(), Integer.parseInt(noteNum));
 			scheduleService.declineSwap(receiverNationalID, LocalDate.parse(date));
             model.addAttribute("employee", employee);
             return "redirect:/";
@@ -74,7 +75,7 @@ public class ScheduleController {
 		try {
 			String receiverNationalID = employeeService.getEmployee(employeeDetails.getID()).getNationalID();
 			scheduleService.swapEmployees(requesterNationalID, receiverNationalID, requesterDate, receiverDate);
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			Notification.setAsRead(employeeService, employeeDetails.getID(), Integer.parseInt(noteNum));
 			return "redirect:/schedule/?month="+YearMonth.now();
 		} catch (Exception e) {
 			e.printStackTrace();

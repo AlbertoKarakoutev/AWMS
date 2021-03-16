@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
+import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.modules.base.forum.data.ForumReply;
 import com.company.awms.modules.base.forum.data.ForumThread;
 import com.company.awms.modules.base.forum.data.ThreadReplyDTO;
@@ -322,11 +323,10 @@ public class ForumController {
 	@GetMapping("/dismiss/{threadID}")
 	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @PathVariable String threadID) {
 		try{
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			Notification.setAsRead(employeeService, employeeDetails.getID(), Integer.parseInt(noteNum));
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
 			model.addAttribute("employee", employee);
-			System.out.println(threadID);
             return "redirect:/forum/thread/"+threadID;
 		}catch(Exception e) {
 			return "erorrs/internalServerError";

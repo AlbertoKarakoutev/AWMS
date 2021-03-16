@@ -34,7 +34,7 @@
                         </h1>
                     </header>
                     <c:if test="${newEmployee==true}">
-                   		<form action="/admin/employee/register" method="POST" enctype="text/plain">
+                   	<form action="/admin/employee/register" method="POST" enctype="text/plain">
                     </c:if>
                     <c:if test="${newEmployee==false}">
                     	<form action="/admin/employee/update/?employeeId=${employee.getID()}" method="POST" enctype="text/plain">

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
+import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.security.EmployeeDetails;
 
 @Controller
@@ -59,6 +60,9 @@ public class IndexController {
             if (!user.getNotifications().get(i).getRead()) {
                 unread++;
             }
+        }
+        if(employeeDetails.getRole().equals("ADMIN")) {
+        	model.addAttribute("credentials", Notification.getCredentials());
         }
         model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
         model.addAttribute("notifications", user.getNotifications());

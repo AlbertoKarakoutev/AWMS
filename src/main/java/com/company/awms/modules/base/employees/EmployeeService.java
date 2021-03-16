@@ -41,7 +41,7 @@ public class EmployeeService {
 	}
 
 	public Employee getEmployee(String employeeID) throws IOException {
-		Optional<Employee> employee = this.employeeRepo.findById(employeeID);
+		Optional<Employee> employee = this.getRepo().findById(employeeID);
 
 		if (employee.isEmpty()) {
 			throw new IOException("Employee not found!");
@@ -51,7 +51,7 @@ public class EmployeeService {
 	}
 
 	public List<Employee> getAllEmployeesDTOs() {
-		List<Employee> employees = this.employeeRepo.findAll();
+		List<Employee> employees = this.getRepo().findAll();
 		List<Employee> employeeDTOs = new ArrayList<Employee>();
 		for (Employee employee : employees) {
 			Employee employeeDTO = new Employee();
@@ -65,7 +65,7 @@ public class EmployeeService {
 	}
 
 	public List<Employee> getAllEmployees() throws IOException {
-		List<Employee> employees = this.employeeRepo.findAll();
+		List<Employee> employees = this.getRepo().findAll();
 
 		if (employees.isEmpty()) {
 			throw new IOException("Employee not found!");
@@ -76,15 +76,15 @@ public class EmployeeService {
 
 	public List<Employee> getDepartmentEmployeesDTOs(String employeeID) throws IllegalAccessException {
 		boolean notPermitted = true;
-		Optional<Employee> downloader = employeeRepo.findById(employeeID);
-		for (Employee manager : employeeRepo.findAllByRole("MANAGER")) {
+		Optional<Employee> downloader = getRepo().findById(employeeID);
+		for (Employee manager : getRepo().findAllByRole("MANAGER")) {
 			if (manager.getID().equals(employeeID)) {
 				notPermitted = false;
 			}
 		}
 		if (notPermitted) throw new IllegalAccessException();
 
-		List<Employee> employees = employeeRepo.findByDepartment(downloader.get().getDepartment());
+		List<Employee> employees = getRepo().findByDepartment(downloader.get().getDepartment());
 		List<Employee> employeeDTOs = new ArrayList<Employee>();
 		for (Employee employee : employees) {
 			Employee employeeDTO = new Employee();
@@ -171,7 +171,7 @@ public class EmployeeService {
 	}
 
 	public Employee getOwner() throws IOException {
-		Optional<Employee> owner = this.employeeRepo.findByRole("OWNER");
+		Optional<Employee> owner = this.getRepo().findByRole("OWNER");
 
 		if (owner.isEmpty()) {
 			return null;
@@ -180,22 +180,16 @@ public class EmployeeService {
 	}
 
 	public List<Employee> getManagers() {
-		return this.employeeRepo.findAllByRole("MANAGER");
+		return this.getRepo().findAllByRole("MANAGER");
 	}
 
 	public Boolean requestLeave(String employeeID, boolean paid, String startDate, String endDate) throws IOException {
-		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
+		List<Employee> admins = getRepo().findAllByRole("ADMIN");
 		if (admins.size() < 1) {
 			throw new IOException();
 		}
 		Employee employee = getEmployee(employeeID);
-
-		List<Object> notificationData = new ArrayList<>();
-		notificationData.add("leave-request");
-		notificationData.add(employeeID);
-		notificationData.add(startDate);
-		notificationData.add(endDate);
-		notificationData.add(paid);
+		
 		String paidStr = "paid";
 		if (paid) {
 			paidStr = "un" + paidStr;
@@ -203,8 +197,7 @@ public class EmployeeService {
 		String message = employee.getFirstName() + " " + employee.getLastName() + " has requested a " + paidStr + " leave in the period from " + startDate + " to " + endDate;
 
 		for (Employee admin : admins) {
-			admin.getNotifications().add(new Notification(message, notificationData));
-			employeeRepo.save(admin);
+			new Notification(message).add("leave-request").add(employeeID).add(startDate).add(endDate).add(paid).sendAndSave(admin, employeeRepo);
 		}
 
 		return paid;
@@ -221,7 +214,7 @@ public class EmployeeService {
 		leave.put("paid", paid);
 		employee.getLeaves().add(leave);
 
-		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
+		List<Employee> admins = getRepo().findAllByRole("ADMIN");
 		if (admins.size() < 1) {
 			throw new IOException();
 		}
@@ -235,18 +228,19 @@ public class EmployeeService {
 					break notificationLoop;
 				}
 			}
-			employeeRepo.save(admin);
+			getRepo().save(admin);
 		}
-
-		employeeRepo.save(employee);
-
+		
 		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been approved";
-		notify(employeeID, message, false);
+		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
+		
+		getRepo().save(employee);
+		
 	}
 
 	public void denyLeave(String employeeID, String startDateStr, String endDateStr) throws IOException {
 		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been denied.";
-		List<Employee> admins = employeeRepo.findAllByRole("ADMIN");
+		List<Employee> admins = getRepo().findAllByRole("ADMIN");
 		if (admins.size() < 1) {
 			throw new IOException();
 		}
@@ -259,9 +253,9 @@ public class EmployeeService {
 					break notificationLoop;
 				}
 			}
-			employeeRepo.save(admin);
+			getRepo().save(admin);
 		}
-		notify(employeeID, message, false);
+		new Notification(message).add("plain-notification").sendAndSave(employeeID, getRepo());
 	}
 
 	public void deleteLeave(String employeeID, String leave) throws IOException {
@@ -270,24 +264,11 @@ public class EmployeeService {
 		LocalDate start = LocalDate.ofInstant(((Date) employee.getLeaves().get(Integer.parseInt(leave)).get("start")).toInstant(), ZoneId.systemDefault());
 		LocalDate end = LocalDate.ofInstant(((Date) employee.getLeaves().get(Integer.parseInt(leave)).get("end")).toInstant(), ZoneId.systemDefault());
 
-		List<Object> notificationData = new ArrayList<>();
-		notificationData.add("plain-notification");
 		String message = "Your leave for the period from " + start + " to " + end + " has been removed.";
-		employee.getNotifications().add(new Notification(message, notificationData));
-
+		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
+		
 		employee.getLeaves().remove(Integer.parseInt(leave));
-		employeeRepo.save(employee);
-	}
-
-	public void setNotificationRead(String employeeID, int notificationNumber) throws IOException {
-		Optional<Employee> employee = employeeRepo.findById(employeeID);
-		if (employee.isEmpty()) {
-			throw new IOException("Employee not found!");
-		} else {
-			employee.get().getNotifications().get(notificationNumber).setRead(true);
-			employeeRepo.save(employee.get());
-		}
-
+		getRepo().save(employee);
 	}
 
 	public Employee registerEmployee(String data) {
@@ -298,17 +279,15 @@ public class EmployeeService {
 		String encodedPassword = this.passwordEncoder.encode(employee.getNationalID());
 		employee.setPassword(encodedPassword);
 
-		List<Object> notificationData = new ArrayList<>();
-		notificationData.add("plain-notification");
 		String message = "Your profile information has been updated by the Administrator.";
-		employee.getNotifications().add(new Notification(message, notificationData));
+		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
 
-		this.employeeRepo.save(employee);
+		this.getRepo().save(employee);
 		return employee;
 	}
 
 	public void deleteEmployee(String employeeID) {
-		employeeRepo.deleteById(employeeID);
+		getRepo().deleteById(employeeID);
 	}
 	
 	public Employee updatePassword(String newPassword, String employeeID) throws IOException {
@@ -317,14 +296,14 @@ public class EmployeeService {
 		String encodedPassword = this.passwordEncoder.encode(newPassword);
 		employee.setPassword(encodedPassword);
 
-		this.employeeRepo.save(employee);
+		this.getRepo().save(employee);
 
 		return employee;
 	}
 
 	public void updateSalary(double newSalary, Employee employee) {
 		employee.setSalary(newSalary);
-		this.employeeRepo.save(employee);
+		this.getRepo().save(employee);
 	}
 
 	public Employee updateEmployeeInfo(String employeeID, String data) throws IOException {
@@ -333,7 +312,7 @@ public class EmployeeService {
 		setEmployeeInfo(data, employee);
 
 		String message = "Your profile information has been updated by the Administrator.";
-		notify(employeeID, message, false);
+		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
 
 		List<Day> schedule = scheduleRepo.findAll();
 		dayLoop:
@@ -353,7 +332,7 @@ public class EmployeeService {
 			}
 		}
 		
-		this.employeeRepo.save(employee);
+		this.getRepo().save(employee);
 		return employee;
 	}
 
@@ -379,23 +358,6 @@ public class EmployeeService {
 			System.out.println("Level is 0");
 			employee.setLevel(0);
 		}
-	}
-
-	private void notify(String employeeID, String message, boolean searchByNationalID) throws IOException {
-		Optional<Employee> employeeOptional;
-		if (searchByNationalID) {
-			employeeOptional = employeeRepo.findByNationalID(employeeID);
-		} else {
-			employeeOptional = employeeRepo.findById(employeeID);
-		}
-		if (employeeOptional.isEmpty()) {
-			throw new IOException("Employee not found!");
-		}
-		Employee employee = employeeOptional.get();
-		List<Object> notificationData = new ArrayList<>();
-		notificationData.add("plain-notification");
-		employee.getNotifications().add(new Notification(message, notificationData));
-		employeeRepo.save(employee);
 	}
 
 	public Module getModule(String name) throws IOException {
@@ -428,5 +390,9 @@ public class EmployeeService {
 
 	public void updateModule(Module module) {
 		moduleRepo.save(module);
+	}
+
+	public EmployeeRepo getRepo() {
+		return employeeRepo;
 	}
 }

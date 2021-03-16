@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.company.awms.modules.base.employees.data.Employee;
+import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.security.EmployeeDetails;
 
 @Controller
@@ -137,7 +138,7 @@ public class EmployeeController {
 	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
 
 		try {
-			employeeService.setNotificationRead(employeeDetails.getID(), Integer.parseInt(noteNum));
+			Notification.setAsRead(employeeService, employeeDetails.getID(), Integer.parseInt(noteNum));
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "redirect:/";
 		} catch (Exception e) {

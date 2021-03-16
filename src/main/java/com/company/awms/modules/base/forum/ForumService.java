@@ -2,7 +2,6 @@ package com.company.awms.modules.base.forum;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,142 +21,126 @@ import com.company.awms.util.ForumComparator;
 
 @Service
 public class ForumService {
-    private ForumThreadRepo forumThreadRepo;
-    private ForumReplyRepo forumReplyRepo;
-    private EmployeeRepo employeeRepo;
+	private ForumThreadRepo forumThreadRepo;
+	private ForumReplyRepo forumReplyRepo;
+	private EmployeeRepo employeeRepo;
 
-    @Autowired
-    public ForumService(ForumThreadRepo forumThreadRepo, ForumReplyRepo forumReplyRepo, EmployeeRepo employeeRepo) {
-        this.forumThreadRepo = forumThreadRepo;
-        this.forumReplyRepo = forumReplyRepo;
-        this.employeeRepo = employeeRepo;
-    }
+	@Autowired
+	public ForumService(ForumThreadRepo forumThreadRepo, ForumReplyRepo forumReplyRepo, EmployeeRepo employeeRepo) {
+		this.forumThreadRepo = forumThreadRepo;
+		this.forumReplyRepo = forumReplyRepo;
+		this.employeeRepo = employeeRepo;
+	}
 
-    public ForumThread getThread(String threadID) throws IOException {
-        Optional<ForumThread> thread = this.forumThreadRepo.findById(threadID);
+	public ForumThread getThread(String threadID) throws IOException {
+		Optional<ForumThread> thread = this.forumThreadRepo.findById(threadID);
 
-        if (thread.isEmpty()) {
-            throw new IOException("Thread not found!");
-        }
+		if (thread.isEmpty()) {
+			throw new IOException("Thread not found!");
+		}
 
-        return thread.get();
-    }
+		return thread.get();
+	}
 
-    public ThreadReplyDTO getThreadWithRepliesByID(String threadID) throws IOException {
-        ForumThread thread = getThread(threadID);
+	public ThreadReplyDTO getThreadWithRepliesByID(String threadID) throws IOException {
+		ForumThread thread = getThread(threadID);
 
-        List<ForumReply> replies = this.forumReplyRepo.findByThreadID(threadID);
+		List<ForumReply> replies = this.forumReplyRepo.findByThreadID(threadID);
 
-        return new ThreadReplyDTO(thread, replies);
-    }
+		return new ThreadReplyDTO(thread, replies);
+	}
 
-    public List<ForumThread> getAllThreads() {
-        List<ForumThread> allThreads = this.forumThreadRepo.findAll();
-        allThreads.sort(new ForumComparator());
+	public List<ForumThread> getAllThreads() {
+		List<ForumThread> allThreads = this.forumThreadRepo.findAll();
+		allThreads.sort(new ForumComparator());
 
-        return allThreads;
-    }
+		return allThreads;
+	}
 
-    public List<ForumThread> getAllAnsweredThreads() {
-        List<ForumThread> allThreads = getAllThreads();
-        allThreads.removeIf(t -> !t.getAnswered());
+	public List<ForumThread> getAllAnsweredThreads() {
+		List<ForumThread> allThreads = getAllThreads();
+		allThreads.removeIf(t -> !t.getAnswered());
 
-        return allThreads;
-    }
+		return allThreads;
+	}
 
-    public List<ForumThread> getAllUnansweredThreads() {
-        List<ForumThread> allThreads = getAllThreads();
-        allThreads.removeIf(ForumThread::getAnswered);
+	public List<ForumThread> getAllUnansweredThreads() {
+		List<ForumThread> allThreads = getAllThreads();
+		allThreads.removeIf(ForumThread::getAnswered);
 
-        return allThreads;
-    }
+		return allThreads;
+	}
 
-    public List<ForumThread> getAllThreadsFromEmployee(String issuerID) {
-        List<ForumThread> employeeThreads = this.forumThreadRepo.findByIssuerID(issuerID);
-        employeeThreads.sort(new ForumComparator());
+	public List<ForumThread> getAllThreadsFromEmployee(String issuerID) {
+		List<ForumThread> employeeThreads = this.forumThreadRepo.findByIssuerID(issuerID);
+		employeeThreads.sort(new ForumComparator());
 
-        return employeeThreads;
-    }
+		return employeeThreads;
+	}
 
-    public List<ForumReply> getAllRepliesFromEmployee(String issuerID) {
-        return this.forumReplyRepo.findByIssuerID(issuerID);
-    }
+	public List<ForumReply> getAllRepliesFromEmployee(String issuerID) {
+		return this.forumReplyRepo.findByIssuerID(issuerID);
+	}
 
-    public ForumThread addNewThread(EmployeeDetails employeeDetails, String title, String body) {
-        ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(), false,
-                employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+	public ForumThread addNewThread(EmployeeDetails employeeDetails, String title, String body) {
+		ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(), false, employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 
-        Employee uploader = employeeRepo.findById(employeeDetails.getID()).get();
-        
-        List<Employee> sameDepartmentEmployees = employeeRepo.findByDepartment(uploader.getDepartment());
-        List<Object> notificationData = new ArrayList<>();
+		Employee uploader = employeeRepo.findById(employeeDetails.getID()).get();
 
-        this.forumThreadRepo.save(newThread);
-         
-        for(Employee admin : employeeRepo.findAllByRole("ADMIN")) {
-        	if(admin.getID().equals(uploader.getID())){
-        		sameDepartmentEmployees = employeeRepo.findAll();
-        		break;
-        	}
-        }
-        
-        ForumThread saved = null;
-        for(ForumThread thread : forumThreadRepo.findByIssuerID(uploader.getID())) {
-        	if(thread.getAnswered()==false && thread.getTitle().equals(newThread.getTitle()) && thread.getBody().equals(newThread.getBody())){
-        		saved = thread;
-        		break;
-        	}
-        }
-        notificationData.add("new-thread");
-        notificationData.add(uploader.getID());
-        notificationData.add(saved.getID());
-        String message = uploader.getFirstName() + " " + uploader.getLastName()
-                + " has uploaded a new topic in the Forum, called \"" + saved.getTitle() + "\".";
-        
-        for (Employee notified : sameDepartmentEmployees) {
-            notified.getNotifications().add(new Notification(message, notificationData));
-            employeeRepo.save(notified);
-        }
+		List<Employee> sameDepartmentEmployees = employeeRepo.findByDepartment(uploader.getDepartment());
+		
+		this.forumThreadRepo.save(newThread);
 
+		for (Employee admin : employeeRepo.findAllByRole("ADMIN")) {
+			if (admin.getID().equals(uploader.getID())) {
+				sameDepartmentEmployees = employeeRepo.findAll();
+				break;
+			}
+		}
 
-        return newThread;
-    }
+		ForumThread saved = null;
+		for (ForumThread thread : forumThreadRepo.findByIssuerID(uploader.getID())) {
+			if (thread.getAnswered() == false && thread.getTitle().equals(newThread.getTitle()) && thread.getBody().equals(newThread.getBody())) {
+				saved = thread;
+				break;
+			}
+		}
+		String message = uploader.getFirstName() + " " + uploader.getLastName() + " has uploaded a new topic in the Forum, called \"" + saved.getTitle() + "\".";
 
-    public void addNewReply(EmployeeDetails employeeDetails, String body, String threadID) {
-        ForumReply newReply = new ForumReply(threadID, employeeDetails.getID(), body, LocalDateTime.now(),
-                employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		for (Employee notified : sameDepartmentEmployees) {
+			new Notification(message).add("new-thread").add(uploader.getID()).add(saved.getID()).sendAndSave(notified, employeeRepo);
+		}
 
-        Employee replier = employeeRepo.findById(employeeDetails.getID()).get();
-        ForumThread answered = forumThreadRepo.findById(threadID).get();
-        List<Object> notificationData = new ArrayList<>();
-        notificationData.add("new-reply");
-        notificationData.add(replier.getID());
-        notificationData.add(newReply);
-        String message = replier.getFirstName() + " " + replier.getLastName() + " has added a reply on the thread \""
-                + answered.getTitle() + "\" you uploaded.";
-        Employee issuer = employeeRepo.findById(answered.getIssuerID()).get();
-        issuer.getNotifications().add(new Notification(message, notificationData));
-        employeeRepo.save(issuer);
-        System.out.println("Reply added by " + replier.getFirstName() + " to " + issuer.getFirstName());
+		return newThread;
+	}
 
-        this.forumReplyRepo.save(newReply);
-    }
+	public void addNewReply(EmployeeDetails employeeDetails, String body, String threadID) {
+		ForumReply newReply = new ForumReply(threadID, employeeDetails.getID(), body, LocalDateTime.now(), employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 
-    public void markAsAnswered(ForumThread forumThread) {
-        forumThread.setAnswered(true);
+		Employee replier = employeeRepo.findById(employeeDetails.getID()).get();
+		ForumThread answered = forumThreadRepo.findById(threadID).get();
+		
+		String message = replier.getFirstName() + " " + replier.getLastName() + " has added a reply on the thread \"" + answered.getTitle() + "\" you uploaded.";
+		Employee issuer = employeeRepo.findById(answered.getIssuerID()).get();
+		new Notification(message).add("new-reply").add(replier.getID()).add(newReply).sendAndSave(issuer, employeeRepo);
 
-        this.forumThreadRepo.save(forumThread);
-    }
+		forumReplyRepo.save(newReply);
+	}
 
-    public ForumThread editThread(String body, String title, ForumThread oldThread) {
-        // We don't update the issuerID, time and isAnswered because they are presumed
-        // to be the same.
-        oldThread.setBody(body);
-        oldThread.setTitle(title);
-        oldThread.setDateTime(LocalDateTime.now());
+	public void markAsAnswered(ForumThread forumThread) {
+		forumThread.setAnswered(true);
+		forumThreadRepo.save(forumThread);
+	}
 
-        this.forumThreadRepo.save(oldThread);
+	public ForumThread editThread(String body, String title, ForumThread oldThread) {
+		// We don't update the issuerID, time and isAnswered because they are presumed
+		// to be the same.
+		oldThread.setBody(body);
+		oldThread.setTitle(title);
+		oldThread.setDateTime(LocalDateTime.now());
 
-        return oldThread;
-    }
+		this.forumThreadRepo.save(oldThread);
+
+		return oldThread;
+	}
 }

@@ -34,6 +34,7 @@ import com.company.awms.modules.base.documents.DocumentService;
 import com.company.awms.modules.base.documents.data.DocInfoDTO;
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
+import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.modules.base.schedule.ScheduleService;
 import com.company.awms.security.EmployeeDetails;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -223,7 +224,24 @@ public class AdminController {
 			return "errors/internalServerError";
 		}
 	}
-
+	
+	@PostMapping("/email")
+	public String setNotificationEmailCredentials(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestBody String data) {
+		String[] dataValues = data.split("\\n");
+		Map<String, String> credentials = new HashMap<>();
+		for (String field : dataValues) {
+			field = field.substring(0, field.length() - 1);
+			credentials.put(field.split("=")[0], field.split("=")[1]);
+		}
+		String status = "off";
+		if(credentials.get("emailNotifications") != null) {
+			status = credentials.get("emailNotifications");
+		}
+		Notification.setCredentials(credentials.get("username"), credentials.get("password"), (status.equals("on") ? true : false));
+		return "redirect:/";
+		
+	}
+	
 	// Schedule methods
 	@GetMapping(value = "/schedule/add")
 	public ResponseEntity<String> addWorkDay(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String employeeNationalID, @RequestParam String date, @RequestParam String startShift, @RequestParam String endShift) {

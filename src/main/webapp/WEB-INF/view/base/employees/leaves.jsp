@@ -14,7 +14,7 @@
     <script src="/webjars/bootstrap/4.5.3/js/bootstrap.bundle.js"></script>
     <script src="/webjars/font-awesome/5.15.1/js/fontawesome.js"></script>
     <sec:authentication property="principal.authorities" var="role"/>
-    <c:if test="${role == '[employee]'}">
+    <c:if test="${role == '[EMPLOYEE]'}">
    	<title>Request a Leave</title>
     </c:if>
     <c:if test="${role != '[ADMIN]'}">

@@ -39,7 +39,7 @@
 			<section class="content">
 				<div id="mainBody" class="p-4">
 					<header class="py-3">
-						<h1 class="ty-page-title"><%=yearMonth.getMonth()%><%=yearMonth.getYear()%></h1>
+						<h1 class="ty-page-title"><%=yearMonth.getMonth()%> <%=yearMonth.getYear()%></h1>
 					</header>
 					<div class="container-fluid">
 						<div class="row seven-cols">
