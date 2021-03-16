@@ -304,6 +304,29 @@ public class ForumController {
 		}
 	}
 
+	@GetMapping("/search")
+	public String searchForum(@RequestParam String searchTerm, @AuthenticationPrincipal EmployeeDetails employeeDetails,
+	            Model model) {
+	        if (!active) {
+	            return "errors/notFound";
+	        }
+
+	        try {
+	            List<ForumThread> threads;
+	            threads =  forumService.getAccessibleThreads(employeeDetails.getID());
+
+	            List<ForumThread> foundThreads = forumService.searchForum(threads, searchTerm);
+	            model.addAttribute("threads", foundThreads);
+	            injectLoggedInEmployeeInfo(model, employeeDetails);
+
+	            return "base/forum/forum";
+	        } catch (IOException e) {
+	            return "erorrs/notFound";
+	        } catch (Exception e) {
+	            return "erorrs/internalServerError";
+	        }
+	    }
+	
 	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
 		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 		model.addAttribute("employeeEmail", employeeDetails.getUsername());

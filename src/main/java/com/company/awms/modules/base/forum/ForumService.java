@@ -2,8 +2,11 @@ package com.company.awms.modules.base.forum;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,6 +60,32 @@ public class ForumService {
 		return allThreads;
 	}
 
+	public List<ForumThread> getAccessibleThreads(String employeeID) throws IOException {
+		List<ForumThread> accessibleThreads = new ArrayList<>();
+
+		Optional<Employee> employeeOptional = employeeRepo.findById(employeeID);
+		if(employeeOptional.isEmpty()) {
+			throw new IOException();
+		}
+		List<String> adminIDs = new ArrayList<String>();
+		for(Employee admin : employeeRepo.findAllByRole("ADMIN")) {
+			adminIDs.add(admin.getID());
+		}
+		
+		if (adminIDs.contains(employeeOptional.get().getID())) {
+			accessibleThreads = forumThreadRepo.findAll();
+		} else {
+			List<ForumThread> departmentThreads = forumThreadRepo.findByDepartment(employeeOptional.get().getDepartment());
+			for (ForumThread thread : departmentThreads) {
+				if (employeeOptional.get().getLevel() >= thread.getLevel()) {
+					accessibleThreads.add(thread);
+				}
+			}
+		}
+
+		return accessibleThreads;
+	}
+	
 	public List<ForumThread> getAllAnsweredThreads() {
 		List<ForumThread> allThreads = getAllThreads();
 		allThreads.removeIf(t -> !t.getAnswered());
@@ -82,10 +111,39 @@ public class ForumService {
 		return this.forumReplyRepo.findByIssuerID(issuerID);
 	}
 
+	public List<ForumThread> searchForum(List<ForumThread> threads, String searchTerm) {
+		List<ForumThread> foundThreads = new ArrayList<>();
+
+		Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);
+
+		for (ForumThread thread : threads) {
+			Matcher matcher = pattern.matcher(thread.getTitle());
+			boolean title = matcher.find();
+			if (title) {
+				foundThreads.add(thread);
+				continue;
+			}
+			matcher = pattern.matcher(thread.getBody());
+			boolean body = matcher.find();
+			if (body) {
+				foundThreads.add(thread);
+				continue;
+			}
+			matcher = pattern.matcher(thread.getIssuerName());
+			boolean name = matcher.find();
+			if (name) {
+				foundThreads.add(thread);
+				continue;
+			}
+		}
+		return foundThreads;
+	}
+	
 	public ForumThread addNewThread(EmployeeDetails employeeDetails, String title, String body) {
-		ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(), false, employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
 
 		Employee uploader = employeeRepo.findById(employeeDetails.getID()).get();
+
+		ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(), false, employeeDetails.getFirstName() + " " + employeeDetails.getLastName(), uploader.getDepartment(), uploader.getLevel());
 
 		List<Employee> sameDepartmentEmployees = employeeRepo.findByDepartment(uploader.getDepartment());
 		
@@ -142,5 +200,10 @@ public class ForumService {
 		this.forumThreadRepo.save(oldThread);
 
 		return oldThread;
+	}
+
+	
+	public void deleteThread(String threadID) {
+		forumThreadRepo.deleteById(threadID);	
 	}
 }

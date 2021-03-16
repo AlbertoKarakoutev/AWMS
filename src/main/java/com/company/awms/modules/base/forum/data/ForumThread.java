@@ -16,17 +16,21 @@ public class ForumThread {
 	private String issuerID;
 	private String issuerName;
 	private LocalDateTime dateTime;
+	private String department;
+	private int level;
 	private boolean isAnswered;
 
 	public ForumThread() {}
 	
-	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered, String issuerName) {
+	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered, String issuerName, String department, int level) {
 		this.issuerID = issuerID;
 		this.issuerName = issuerName;
 		this.title = title;
 		this.body = body;
 		this.dateTime = time;
 		this.isAnswered = isAnswered;
+		this.department = department;
+		this.level = level;
 	}
 
 	public String getID() {
@@ -79,5 +83,21 @@ public class ForumThread {
 
 	public void setAnswered(boolean answered) {
 		isAnswered = answered;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 }

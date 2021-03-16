@@ -288,6 +288,18 @@ public class EmployeeService {
 
 	public void deleteEmployee(String employeeID) {
 		getRepo().deleteById(employeeID);
+		
+		List<Day> schedule = scheduleRepo.findAll();
+
+		for(Day day : schedule) {
+			for(EmployeeDailyReference  edr : day.getEmployees()) {
+				if(edr.getIDRef().equals(employeeID)) {
+					day.getEmployees().remove(edr);
+					scheduleRepo.save(day);
+					break;
+				}
+			}
+		}
 	}
 	
 	public Employee updatePassword(String newPassword, String employeeID) throws IOException {
@@ -321,6 +333,7 @@ public class EmployeeService {
 				if(edr.getIDRef().equals(employee.getID())) {
 					if(!edr.getDepartment().equals(employee.getDepartment()) || edr.getLevel() != employee.getLevel()) {
 						day.getEmployees().remove(edr);
+						scheduleRepo.save(day);
 						continue dayLoop;
 					}
 					edr.setFirstName(employee.getFirstName());
@@ -332,7 +345,7 @@ public class EmployeeService {
 			}
 		}
 		
-		this.getRepo().save(employee);
+		getRepo().save(employee);
 		return employee;
 	}
 

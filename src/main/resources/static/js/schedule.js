@@ -253,3 +253,37 @@ function addWorkDay(date){
 	req.send();
 }
 
+function getEmployeeData(){
+	let searchTerm = document.getElementById("search-field").value;
+	if(searchTerm === ""){
+		alert("Please enter a value!");
+		return;
+	}else{
+		if(/^\d+$/.test(searchTerm) === false){
+			alert("Please enter a numeric value!");
+			return;
+		}
+	}
+	let req = new XMLHttpRequest();
+	req.open("GET", "/schedule/employee/get/?employeeNationalID="+searchTerm, true);
+	req.onreadystatechange = function(){
+		if(req.readyState == 4 && req.status == 200){
+			let data = JSON.parse(req.response);
+			
+			let resHead= document.getElementById("res-head");
+			console.log(resHead);
+			resHead.innerHTML = "<tr><th scope='col'><b>Name:</b> " + data["name"]+"</th></tr>";
+			
+			let resBody= document.getElementById("res-body");
+			resBody.innerHTML = "";
+			for(let i = 0; i < data["schedule"].length; i++){
+				resBody.innerHTML += "<tr><td><h6>" + data["schedule"][i]+"</h6></td></tr>";
+			}
+			
+		}else if(req.readyState == 4 && req.status != 200){
+			alert("Employee not found!");
+		}
+		document.getElementById("search-field").value = "";
+	}
+	req.send();
+}

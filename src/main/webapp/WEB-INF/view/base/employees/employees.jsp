@@ -26,62 +26,62 @@
 			</header>
 			<section class="content">
                 <div class="p-4">
-			    	<header class="py-3">
-                        <h1 class="ty-page-title">Employees</h1>
-                    </header>
-                    <div class="my-3 d-flex">
-						<form method='get' action='/admin/employee/search' class='mr-auto p-2'>
-						    <div class="form-row">
-							    <div class="form-group col-md-4">
-							        <input class="form-control" type="text" name='searchTerm'
-								        id="employeesSearch" placeholder="Search employees..." aria-label="Search employees...">
-								</div>
-								<div class="form-group col-md-4">
-                            	    <select class="form-control" name="type" id="departmentEmployee">
-                                        <option>NATIONAL ID</option>
-                                        <option selected>FIRST NAME</option>
-                                        <option>LAST NAME</option>
-                                        <option>ROLE</option>
-                                        <option>E-MAIL</option>
-                                        <option>IBAN</option>
-                                        <option>LEVEL</option>
-                                        <option>DEPARTMENT CODE</option>
-                                        <option>ACCESS LEVEL</option>
-                            	    </select>
-                                </div>
-							    <div class="form-group col-md-2">
-								    <button class="btn btn-dark" type="submit">Search</button>
-								</div>
-							</div>
-						</form>
-						
-						<c:if test="${role == '[ADMIN]'}">
-							<div class="w-50 p-2">
-							    <a class="btn btn-danger" href="/admin/schedule/apply" title="Apply schedule">Calculate schedule</a>
-							</div>
-							<div class="p-2">
-							    <a class="btn btn-dark" href="/admin/employee/register" title="Add employee">Add</a>
-							</div>
-						</c:if>
+			<header class="py-3">
+                        	<h1 class="ty-page-title">Employees</h1>
+                	</header>
+                    	<div class="my-3 d-flex">
+				<form method='get' action='/admin/employee/search' class='mr-auto p-2'>
+					<div class="form-row">
+						<div class="form-group col-md-4">
+							<input class="form-control" type="text" name='searchTerm'
+							 id="employeesSearch" placeholder="Search employees..." aria-label="Search employees...">
+						</div>
+						<div class="form-group col-md-4">
+			                        	<select class="form-control" name="type" id="departmentEmployee">
+				                                <option>NATIONAL ID</option>
+				                                <option selected>FIRST NAME</option>
+				                                <option>LAST NAME</option>
+				                                <option>ROLE</option>
+				                                <option>E-MAIL</option>
+				                                <option>IBAN</option>
+				                                <option>LEVEL</option>
+				                                <option>DEPARTMENT CODE</option>
+				                                <option>ACCESS LEVEL</option>
+			                        	</select>
+                                		</div>
+						<div class="form-group col-md-2">
+							<button class="btn btn-dark" type="submit">Search</button>
+						</div>
 					</div>
-					<div class="table-responsive">
-				    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">First Name</th>
-                                <th scope="col">Family Name</th>
-
+				</form>
+						
 				<c:if test="${role == '[ADMIN]'}">
-                                	<th scope="col">Department</th>
-					<th scope="col">Edit</th>
+					<div class="w-50 p-2">
+					    <a class="btn btn-danger" href="/admin/schedule/apply" title="Apply schedule">Calculate schedule</a>
+					</div>
+					<div class="p-2">
+					    <a class="btn btn-dark" href="/admin/employee/register" title="Add employee">Add</a>
+					</div>
 				</c:if>
-				<th scope="col">Leaves</th>
-				<c:if test="${role == '[ADMIN]'}">
-					<th scope="col">Delete</th>
-				</c:if>
-                            </tr>
-                        </thead>
+			</div>
+			<div class="table-responsive">
+				<table class="table">
+		                        <thead>
+		                            <tr>
+		                                <th scope="col">#</th>
+		                                <th scope="col">First Name</th>
+		                                <th scope="col">Family Name</th>
+		
+						<c:if test="${role == '[ADMIN]'}">
+		                                	<th scope="col">Department</th>
+							<th scope="col">Edit</th>
+						</c:if>
+						<th scope="col">Leaves</th>
+						<c:if test="${role == '[ADMIN]'}">
+							<th scope="col">Delete</th>
+						</c:if>
+		                            </tr>
+		                        </thead>
                         <tbody>
                         
                             <c:forEach items="${employees}" var="employee" varStatus="loop">

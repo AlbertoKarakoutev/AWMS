@@ -30,6 +30,7 @@ import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.modules.base.schedule.data.Day;
 import com.company.awms.modules.base.schedule.data.ScheduleRepo;
 import com.company.awms.modules.base.schedule.data.Task;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ScheduleService {
@@ -579,7 +580,7 @@ public class ScheduleService {
 
 		String message = "The schedule for " + YearMonth.from(LocalDate.now().plus(1, ChronoUnit.MONTHS)) + " has been updated.";
 		for (Employee issuer : allEmployees) {
-			new Notification(message).add("schedule-update").sendAndSave(issuer, employeeRepo);
+			new Notification(message).add("plain-notification").sendAndSave(issuer, employeeRepo);
 		}
 	}
 
@@ -1039,4 +1040,38 @@ public class ScheduleService {
 		departmentRepo.deleteById(toBeDeleted.getID());
 	}
 
+	public String getEmployeeScheduleAsString(String employeeNationalID, String requesterID) throws IOException, IllegalAccessException {
+		Optional<Employee> employeeOptional = employeeRepo.findByNationalID(employeeNationalID);
+		if (employeeOptional.isEmpty()) {
+			throw new IOException("Employee not found!");
+		}
+		Employee employee = employeeOptional.get();
+		
+		Optional<Employee> requesterOptional = employeeRepo.findById(requesterID);
+		if (requesterOptional.isEmpty()) {
+			throw new IOException("Requester not found!");
+		}
+		Employee requester = requesterOptional.get();
+		
+		if(employee.getLevel() > requester.getLevel() || !employee.getDepartment().equals(requester.getDepartment())) {
+			throw new IllegalAccessException();
+		}
+		
+		List<String> edrDTO = new ArrayList<String>();
+		
+		for(Day day : scheduleRepo.findAll()) {
+			if(day.getDate().isAfter(LocalDate.now())){
+				for(EmployeeDailyReference edr : day.getEmployees()) {
+					if(edr.getNationalID().equals(employeeNationalID)) {
+						edrDTO.add(day.getDate().toString() + ": " + edr.getWorkTimeInfo());
+					}
+				}
+			}
+		}
+		ObjectMapper mapper = new ObjectMapper();
+		String scheduleStr = mapper.writeValueAsString(edrDTO);
+		String data = "{\"name\" : \""+employee.getFirstName() + " " + employee.getLastName() + "\" , \"schedule\" : " + scheduleStr + "}";
+		
+		return data;
+	}
 }

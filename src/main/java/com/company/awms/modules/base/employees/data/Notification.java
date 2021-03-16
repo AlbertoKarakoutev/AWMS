@@ -1,6 +1,8 @@
 package com.company.awms.modules.base.employees.data;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,11 @@ public class Notification {
 		notified.getNotifications().add(this);
 		employeeRepo.save(notified);
 		if(emailNotifications) {
-			EmailNotifier.sendMail("smtp.gmail.com", senderUsername, senderPassword, notified.getEmail(), "AWMS Notification", message + "\n\nView it at <a href='https://awms.ddns.net'>AWMS</a>");
+			String address = null;
+			try {
+				address =  "https://"+InetAddress.getLocalHost().getHostAddress()+":8443";
+			}catch(UnknownHostException e) {}
+			EmailNotifier.sendMail("smtp.gmail.com", senderUsername, senderPassword, notified.getEmail(), "AWMS Notification", message + "</br>View it at <a href='"+address+"'>AWMS</a>");
 		}
 	}
 	

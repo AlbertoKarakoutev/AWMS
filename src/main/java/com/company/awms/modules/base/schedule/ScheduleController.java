@@ -157,6 +157,17 @@ public class ScheduleController {
 		}
 	}
 	
+	@GetMapping("/employee/get")
+	public ResponseEntity<String> getEmployeeScheduleAsString(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String employeeNationalID){
+		try {
+			String employeeSchedule= scheduleService.getEmployeeScheduleAsString(employeeNationalID, employeeDetails.getID());
+			return new ResponseEntity<String>(employeeSchedule, HttpStatus.OK);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
 	@GetMapping("/day")
 	public ResponseEntity<String> getDay(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr){
 		try {

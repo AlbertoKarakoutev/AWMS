@@ -41,121 +41,153 @@
 					<header class="py-3">
 						<h1 class="ty-page-title"><%=yearMonth.getMonth()%> <%=yearMonth.getYear()%></h1>
 					</header>
-					<div class="container-fluid">
-						<div class="row seven-cols">
-							<div class="col-md-1">
-								<h3 class="text-center">Monday</h3>
-							</div>
-							<div class="col-md-1">
-								<h3 class="text-center">Tuesday</h3>
-							</div>
-							<div class="col-md-1">
-								<h3 class="text-center">Wednesday</h3>
-							</div>
-							<div class="col-md-1">
-								<h3 class="text-center">Thursday</h3>
-							</div> 
-							<div class="col-md-1">
-								<h3 class="text-center">Friday</h3>
-							</div>
-							<div class="col-md-1">
-								<h3 class="text-center">Saturday</h3>
-							</div>
-							<div class="col-md-1">
-								<h3 class="text-center">Sunday</h3>
-							</div>
-						</div>
-						<div id='swap-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>
-							<div class='modal-dialog modal-dialog-centered modal-xl' role='document'>
-								<div class='modal-content'>
-									<div class='modal-header'>
-										<h5 class='modal-title'>Swap Shifts</h5>
-										<button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-											<span aria-hidden='true'><i class='fas fa-times'></i></span>
-										</button>
-									</div>
-									<div class='modal-body'>
-										<form method="GET" action="/schedule/swapRequest">
-											<div class="form-group">
-												<div class="md-form">
-													<select name="requesterDate" id="dates" class="form-control">
-
-													</select>
-												</div>
+					<table>
+						<tr>
+							<th valign="top">
+								<div class="container-fluid mt-4">
+									<div id="search">
+										<div class="form-row ">
+											<div class="form-group col-lg">
+												<input class="form-control" type="text" name='searchTerm'
+												 id="search-field" placeholder="Search by national ID..." aria-label="Search..." required>
 											</div>
-											<small class='form-text text-muted'>Select the date, which you wish to switch.</small><br>
-											<input type="hidden" id="receiverNationalID" name="receiverNationalID"> <input
-												type="hidden" id="receiverDate" name="receiverDate">
-										</form>
-										<button class="btn btn-dark" id="swap-request-btn" data-dismiss="modal" onclick='sendSwapRequest()'>Send
-											request!</button>
-									</div>
-									<div class='modal-footer'></div>
-								</div>
-							</div>
-						</div>
-						<div class='modal fade' id="employeeModal" tabindex="-1" role="dialog"
-							aria-labelledby="EmployeeModal" aria-hidden="true">
-							<div class='modal-dialog modal-dialog-centered modal-xl' role="document">
-								<div class='modal-content'>
-									<div class='modal-header'>
-										<h5 id='EmployeeModal' class="modal-title">Employees</h5>
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-											<span aria-hidden="true"> <i class="fas fa-times"></i>
-											</span>
-										</button>
-									</div>
-									<div class="modal-body">
-										<div class="table-responsive text-center">
-											<table class="table">
-												<thead>
-													<tr>
-														<th scope="col">Name</th>
-														<th scope="col">Working Hours</th>
-													</tr>
-												</thead>
-												<tbody id="day-modal-body">
-													<tr></tr>
-												</tbody>
-											</table>
+											<div class="form-group mr-auto col-md-4">
+												<button class="btn btn-dark" onclick="getEmployeeData()">Search</button>
+											</div>
 										</div>
-										<table id="task-table" class="table">
-											<thead>
-												<tr>
-													<th scope="col">Title</th>
-													<th scope="col">Assignment</th>
-													<th scope="col">Reward</th>
-													<th scope="col" style="text-align:center">State</th>
-												</tr>
+									</div>
+									<div style="height:440px;overflow-y:auto">
+										<table class="table">
+											<thead id="res-head">
+												
 											</thead>
-											<tbody>
-												<tbody id="task-modal-body">
-													<tr></tr>
-												</tbody>
+											<tbody id="res-body">
+											
 											</tbody>
 										</table>
 									</div>
+								
 								</div>
-							</div>
-						</div>
-						<div class="mt-2">
-							<div class="row seven-cols">
-								<%for (int i = 0; i <= 34; i++) {%>
-								<div class="col-md-1 p-0">
-									<%if (i >= offset && i < thisMonth.lengthOfMonth() + offset) {%>
-										<button class='day-box' onclick='getDayData(<%=i-offset+1%>)' data-toggle="modal" data-target="#employeeModal">
-											<%if(sle[i - offset + 1]){%>
-												<span class='work-day'></span>
+							</th>
+							<th>
+								<div class="container-fluid">
+									<div class="row seven-cols">
+										<div class="col-md-1">
+											<h3 class="text-center">Monday</h3>
+										</div>
+										<div class="col-md-1">
+											<h3 class="text-center">Tuesday</h3>
+										</div>
+										<div class="col-md-1">
+											<h3 class="text-center">Wednesday</h3>
+										</div>
+										<div class="col-md-1">
+											<h3 class="text-center">Thursday</h3>
+										</div> 
+										<div class="col-md-1">
+											<h3 class="text-center">Friday</h3>
+										</div>
+										<div class="col-md-1">
+											<h3 class="text-center">Saturday</h3>
+										</div>
+										<div class="col-md-1">
+											<h3 class="text-center">Sunday</h3>
+										</div>
+									</div>
+									<div class='modal fade' id='swap-modal' tabindex='-1' role='dialog' aria-hidden='true'>
+										<div class='modal-dialog modal-dialog-centered modal-xl' role='document'>
+											<div class='modal-content'>
+												<div class='modal-header'>
+													<h5 class='modal-title'>Swap Shifts</h5>
+													<button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+														<span aria-hidden='true'><i class='fas fa-times'></i></span>
+													</button>
+												</div>
+												<div class='modal-body'>
+													<form method="GET" action="/schedule/swapRequest">
+														<div class="form-group">
+															<div class="md-form">
+																<select name="requesterDate" id="dates" class="form-control">
+			
+																</select>
+															</div>
+														</div>
+														<small class='form-text text-muted'>Select the date, which you wish to switch.</small><br>
+														<input type="hidden" id="receiverNationalID" name="receiverNationalID"> <input
+															type="hidden" id="receiverDate" name="receiverDate">
+													</form>
+													<button class="btn btn-dark" id="swap-request-btn" data-dismiss="modal" onclick='sendSwapRequest()'>Send
+														request!</button>
+												</div>
+												<div class='modal-footer'></div>
+											</div>
+										</div>
+									</div>
+									<div class='modal fade' id="employeeModal" tabindex="-1" role="dialog"
+										aria-labelledby="EmployeeModal" aria-hidden="true">
+										<div class='modal-dialog modal-dialog-centered modal-xl' role="document">
+											<div class='modal-content'>
+												<div class='modal-header'>
+													<h5 id='EmployeeModal' class="modal-title">Employees</h5>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+														<span aria-hidden="true"> <i class="fas fa-times"></i>
+														</span>
+													</button>
+												</div>
+												<div class="modal-body">
+													<div class="table-responsive text-center">
+														<table class="table">
+															<thead>
+																<tr>
+																	<th scope="col">Name</th>
+																	<th scope="col">Working Hours</th>
+																</tr>
+															</thead>
+															<tbody id="day-modal-body">
+																<tr></tr>
+															</tbody>
+														</table>
+													</div>
+													<table id="task-table" class="table">
+														<thead>
+															<tr>
+																<th scope="col">Title</th>
+																<th scope="col">Assignment</th>
+																<th scope="col">Reward</th>
+																<th scope="col" style="text-align:center">State</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tbody id="task-modal-body">
+																<tr></tr>
+															</tbody>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="mt-2">
+										<div class="row seven-cols">
+											<%for (int i = 0; i <= 34; i++) {%>
+											<div class="col-md-1 p-0">
+												<%if (i >= offset && i < thisMonth.lengthOfMonth() + offset) {%>
+													<button class='day-box' onclick='getDayData(<%=i-offset+1%>)' data-toggle="modal" data-target="#employeeModal">
+														<%if(sle[i - offset + 1]){%>
+															<span class='work-day'></span>
+														<%} %>
+													</button>
+												<%}else{%>
+													<div class="empty-day"></div>
+												<%}%>
+											</div>
 											<%} %>
-										</button>
-									<%}else{%>
-										<div class="empty-day"></div>
-									<%}%>
+										</div>
+									</div>
 								</div>
-								<%} %>
-							</div>
-						</div>
-					</div>
+							</th>
+						</tr>
+					</table>
 				</div>
 				<div class="my-2 text-center">
 					<%if (yearMonth.equals(YearMonth.now())) {%>

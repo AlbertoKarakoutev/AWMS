@@ -1,15 +1,11 @@
 package com.company.awms.modules.base.admin;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.json.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -20,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,18 +25,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.company.awms.modules.base.admin.data.*;
+import com.company.awms.modules.base.admin.data.Department;
 import com.company.awms.modules.base.admin.data.Module;
 import com.company.awms.modules.base.documents.DocumentService;
 import com.company.awms.modules.base.documents.data.DocInfoDTO;
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
 import com.company.awms.modules.base.employees.data.Notification;
+import com.company.awms.modules.base.forum.ForumService;
 import com.company.awms.modules.base.schedule.ScheduleService;
 import com.company.awms.security.EmployeeDetails;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
@@ -49,12 +45,14 @@ public class AdminController {
 	private EmployeeService employeeService;
 	private DocumentService documentService;
 	private ScheduleService scheduleService;
+	private ForumService forumService;
 
 	@Autowired
-	public AdminController(EmployeeService employeeService, DocumentService documentService, ScheduleService scheduleService) {
+	public AdminController(EmployeeService employeeService, DocumentService documentService, ScheduleService scheduleService,ForumService forumService) {
 		this.documentService = documentService;
 		this.employeeService = employeeService;
 		this.scheduleService = scheduleService;
+		this.forumService = forumService;
 	}
 
 	// Employee methods
@@ -240,6 +238,17 @@ public class AdminController {
 		Notification.setCredentials(credentials.get("username"), credentials.get("password"), (status.equals("on") ? true : false));
 		return "redirect:/";
 		
+	}
+	
+	//Forum methods
+	@GetMapping("/forum/delete/{threadID}")
+	public String deleteThread(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @PathVariable String threadID) {
+		try {
+			forumService.deleteThread(threadID);
+			return "redirect:/forum";
+		}catch(Exception e) {
+			return "internalServerError";
+		}
 	}
 	
 	// Schedule methods
