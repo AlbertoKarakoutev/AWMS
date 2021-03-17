@@ -1,9 +1,7 @@
 package com.company.awms.modules.base.schedule;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,11 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
-import com.company.awms.modules.base.employees.data.EmployeeDailyReference;
 import com.company.awms.modules.base.employees.data.Notification;
-import com.company.awms.modules.base.schedule.data.Task;
 import com.company.awms.security.EmployeeDetails;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @RequestMapping("/schedule")
@@ -38,103 +33,72 @@ public class ScheduleController {
 		this.employeeService = employeeService;
 	}
 
-	@GetMapping("/swapRequest")
-	public ResponseEntity<String> swapRequest(@AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String receiverNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
-		try {
-			scheduleService.swapRequest(employeeDetails.getID(),receiverNationalID, requesterDate, receiverDate);
-			return new ResponseEntity<String>(HttpStatus.OK);
-		} catch(IOException e1) {
-			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-		}catch (Exception e) {
-			if(e.getMessage().equals("The requester already has a shift in that day!")) {
-				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
-			}
-			e.printStackTrace();
-			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
 	@GetMapping("/decline")
-	public String declineSwapRequest(Model model, @RequestParam String receiverNationalID, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @RequestParam String date) {
-
-		try{
-			injectLoggedInEmployeeInfo(model, employeeDetails);
-			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
-			Notification.setAsRead(employeeService, employeeDetails.getID(), Integer.parseInt(noteNum));
-			scheduleService.declineSwap(receiverNationalID, LocalDate.parse(date));
-            model.addAttribute("employee", employee);
-            return "redirect:/";
-		} catch(Exception e) {
-			return "erorrs/internalServerError";
+	public String declineSwapRequest(Model model, @RequestParam String receiverNationalID, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam int noteNum, @RequestParam String date) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+		try {
+			scheduleService.declineSwap(receiverNationalID, date);
+			Notification.setAsRead(employeeService, employeeDetails.getID(), noteNum);
+			return "redirect:/schedule/?month=" + YearMonth.now();
+		} catch (IOException e) {
+			return "errors/notFound";
+		} catch (Exception e) {
+			return "errors/internalServerError";
 		}
 	}
-	
+
 	@PostMapping(value = "/swap")
-	public String acceptSwapRequest(Model model, @RequestParam String noteNum, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
-
+	public String acceptSwapRequest(Model model, @RequestParam String noteNum, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String requesterNationalID, @RequestParam String requesterDate,
+			@RequestParam String receiverDate) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			String receiverNationalID = employeeService.getEmployee(employeeDetails.getID()).getNationalID();
-			scheduleService.swapEmployees(requesterNationalID, receiverNationalID, requesterDate, receiverDate);
+			scheduleService.swapEmployees(requesterNationalID, employeeDetails.getID(), requesterDate, receiverDate);
 			Notification.setAsRead(employeeService, employeeDetails.getID(), Integer.parseInt(noteNum));
-			return "redirect:/schedule/?month="+YearMonth.now();
+			return "redirect:/schedule/?month=" + YearMonth.now();
+		} catch (IOException e) {
+			return "errors/notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
-	@PostMapping("/addTask")
-	public ResponseEntity<String> addTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestBody String data) {
-		if(!employeeDetails.getRole().equals("MANAGER")){
-			return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
-		}
-		try {
-			scheduleService.addTask(data);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
-			return new ResponseEntity<String>(HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	@GetMapping("taskComplete")
-	public ResponseEntity<String> markTaskAsComplete(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails,  @RequestParam String taskNum,  @RequestParam String date) {
-		try {
-			scheduleService.markTaskAsComplete(employeeDetails.getID(), taskNum, date);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
-			return new ResponseEntity<String>(HttpStatus.OK);
-		}catch(Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
 	@PostMapping("/approveTask")
 	public String approveTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String dateStr, @RequestParam String taskNum, @RequestParam String employeeID) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			this.scheduleService.approveTask(dateStr, employeeID, taskNum, employeeDetails.getID());
-			
-			return "redirect:/schedule/?month="+YearMonth.now();
-		}catch(Exception e) {
+			scheduleService.approveTask(dateStr, employeeID, taskNum, employeeDetails.getID());
+			return "redirect:/schedule/?month=" + YearMonth.now();
+		} catch (IOException e) {
+			return "errors/notFound";
+		} catch (IllegalAccessException e) {
+			return "errors/notAuthorized";
+		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
-	
+
 	@PostMapping("/resetTask")
 	public String resetTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String dateStr, @RequestParam String taskNum, @RequestParam String employeeID) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			this.scheduleService.resetTask(dateStr, employeeID, taskNum, employeeDetails.getID());
-			
-			return "redirect:/schedule/?month="+YearMonth.now();
-		}catch(Exception e) {
-			return "erorrs/internalServerError";
+			scheduleService.resetTask(dateStr, employeeID, taskNum, employeeDetails.getID());
+
+			return "redirect:/schedule/?month=" + YearMonth.now();
+		} catch (IOException e) {
+			return "errors/notFound";
+		} catch (IllegalAccessException e) {
+			return "errors/notAuthorized";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "errors/internalServerError";
 		}
 	}
-	
+
 	@GetMapping("")
 	public String getSchedule(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam YearMonth month) {
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		YearMonth monthChecked = month;
 		if (!monthChecked.equals(YearMonth.now().plusMonths(1)) && !monthChecked.equals(YearMonth.now())) {
 			monthChecked = YearMonth.of(YearMonth.now().getYear(), YearMonth.now().getMonthValue());
@@ -145,94 +109,117 @@ public class ScheduleController {
 			boolean[] employeeWorkDays = this.scheduleService.getSchedule(authenticatedEmployee, monthChecked);
 			model.addAttribute("employeeWorkDays", employeeWorkDays);
 			model.addAttribute("month", monthChecked);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
-
+			
 			return "base/schedule/schedule";
 		} catch (IOException e) {
-			e.printStackTrace();
-			return "erorrs/badRequest";
+			return "errors/badRequest";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
+		}
+	}
+
+	@GetMapping("/swapRequest")
+	public ResponseEntity<String> swapRequest(@AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String receiverNationalID, @RequestParam String requesterDate, @RequestParam String receiverDate) {
+		try {
+			scheduleService.swapRequest(employeeDetails.getID(), receiverNationalID, requesterDate, receiverDate);
+			return new ResponseEntity<String>(HttpStatus.OK);
+		} catch (IOException e) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			if (e.getMessage().equals("The requester already has a shift in that day!")) {
+				return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+			}
+			e.printStackTrace();
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@GetMapping("/employee/get")
-	public ResponseEntity<String> getEmployeeScheduleAsString(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String employeeNationalID){
+	@PostMapping("/addTask")
+	public ResponseEntity<String> addTask(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestBody String data) {
+		if (!employeeDetails.getRole().equals("MANAGER")) {
+			return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+		}
 		try {
-			String employeeSchedule= scheduleService.getEmployeeScheduleAsString(employeeNationalID, employeeDetails.getID());
+			scheduleService.addTask(data);
+			employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+			return new ResponseEntity<String>(HttpStatus.OK);
+		} catch (IOException e) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		} catch (IllegalAccessException e) {
+			return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
+		} catch (Exception e) {
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("taskComplete")
+	public ResponseEntity<String> markTaskAsComplete(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String taskNum, @RequestParam String date) {
+		try {
+			scheduleService.markTaskAsComplete(employeeDetails.getID(), taskNum, date);
+			employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+			return new ResponseEntity<String>(HttpStatus.OK);
+		} catch (IOException e) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/employee/get")
+	public ResponseEntity<String> getEmployeeScheduleAsString(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String employeeNationalID) {
+		try {
+			String employeeSchedule = scheduleService.getEmployeeScheduleAsString(employeeNationalID, employeeDetails.getID());
 			return new ResponseEntity<String>(employeeSchedule, HttpStatus.OK);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	@GetMapping("/day")
-	public ResponseEntity<String> getDay(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr){
+	public ResponseEntity<String> getDayAsString(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr) {
 		try {
-			 injectLoggedInEmployeeInfo(model, employeeDetails);
-			 LocalDate date = LocalDate.parse(dateStr);
-			 ObjectMapper mapper = new ObjectMapper();
-			 String role = " { \"role\" : \"" + employeeDetails.getRole() + "\" , \"employees\" : ";
-			 List<EmployeeDailyReference> day = scheduleService.getDailySchedule(date, employeeDetails.getID());
-			 boolean workDayForEmployee = false;
-			 for(EmployeeDailyReference edr : day) {
-				 if(edr.getNationalID().equals(employeeDetails.getNationalID())){
-					 workDayForEmployee = true;
-					 break;
-				 }
-			 }
-			 return new ResponseEntity<String>(role +mapper.writeValueAsString(day) + ", \"workDayForEmployee\": "+workDayForEmployee+"}", HttpStatus.OK);
-		}catch(Exception e) {
+			employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+			String dailySchedule = scheduleService.getDailySchedule(dateStr, employeeDetails);
+			return new ResponseEntity<String>(dailySchedule, HttpStatus.OK);
+		} catch (IOException e) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/day/tasks")
-	public ResponseEntity<String> getDayTasks(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr){
+	public ResponseEntity<String> getDailyTasks(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr) {
 		try {
-			 injectLoggedInEmployeeInfo(model, employeeDetails);
-			 LocalDate date = LocalDate.parse(dateStr);
-			 ObjectMapper mapper = new ObjectMapper();
-			 List<Task> dayTasks = scheduleService.getDailyTasks(date, employeeDetails.getID());
-			 return new ResponseEntity<String>(mapper.writeValueAsString(dayTasks), HttpStatus.OK);
-		}catch(Exception e) {
+			employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+			String dayTasks = scheduleService.getDailyTasks(dateStr, employeeDetails.getID());
+			return new ResponseEntity<String>(dayTasks, HttpStatus.OK);
+		} catch (IOException e) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@GetMapping("/upcoming")
-	public ResponseEntity<String> viewScheduleAfterDate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr, @RequestParam String receiverNationalID){
+	public ResponseEntity<String> getScheduleAfterDate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String dateStr, @RequestParam String receiverNationalID) {
 		try {
-			 injectLoggedInEmployeeInfo(model, employeeDetails);
-			 ObjectMapper mapper = new ObjectMapper();
-			 List<String> schedule = scheduleService.getScheduleAfterDate(employeeDetails.getID(), dateStr, receiverNationalID);
-			 return new ResponseEntity<String>(mapper.writeValueAsString(schedule), HttpStatus.OK);
-		}catch(Exception e) {
+			employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+
+			String schedule = scheduleService.getScheduleAfterDate(employeeDetails.getID(), dateStr, receiverNationalID);
+			return new ResponseEntity<String>(schedule, HttpStatus.OK);
+		} catch (IOException e) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	
-	}
-	
-	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
-		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-		model.addAttribute("employeeEmail", employeeDetails.getUsername());
-		model.addAttribute("employeeID", employeeDetails.getID());
-		model.addAttribute("employeeNationalID", employeeDetails.getNationalID());
-		Employee user = employeeService.getEmployee(employeeDetails.getID());
-		int unread = 0;
-		for(int i = 0; i < user.getNotifications().size(); i++) {
-			if(!user.getNotifications().get(i).getRead()) {
-				unread++;
-			}
-		}
-		model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
-		model.addAttribute("notifications", user.getNotifications());
-		model.addAttribute("unread", unread);
+
 	}
 
 }

@@ -9,6 +9,7 @@ import com.company.awms.modules.base.employees.data.Employee;
 import java.util.Collection;
 import java.util.Collections;
 
+@SuppressWarnings("serial")
 public class EmployeeDetails implements UserDetails {
 
     private String username;

@@ -30,9 +30,9 @@ public class EmployeeController {
 
 	@GetMapping("/manager/department/")
 	public String getDepartmentEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String managerID) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
 			List<Employee> employees = employeeService.getDepartmentEmployeesDTOs(managerID);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 			model.addAttribute("employees", employees);
 			return "base/employees/employees";
 		} catch (IllegalAccessException e) {
@@ -44,32 +44,30 @@ public class EmployeeController {
 
 	@PostMapping("/password")
 	public String updatePassword(@RequestParam String newPassword, @RequestParam String confirmPassword, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
 			if (!newPassword.equals(confirmPassword)) {
-				injectLoggedInEmployeeInfo(model, employeeDetails);
 				model.addAttribute("mismatch", true);
-
 				return "base/employees/newPassword";
 			}
 
 			Employee employee = this.employeeService.updatePassword(newPassword, employeeDetails.getID());
 
 			model.addAttribute("employee", employee);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/employees/index";
 		} catch (IOException e) {
-			return "erorrs/notFound";
+			return "errors/notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@GetMapping("/password/new")
 	public String getPasswordUpdate(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) throws IOException {
 
-		injectLoggedInEmployeeInfo(model, employeeDetails);
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		model.addAttribute("mismatch", false);
 
 		return "base/employees/newPassword";
@@ -77,11 +75,11 @@ public class EmployeeController {
 
 	@GetMapping("/manager/leaves/{leaveEmployeeID}")
 	public String getLeavesAsManager(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @PathVariable String leaveEmployeeID) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
 			if (!employeeDetails.getRole().equals("MANAGER")) {
 				return "errors/notAuthorized";
 			}
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = employeeService.getEmployee(leaveEmployeeID);
 			model.addAttribute("leaveEmployeeID", leaveEmployeeID);
 			model.addAttribute("leaves", employee.getLeaves());
@@ -94,55 +92,36 @@ public class EmployeeController {
 
 	@GetMapping("/leaves")
 	public String getLeaves(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = employeeService.getEmployee(employeeDetails.getID());
 			model.addAttribute("leaves", employee.getLeaves());
 			return "base/employees/leaves";
 		} catch (Exception e) {
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@GetMapping("/requestLeave")
-	public String requestLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String paidStr, @RequestParam String startDate, @RequestParam String endDate) {
-
+	public String requestLeave(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam boolean paid, @RequestParam String startDate, @RequestParam String endDate) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			boolean paid = Boolean.parseBoolean(paidStr);
 			employeeService.requestLeave(employeeDetails.getID(), paid, startDate, endDate);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
-			return "redirect:/";
+			return "redirect:/employee/leaves";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
-	}
-
-	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
-		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-		model.addAttribute("employeeEmail", employeeDetails.getUsername());
-		model.addAttribute("employeeID", employeeDetails.getID());
-		Employee user = employeeService.getEmployee(employeeDetails.getID());
-		int unread = 0;
-		for (int i = 0; i < user.getNotifications().size(); i++) {
-			if (!user.getNotifications().get(i).getRead()) {
-				unread++;
-			}
-		}
-		model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
-		model.addAttribute("notifications", user.getNotifications());
-		model.addAttribute("unread", unread);
 	}
 
 	@GetMapping("/dismiss")
-	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, String noteNum) {
-
+	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
 			Notification.setAsRead(employeeService, employeeDetails.getID(), Integer.parseInt(noteNum));
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 			return "redirect:/";
 		} catch (Exception e) {
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 

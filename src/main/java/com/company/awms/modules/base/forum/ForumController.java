@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
 import com.company.awms.modules.base.employees.data.Notification;
-import com.company.awms.modules.base.forum.data.ForumReply;
 import com.company.awms.modules.base.forum.data.ForumThread;
 import com.company.awms.modules.base.forum.data.ThreadReplyDTO;
 import com.company.awms.security.EmployeeDetails;
@@ -24,8 +23,6 @@ import com.company.awms.security.EmployeeDetails;
 @Controller
 @RequestMapping("/forum")
 public class ForumController {
-
-	private static final boolean active = true;
 
 	private ForumService forumService;
 	private EmployeeService employeeService;
@@ -37,320 +34,222 @@ public class ForumController {
 	}
 
 	@GetMapping("")
-	public String getAllThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+	public String getAccessibleThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<ForumThread> threads = this.forumService.getAccessibleThreads(employeeDetails.getID());
+			List<ForumThread> threads = forumService.getAccessibleThreads(employeeDetails.getID());
 			model.addAttribute("threads", threads);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/forum";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/notFound";
+			return "errors/notFound";
 		}
 	}
 
 	@GetMapping("/thread/{threadID}")
 	public String getThreadWithReplies(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID, employeeDetails.getID());
+			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID, employeeDetails.getID());
 			model.addAttribute("thread", threadAndReplies.getForumThread());
 			model.addAttribute("replies", threadAndReplies.getForumReplies());
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/thread";
 		} catch (IOException e) {
-			return "erorrs/notFound";
+			return "errors/notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@GetMapping("answered")
 	public String getAllAnsweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<ForumThread> threads = this.forumService.getAllAnsweredThreads(employeeDetails.getID());
+			List<ForumThread> threads = forumService.getAllAnsweredThreads(employeeDetails.getID());
 			model.addAttribute("threads", threads);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/forum";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@GetMapping("unanswered")
 	public String getAllUnansweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<ForumThread> threads = this.forumService.getAllUnansweredThreads(employeeDetails.getID());
+			List<ForumThread> threads = forumService.getAllUnansweredThreads(employeeDetails.getID());
 			model.addAttribute("threads", threads);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/forum";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
-	// maybe this belongs in EmployeeController
 	@GetMapping("/employee/threads/{employeeID}")
 	public String getAllThreadsFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<ForumThread> threads = this.forumService.getAllThreadsFromEmployee(employeeID);
+			List<ForumThread> threads = forumService.getAllThreadsFromEmployee(employeeID);
 			model.addAttribute("threads", threads);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/forum";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@GetMapping("/thread/new")
 	public String newThread(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
-		try {
-			injectLoggedInEmployeeInfo(model, employeeDetails);
-
-			return "base/forum/newThread";
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "erorrs/internalServerError";
-		}
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+		return "base/forum/newThread";
 	}
 
-	// maybe this belongs in EmployeeController
-	@GetMapping("/employee/replies/{employeeID}")
-	public String getAllRepliesFromEmployee(@PathVariable String employeeID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
-		try {
-			List<ForumReply> replies = this.forumService.getAllRepliesFromEmployee(employeeID);
-			model.addAttribute("replies", replies);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
-
-			return "base/forum/repliesFromEmployee";
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "erorrs/internalServerError";
-		}
-	}
-
-	// Forum edit thread
 	@GetMapping("/thread/{threadID}/edit")
 	public String getThreadEdit(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			ForumThread thread = this.forumService.getThread(threadID);
-
+			ForumThread thread = forumService.getThread(threadID);
 			model.addAttribute("thread", thread);
-
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/newThread";
 		} catch (IOException e) {
 			return "errors/notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@GetMapping("/thread/{threadID}/reply/new")
 	public String newReply(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			ForumThread thread = this.forumService.getThread(threadID);
+			ForumThread thread = forumService.getThread(threadID);
 
 			model.addAttribute("threadID", threadID);
 			model.addAttribute("threadTitle", thread.getTitle());
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/threadReply";
 		} catch (IOException e) {
-			return "erorrs/notFound";
+			return "errors/notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@PostMapping(value = "/add")
 	public String addThread(@RequestParam String title, @RequestParam String body, @RequestParam boolean limitedAccess, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
 			ForumThread forumThread = this.forumService.addNewThread(employeeDetails, title, body, limitedAccess);
 
 			model.addAttribute("thread", forumThread);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/thread";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@PostMapping(value = "/thread/{threadID}/add")
 	public String addReply(@RequestParam String body, @PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			this.forumService.addNewReply(employeeDetails, body, threadID);
+			forumService.addNewReply(employeeDetails, body, threadID);
 			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID, employeeDetails.getID());
 			model.addAttribute("thread", threadAndReplies.getForumThread());
 			model.addAttribute("replies", threadAndReplies.getForumReplies());
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/thread";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
 
 	@PostMapping(value = "/thread/{threadID}/answered")
 	public String markThreadAsAnswered(@PathVariable String threadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			ForumThread forumThread = this.forumService.getThread(threadID);
+			ForumThread forumThread = forumService.getThread(threadID);
 
 			if (!employeeDetails.getID().equals(forumThread.getIssuerID())) {
-				return "erorrs/notAuthorized";
+				return "errors/notAuthorized";
 			}
 
-			this.forumService.markAsAnswered(forumThread);
+			forumService.markAsAnswered(forumThread);
 			model.addAttribute("thread", forumThread);
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/thread";
 		} catch (IOException e) {
-			return "erorrs/notFound";
+			return "errors/notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalSeverError";
+			return "errors/internalSeverError";
 		}
 	}
 
 	@PostMapping(value = "/thread/{oldThreadID}/edit")
 	public String editThread(@RequestParam String title, @RequestParam String body, @PathVariable String oldThreadID, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
-		if (!active) {
-			return "erorrs/notFound";
-		}
-
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			ForumThread oldThread = this.forumService.getThread(oldThreadID);
+			ForumThread oldThread = forumService.getThread(oldThreadID);
 
 			if (!oldThread.getIssuerID().equals(employeeDetails.getID())) {
-				return "erorrs/notAuthorized";
+				return "errors/notAuthorized";
 			}
 
-			oldThread = this.forumService.editThread(body, title, oldThread);
+			oldThread = forumService.editThread(body, title, oldThread);
 
-			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(oldThreadID, employeeDetails.getID());
+			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(oldThreadID, employeeDetails.getID());
 			model.addAttribute("thread", oldThread);
 			model.addAttribute("replies", threadAndReplies.getForumReplies());
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 
 			return "base/forum/thread";
 		} catch (IOException e) {
-			return "erorrs/notFound";
+			return "errors/notFound";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "erorrs/internalServerError";
+			return "errors/internalServerError";
 		}
 	}
-	
+
 	@GetMapping("/search")
-	public String searchForum(@RequestParam String searchTerm, @AuthenticationPrincipal EmployeeDetails employeeDetails,
-	            Model model) {
-	        if (!active) {
-	            return "errors/notFound";
-	        }
+	public String searchForum(@RequestParam String searchTerm, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+		try {
+			List<ForumThread> threads = forumService.getAccessibleThreads(employeeDetails.getID());
+			List<ForumThread> foundThreads = forumService.searchForum(threads, searchTerm);
+			model.addAttribute("threads", foundThreads);
 
-	        try {
-	            List<ForumThread> threads  =  forumService.getAccessibleThreads(employeeDetails.getID());
-	            List<ForumThread> foundThreads = forumService.searchForum(threads, searchTerm);
-	            model.addAttribute("threads", foundThreads);
-	            injectLoggedInEmployeeInfo(model, employeeDetails);
-
-	            return "base/forum/forum";
-	        } catch (IOException e) {
-	            return "erorrs/notFound";
-	        } catch (Exception e) {
-	            return "erorrs/internalServerError";
-	        }
-	    }
-	
-	private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
-		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-		model.addAttribute("employeeEmail", employeeDetails.getUsername());
-		model.addAttribute("employeeID", employeeDetails.getID());
-		Employee user = employeeService.getEmployee(employeeDetails.getID());
-		int unread = 0;
-		for(int i = 0; i < user.getNotifications().size(); i++) {
-			if(!user.getNotifications().get(i).getRead()) {
-				unread++;
-			}
+			return "base/forum/forum";
+		} catch (IOException e) {
+			return "errors/notFound";
+		} catch (Exception e) {
+			return "errors/internalServerError";
 		}
-		model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
-		model.addAttribute("notifications", user.getNotifications());
-		model.addAttribute("unread", unread);
 	}
 
 	@GetMapping("/dismiss/{threadID}")
 	public String dismiss(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails, @RequestParam String noteNum, @PathVariable String threadID) {
-		try{
+		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
+		try {
 			Notification.setAsRead(employeeService, employeeDetails.getID(), Integer.parseInt(noteNum));
-			injectLoggedInEmployeeInfo(model, employeeDetails);
 			Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
 			model.addAttribute("employee", employee);
-            return "redirect:/forum/thread/"+threadID;
-		}catch(Exception e) {
-			return "erorrs/internalServerError";
+			return "redirect:/forum/thread/" + threadID;
+		} catch (Exception e) {
+			return "errors/internalServerError";
 		}
 	}
 

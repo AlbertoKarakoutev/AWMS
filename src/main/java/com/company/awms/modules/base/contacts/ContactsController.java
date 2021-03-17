@@ -17,8 +17,6 @@ import java.util.List;
 public class ContactsController {
     private EmployeeService employeeService;
 
-    private static final boolean active = true;
-    
     @Autowired
     public ContactsController(EmployeeService employeeService) {
         this.employeeService = employeeService;
@@ -26,45 +24,19 @@ public class ContactsController {
 
     @GetMapping("contacts")
     public String getContacts(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
-        if (!active) {
-            return "errors/notFound";
-        }
-
+	    employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
         try {
-            Employee owner = this.employeeService.getOwner();
-            List<Employee> managers = this.employeeService.getManagers();
-            injectLoggedInEmployeeInfo(model, employeeDetails);
+            Employee owner = employeeService.getOwner();
+            List<Employee> managers = employeeService.getManagers();
             model.addAttribute("owner", owner);
             model.addAttribute("managers", managers);
-            injectLoggedInEmployeeInfo(model, employeeDetails);
             
             return "base/contacts/contacts";
         } catch (IOException e) {
-            e.printStackTrace();
-            return "erorrs/notFound";
+            return "errors/notFound";
         } catch (Exception e){
             e.printStackTrace();
-            return "erorrs/internalServerError";
+            return "errors/internalServerError";
         }
     }
-
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
-		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-		model.addAttribute("employeeEmail", employeeDetails.getUsername());
-		model.addAttribute("employeeID", employeeDetails.getID());
-		Employee user = employeeService.getEmployee(employeeDetails.getID());
-		int unread = 0;
-		for(int i = 0; i < user.getNotifications().size(); i++) {
-			if(!user.getNotifications().get(i).getRead()) {
-				unread++;
-			}
-		}
-		model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
-		model.addAttribute("notifications", user.getNotifications());
-		model.addAttribute("unread", unread);
-	}
-    
-    public static boolean getActive() {
-		return active;
-	}
 }

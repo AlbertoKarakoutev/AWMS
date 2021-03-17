@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.company.awms.modules.base.employees.EmployeeService;
 import com.company.awms.modules.base.employees.data.Employee;
-import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.security.EmployeeDetails;
 
 @Controller
@@ -25,12 +24,10 @@ public class IndexController {
 
     @GetMapping({ "/", "/index" })
     public String index(Model model, @AuthenticationPrincipal EmployeeDetails employeeDetails) {
-
+        employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
         try {
-            Employee employee = this.employeeService.getEmployee(employeeDetails.getID());
-
+            Employee employee = employeeService.getEmployee(employeeDetails.getID());
             model.addAttribute("employee", employee);
-            injectLoggedInEmployeeInfo(model, employeeDetails);
             return "base/employees/index";
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,22 +47,4 @@ public class IndexController {
         }
     }
 
-    private void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails) throws IOException {
-        model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
-        model.addAttribute("employeeEmail", employeeDetails.getUsername());
-        model.addAttribute("employeeID", employeeDetails.getID());
-        Employee user = employeeService.getEmployee(employeeDetails.getID());
-        int unread = 0;
-        for (int i = 0; i < user.getNotifications().size(); i++) {
-            if (!user.getNotifications().get(i).getRead()) {
-                unread++;
-            }
-        }
-        if(employeeDetails.getRole().equals("ADMIN")) {
-        	model.addAttribute("credentials", Notification.getCredentials());
-        }
-        model.addAttribute("extModules", employeeService.getExtensionModulesDTOs());
-        model.addAttribute("notifications", user.getNotifications());
-        model.addAttribute("unread", unread);
-    }
 }

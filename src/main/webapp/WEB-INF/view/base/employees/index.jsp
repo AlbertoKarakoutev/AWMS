@@ -41,7 +41,7 @@
 										Role: <span class="font-weight-bold">${employee.getRole()}</span>
 									</div>
 									<div class="col-12 col-md-6">
-										Natinal ID: <span class="font-weight-bold">${employee.getNationalID()}</span>
+										National ID: <span class="font-weight-bold">${employee.getNationalID()}</span>
 									</div>
 									<div class="col-12 col-md-6">
 										Salary: <span class="font-weight-bold">${employee.getSalary()}</span>
@@ -66,21 +66,24 @@
 					<sec:authentication property="principal.authorities" var="role"/>
     					<c:if test="${role == '[ADMIN]'}">
     					
-						<div class="d-flex flex-row">
+						<div class="d-flex flex-row mt-5">
 							<label><b>Enable/Disable the email notifications with credentials:</b></label>
 						</div>
 						<div class="d-flex">
 							<form action="/admin/email" method="POST" enctype="text/plain">
-								<div class="form-group">
-									<label for="username">Username</label>
-	                            					<input type="text" id="username" name="username" value="${credentials[0]}" aria-describedby="username" class="form-control" placeholder="Username" required>
+								<div class="row">
+									<div class="col">
+										<label for="username">Username</label>
+		                            					<input type="text" id="username" name="username" value="${credentials[0]}" aria-describedby="username" class="form-control" placeholder="Username" required>
+		                            				</div>
+		                            				<div class="col">
+										<label for="password">Password</label>
+		                            					<input type="text" id="password" name="password" value="${credentials[1]}" aria-describedby="password"class="form-control" placeholder="Password" required>
+		                            				</div>
 	                            				</div>
-	                            				<div class="form-group">
-									<label for="password">Password</label>
-	                            					<input type="text" id="password" name="password" value="${credentials[1]}" aria-describedby="password"class="form-control" placeholder="Password" required>
-	                            				</div>
-								<div class="form-group">
-									<label for="emailNotifications">On/Off</label>
+	                            				
+								<div class="py-2 pr-2">
+									<label for="emailNotifications">Enabled</label>
 		                            				<input type="checkbox" id="emailNotifications" name="emailNotifications" aria-describedby="emailNotifications" ${credentials[2] ? "checked" : ""}>
 		                            			</div>
 								<div class="form-group">

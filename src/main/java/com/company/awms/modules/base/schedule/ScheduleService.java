@@ -30,6 +30,7 @@ import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.modules.base.schedule.data.Day;
 import com.company.awms.modules.base.schedule.data.ScheduleRepo;
 import com.company.awms.modules.base.schedule.data.Task;
+import com.company.awms.security.EmployeeDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -56,6 +57,16 @@ public class ScheduleService {
 			throw new IOException("Invalid date");
 		}
 		return dayOptional.get();
+	}
+
+	public Employee getEmployee(String employeeID) throws IOException {
+		Optional<Employee> employee = employeeRepo.findById(employeeID);
+
+		if (employee.isEmpty()) {
+			throw new IOException("Employee not found!");
+		}
+
+		return employee.get();
 	}
 
 	public void addWorkDays(String employeeNationalID, String dateStr, boolean onCall, String startShiftStr, String endShiftStr) throws Exception {
@@ -130,7 +141,7 @@ public class ScheduleService {
 		}
 	}
 
-	public void addWorkDay(String employeeNationalID, String dateStr, boolean onCall, String startShiftStr, String endShiftStr) throws Exception {
+	public void addWorkDay(String employeeNationalID, String dateStr, boolean onCall, String startShiftStr, String endShiftStr) throws IOException, IllegalAccessException {
 
 		LocalTime startShift = null;
 		LocalTime endShift = null;
@@ -179,7 +190,7 @@ public class ScheduleService {
 		}
 
 		if (currentDay.getDate().isBefore(LocalDate.now()))
-			throw new Exception("This date has already passed!");
+			throw new IllegalAccessException("This date has already passed!");
 
 		if (currentDay.getEmployees() != null) {
 			currentDay.addEmployee(employee);
@@ -191,10 +202,10 @@ public class ScheduleService {
 		scheduleRepo.save(currentDay);
 	}
 
-	public void deleteWorkDay(String employeeNationalID, String date) throws Exception {
+	public void deleteWorkDay(String employeeNationalID, String date) throws IOException, IllegalAccessException {
 		Day selectedDay = getDay(LocalDate.parse(date));
 		if (selectedDay.getDate().isBefore(LocalDate.now()))
-			throw new Exception("This date had already passed!");
+			throw new IllegalAccessException("This date had already passed!");
 		for (EmployeeDailyReference edr : selectedDay.getEmployees()) {
 			if (edr.getNationalID().equals(employeeNationalID)) {
 				selectedDay.getEmployees().remove(edr);
@@ -204,12 +215,16 @@ public class ScheduleService {
 		scheduleRepo.save(selectedDay);
 	}
 
-	public void declineSwap(String employeeID, LocalDate receiverDate) throws IOException {
-		String message = "Your swap request for " + receiverDate + " has been declined.";
-		new Notification(message).add("plain-notification").sendAndSave(employeeID, employeeRepo);
+	public void declineSwap(String receiverNationalID, String dateStr) throws IOException {
+		LocalDate date = LocalDate.parse(dateStr);
+		String message = "Your swap request for " + date + " has been declined.";
+		new Notification(message).add("plain-notification").sendAndSave(receiverNationalID, employeeRepo);
+
 	}
 
-	public void swapEmployees(String requesterNationalID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws IOException, NullPointerException {
+	public void swapEmployees(String requesterNationalID, String receiverID, String requesterDateParam, String receiverDateParam) throws IOException {
+
+		String receiverNationalID = getEmployee(receiverID).getNationalID();
 
 		EmployeeDailyReference requester = null;
 		EmployeeDailyReference receiver = null;
@@ -240,7 +255,7 @@ public class ScheduleService {
 			receiverDay.getEmployees().add(requester);
 
 		} else {
-			throw new NullPointerException("No such EDR in those days");
+			throw new IOException("No such EDR in those days");
 		}
 
 		Employee requesterObj = employeeRepo.findByNationalID(requesterNationalID).get();
@@ -252,12 +267,8 @@ public class ScheduleService {
 	}
 
 	public void swapRequest(String requesterID, String receiverNationalID, String requesterDateParam, String receiverDateParam) throws Exception {
-	
-		Optional<Employee> requesterOptional = employeeRepo.findById(requesterID);
-		if (requesterOptional.isEmpty()) {
-			throw new IOException("Requester not found!");
-		}
-		Employee requester = requesterOptional.get();
+
+		Employee requester = getEmployee(requesterID);
 
 		Optional<Employee> receiverOptional = employeeRepo.findByNationalID(receiverNationalID);
 		if (receiverOptional.isEmpty()) {
@@ -279,12 +290,12 @@ public class ScheduleService {
 
 	}
 
-	public void addTask(String data) throws Exception {
+	public void addTask(String data) throws IOException, IllegalAccessException {
 
 		String[] dataValues = data.split("\\n");
 
 		if (dataValues.length != 5) {
-			throw new Exception("Invalid request");
+			throw new IllegalAccessException("Invalid request");
 		}
 		Map<String, String> newInfo = new HashMap<>();
 		for (String field : dataValues) {
@@ -295,11 +306,11 @@ public class ScheduleService {
 		Day currentDay = getDay(LocalDate.parse(newInfo.get("date")));
 
 		if (currentDay.getDate().isBefore(LocalDate.now()))
-			throw new Exception("This date has already passed!");
+			throw new IllegalAccessException("This date has already passed!");
 
 		Task task;
 		for (EmployeeDailyReference edr : currentDay.getEmployees()) {
-			if (((String)newInfo.get("receiverNationalID")).equals(edr.getNationalID())) {
+			if (newInfo.get("receiverNationalID").equals(edr.getNationalID())) {
 				task = new Task(currentDay, newInfo.get("title"), newInfo.get("body"));
 				task.setTaskReward(Integer.parseInt(newInfo.get("reward")));
 				if (edr.getTasks() != null) {
@@ -312,23 +323,19 @@ public class ScheduleService {
 					this.scheduleRepo.save(currentDay);
 				}
 				Employee employee = employeeRepo.findByNationalID(newInfo.get("receiverNationalID")).get();
-				
+
 				String message = "You have a new task for " + newInfo.get("date");
 				new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
-				
+
 				return;
 			}
 		}
-		throw new Exception();
 	}
 
 	public void markTaskAsComplete(String employeeID, String taskNum, String dateStr) throws IOException {
 		Day day = getDay(LocalDate.parse(dateStr));
-		Optional<Employee> employeeOptional = employeeRepo.findById(employeeID);
-		if (employeeOptional.isEmpty()) {
-			throw new IOException("Employee not found");
-		}
-		String employeeNationalID = employeeOptional.get().getNationalID();
+
+		String employeeNationalID = getEmployee(employeeID).getNationalID();
 
 		for (EmployeeDailyReference edr : day.getEmployees()) {
 			if (edr.getNationalID().equals(employeeNationalID)) {
@@ -357,21 +364,13 @@ public class ScheduleService {
 
 	}
 
-	public void approveTask(String dateStr, String employeeID, String taskNum, String managerID) throws Exception {
+	public void approveTask(String dateStr, String employeeID, String taskNum, String managerID) throws IllegalAccessException, IOException {
 		Day taskDay = getDay(LocalDate.parse(dateStr));
+		Employee employee = getEmployee(employeeID);
+		String employeeNationalID = employee.getNationalID();
 
-		Optional<Employee> employeeOptional = employeeRepo.findById(employeeID);
-		if (employeeOptional.isEmpty()) {
-			throw new IOException("Employee not found");
-		}
-		String employeeNationalID = employeeOptional.get().getNationalID();
-
-		Optional<Employee> managerOptional = employeeRepo.findById(managerID);
-		if (employeeOptional.isEmpty()) {
-			throw new IOException("Employee not found");
-		}
-		if (!managerOptional.get().getRole().equals("MANAGER")) {
-			throw new Exception("Employee is not a manager!");
+		if (!getEmployee(managerID).getRole().equals("MANAGER")) {
+			throw new IllegalAccessException("Employee is not a manager!");
 		}
 
 		for (EmployeeDailyReference edr : taskDay.getEmployees()) {
@@ -390,7 +389,7 @@ public class ScheduleService {
 				notificationData.add("plain-notification");
 				String message = "Your have been rewarded for your task  \"" + task.getTaskTitle() + "\"";
 
-				new Notification(message).add("plain-notification").sendAndSave(employeeOptional.get(), employeeRepo);
+				new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
 
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
 				for (Employee manager : managers) {
@@ -418,21 +417,14 @@ public class ScheduleService {
 
 	}
 
-	public void resetTask(String dateStr, String employeeID, String taskNum, String managerID) throws Exception {
+	public void resetTask(String dateStr, String employeeID, String taskNum, String managerID) throws IOException, IllegalAccessException {
 		Day taskDay = getDay(LocalDate.parse(dateStr));
 
-		Optional<Employee> employeeOptional = employeeRepo.findById(employeeID);
-		if (employeeOptional.isEmpty()) {
-			throw new IOException("Employee not found");
-		}
-		String employeeNationalID = employeeOptional.get().getNationalID();
+		Employee employee = getEmployee(employeeID);
+		String employeeNationalID = employee.getNationalID();
 
-		Optional<Employee> managerOptional = employeeRepo.findById(managerID);
-		if (employeeOptional.isEmpty()) {
-			throw new IOException("Employee not found");
-		}
-		if (!managerOptional.get().getRole().equals("MANAGER")) {
-			throw new Exception("Employee is not a manager!");
+		if (getEmployee(managerID).getRole().equals("MANAGER")) {
+			throw new IllegalAccessException("Employee is not a manager!");
 		}
 
 		for (EmployeeDailyReference edr : taskDay.getEmployees()) {
@@ -449,7 +441,7 @@ public class ScheduleService {
 
 				String message = "Your work on task \"" + task.getTaskTitle() + "\" has not been approved";
 
-				new Notification(message).add("plain-notification").sendAndSave(employeeOptional.get(), employeeRepo);
+				new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
 
 				List<Employee> managers = employeeRepo.findAllByRole("MANAGER");
 				for (Employee manager : managers) {
@@ -603,17 +595,13 @@ public class ScheduleService {
 		return employeeWorkDays;
 	}
 
-	public List<String> getScheduleAfterDate(String employeeID, String dateStr, String receiverNationalID) throws IOException {
+	public String getScheduleAfterDate(String employeeID, String dateStr, String receiverNationalID) throws IOException {
 
 		LocalDate date = LocalDate.parse(dateStr);
 		if (date.isBefore(LocalDate.now()))
 			return null;
 
-		Optional<Employee> viewerOptional = this.employeeRepo.findById(employeeID);
-		if (viewerOptional.isEmpty()) {
-			throw new IOException("Employee not found!");
-		}
-		Employee viewer = viewerOptional.get();
+		Employee viewer = getEmployee(employeeID);
 
 		List<String> employeeWorkDays = new ArrayList<String>();
 
@@ -655,18 +643,16 @@ public class ScheduleService {
 			}
 		}
 
-		return employeeWorkDays;
+		ObjectMapper mapper = new ObjectMapper();
+		String scheduleAfterdateJson = mapper.writeValueAsString(employeeWorkDays);
+
+		return scheduleAfterdateJson;
 	}
 
-	public List<EmployeeDailyReference> getDailySchedule(LocalDate date, String employeeID) throws IOException {
+	public String getDailySchedule(String dateStr, EmployeeDetails employeeDetails) throws IOException {
+		LocalDate date = LocalDate.parse(dateStr);
 		List<EmployeeDailyReference> employees = new ArrayList<EmployeeDailyReference>();
-		Optional<Employee> viewerOptional = employeeRepo.findById(employeeID);
-		Employee viewer = null;
-		if (viewerOptional.isEmpty()) {
-			throw new IOException();
-		} else {
-			viewer = viewerOptional.get();
-		}
+		Employee viewer = getEmployee(employeeDetails.getID());
 
 		Day day = getDay(date);
 
@@ -687,18 +673,64 @@ public class ScheduleService {
 				}
 			}
 		}
-		return employees;
+
+		ObjectMapper mapper = new ObjectMapper();
+		boolean workDayForEmployee = false;
+		for (EmployeeDailyReference edr : employees) {
+			if (edr.getNationalID().equals(employeeDetails.getNationalID())) {
+				workDayForEmployee = true;
+				break;
+			}
+		}
+
+		String role = " { \"role\" : \"" + employeeDetails.getRole() + "\" , \"employees\" : ";
+
+		String jsonString = role + mapper.writeValueAsString(day) + ", \"workDayForEmployee\": " + workDayForEmployee + "}";
+
+		return jsonString;
 	}
 
-	public List<Task> getDailyTasks(LocalDate date, String employeeID) throws IOException {
+	public String getEmployeeScheduleAsString(String employeeNationalID, String requesterID) throws IOException, IllegalAccessException {
+		Optional<Employee> employeeOptional = employeeRepo.findByNationalID(employeeNationalID);
+		if (employeeOptional.isEmpty()) {
+			throw new IOException("Employee not found!");
+		}
+		Employee employee = employeeOptional.get();
+
+		Employee requester = getEmployee(requesterID);
+
+		if (employee.getLevel() > requester.getLevel() || !employee.getDepartment().equals(requester.getDepartment())) {
+			throw new IllegalAccessException();
+		}
+
+		List<String> edrDTO = new ArrayList<String>();
+
+		for (Day day : scheduleRepo.findAll()) {
+			if (day.getDate().isAfter(LocalDate.now())) {
+				for (EmployeeDailyReference edr : day.getEmployees()) {
+					if (edr.getNationalID().equals(employeeNationalID)) {
+						edrDTO.add(day.getDate().toString() + ": " + edr.getWorkTimeInfo());
+					}
+				}
+			}
+		}
+		ObjectMapper mapper = new ObjectMapper();
+		String scheduleStr = mapper.writeValueAsString(edrDTO);
+		String data = "{\"name\" : \"" + employee.getFirstName() + " " + employee.getLastName() + "\" , \"schedule\" : " + scheduleStr + "}";
+
+		return data;
+	}
+
+	public String getDailyTasks(String dateStr, String employeeID) throws IOException {
+		LocalDate date = LocalDate.parse(dateStr);
+
 		List<Task> tasks = new ArrayList<Task>();
-		
+
 		Day taskDay = getDay(date);
-		
+
 		EmployeeDailyReference thisEDR = null;
 
-		edrLoop: 
-		for (EmployeeDailyReference edr : taskDay.getEmployees()) {
+		edrLoop: for (EmployeeDailyReference edr : taskDay.getEmployees()) {
 			if (edr.getIDRef().equals(employeeID)) {
 				thisEDR = edr;
 				break edrLoop;
@@ -710,7 +742,10 @@ public class ScheduleService {
 			}
 		}
 
-		return tasks;
+		ObjectMapper mapper = new ObjectMapper();
+		String tasksJson = mapper.writeValueAsString(tasks);
+
+		return tasksJson;
 	}
 
 	public boolean applyOnCallSchedule(String department, int level) throws Exception {
@@ -956,17 +991,14 @@ public class ScheduleService {
 		return thisDepartment.getLevel(level);
 	}
 
-	public Department getDepartment(String departmentCode) throws Exception {
+	public Department getDepartment(String departmentCode) {
 
 		Optional<Department> department = departmentRepo.findByDepartmentCode(departmentCode);
 		if (department.isEmpty()) {
 			return null;
 		}
-		return department.get();
-	}
 
-	public List<Department> getAllDepartments() {
-		return this.departmentRepo.findAll();
+		return department.get();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1020,8 +1052,8 @@ public class ScheduleService {
 			}
 		} else {
 			// for(Object levelObj : (ArrayList)departmentJSON.get("levels")) {
-			for (int i = 0; i < ((ArrayList) departmentJSON.get("levels")).size(); i++) {
-				Object levelObj = ((ArrayList) departmentJSON.get("levels")).get(i);
+			for (int i = 0; i < ((ArrayList<?>) departmentJSON.get("levels")).size(); i++) {
+				Object levelObj = ((ArrayList<?>) departmentJSON.get("levels")).get(i);
 				JSONObject levelJSON = new JSONObject((Map<Object, String>) levelObj);
 				Department level = new Department();
 				level.update(levelJSON);
@@ -1035,43 +1067,4 @@ public class ScheduleService {
 		departmentRepo.save(department);
 	}
 
-	public void deleteDepartment(String departmentCode) throws Exception {
-		Department toBeDeleted = getDepartment(departmentCode);
-		departmentRepo.deleteById(toBeDeleted.getID());
-	}
-
-	public String getEmployeeScheduleAsString(String employeeNationalID, String requesterID) throws IOException, IllegalAccessException {
-		Optional<Employee> employeeOptional = employeeRepo.findByNationalID(employeeNationalID);
-		if (employeeOptional.isEmpty()) {
-			throw new IOException("Employee not found!");
-		}
-		Employee employee = employeeOptional.get();
-		
-		Optional<Employee> requesterOptional = employeeRepo.findById(requesterID);
-		if (requesterOptional.isEmpty()) {
-			throw new IOException("Requester not found!");
-		}
-		Employee requester = requesterOptional.get();
-		
-		if(employee.getLevel() > requester.getLevel() || !employee.getDepartment().equals(requester.getDepartment())) {
-			throw new IllegalAccessException();
-		}
-		
-		List<String> edrDTO = new ArrayList<String>();
-		
-		for(Day day : scheduleRepo.findAll()) {
-			if(day.getDate().isAfter(LocalDate.now())){
-				for(EmployeeDailyReference edr : day.getEmployees()) {
-					if(edr.getNationalID().equals(employeeNationalID)) {
-						edrDTO.add(day.getDate().toString() + ": " + edr.getWorkTimeInfo());
-					}
-				}
-			}
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		String scheduleStr = mapper.writeValueAsString(edrDTO);
-		String data = "{\"name\" : \""+employee.getFirstName() + " " + employee.getLastName() + "\" , \"schedule\" : " + scheduleStr + "}";
-		
-		return data;
-	}
 }

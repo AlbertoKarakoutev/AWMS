@@ -48,7 +48,7 @@
                             </div>
                             <c:if test="${not empty thread.getDateTime()}">
                                 <div class="card-footer text-muted">
-                                    <p><b>Created on:</b> ${thread.getDateTime()}</p>
+                                    <p><b>Created on:</b> ${thread.getDateTime().toString().split("T")[1].split("\\.")[0]}, ${thread.getDateTime().toString().split("T")[0]} </p>
                                 </div>
                             </c:if>
                         </div>
@@ -59,7 +59,7 @@
                                 </a>
                                 <c:if test="${thread.getAnswered() == false}">
                                     <form action="${thread.getID()}/answered" method="post" class="m-0">
-                                        <input type="submit" class="btn btn-dark btn-md mx-2" value="Mark as answered" />
+                                        <input type="submit" class="btn btn-dark btn-md ml-2" value="Mark as answered" />
                                     </form>
                                 </c:if>
                             </c:if>
@@ -80,7 +80,7 @@
                                 </div>
                                 <c:if test="${not empty reply.getDateTime()}">
                                     <div class="card-footer text-muted">
-                                        <p><b>Added:</b> ${reply.getDateTime()}</p>
+                                        <p><b>Added:</b>${reply.getDateTime().toString().split("T")[1].split("\\.")[0]}, ${reply.getDateTime().toString().split("T")[0]}</p>
                                     </div>
                                 </c:if>
                             </div>

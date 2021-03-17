@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@page import="java.util.List"%>
-<%@page import="com.company.awms.modules.base.employees.data.EmployeeDailyReference"%>
-<%@page import="com.company.awms.modules.base.schedule.data.Task"%>
-<%@page import="java.time.LocalDate"%>
-<%@	taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ page import="java.util.List"%>
+<%@ page import="com.company.awms.modules.base.employees.data.EmployeeDailyReference"%>
+<%@ page import="com.company.awms.modules.base.schedule.data.Task"%>
+<%@ page import="java.time.LocalDate"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>

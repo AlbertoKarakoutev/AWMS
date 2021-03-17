@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import com.company.awms.modules.base.admin.data.Module;
 import com.company.awms.modules.base.admin.data.ModuleRepo;
@@ -24,6 +25,7 @@ import com.company.awms.modules.base.employees.data.EmployeeRepo;
 import com.company.awms.modules.base.employees.data.Notification;
 import com.company.awms.modules.base.schedule.data.Day;
 import com.company.awms.modules.base.schedule.data.ScheduleRepo;
+import com.company.awms.security.EmployeeDetails;
 
 @Service
 public class EmployeeService {
@@ -41,13 +43,82 @@ public class EmployeeService {
 	}
 
 	public Employee getEmployee(String employeeID) throws IOException {
-		Optional<Employee> employee = this.getRepo().findById(employeeID);
+		Optional<Employee> employee = getRepo().findById(employeeID);
 
 		if (employee.isEmpty()) {
 			throw new IOException("Employee not found!");
 		}
 
 		return employee.get();
+	}
+
+	public Employee getOwner() throws IOException {
+		Optional<Employee> owner = this.getRepo().findByRole("OWNER");
+
+		if (owner.isEmpty()) {
+			return null;
+		}
+		return owner.get();
+	}
+
+	public Employee registerEmployee(String data) {
+		Employee employee = new Employee();
+
+		setEmployeeInfo(data, employee);
+
+		String encodedPassword = this.passwordEncoder.encode(employee.getNationalID());
+		employee.setPassword(encodedPassword);
+
+		String message = "Your profile information has been updated by the Administrator.";
+		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
+
+		getRepo().save(employee);
+		return employee;
+	}
+
+	public Employee updatePassword(String newPassword, String employeeID) throws IOException {
+		Employee employee = getEmployee(employeeID);
+
+		String encodedPassword = this.passwordEncoder.encode(newPassword);
+		employee.setPassword(encodedPassword);
+
+		this.getRepo().save(employee);
+
+		return employee;
+	}
+
+	public Employee updateEmployeeInfo(String employeeID, String data) throws IOException {
+		Employee employee = getEmployee(employeeID);
+
+		setEmployeeInfo(data, employee);
+
+		String message = "Your profile information has been updated by the Administrator.";
+		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
+
+		List<Day> schedule = scheduleRepo.findAll();
+		dayLoop: for (Day day : schedule) {
+			for (EmployeeDailyReference edr : day.getEmployees()) {
+				if (edr.getIDRef().equals(employee.getID())) {
+					if (!edr.getDepartment().equals(employee.getDepartment()) || edr.getLevel() != employee.getLevel()) {
+						day.getEmployees().remove(edr);
+						scheduleRepo.save(day);
+						continue dayLoop;
+					}
+					edr.setFirstName(employee.getFirstName());
+					edr.setLastName(employee.getLastName());
+					edr.setNationalID(employee.getNationalID());
+					scheduleRepo.save(day);
+					break;
+				}
+			}
+		}
+
+		getRepo().save(employee);
+		return employee;
+	}
+
+	public List<Employee> getManagers() {
+		return this.getRepo().findAllByRole("MANAGER");
 	}
 
 	public List<Employee> getAllEmployeesDTOs() {
@@ -82,7 +153,8 @@ public class EmployeeService {
 				notPermitted = false;
 			}
 		}
-		if (notPermitted) throw new IllegalAccessException();
+		if (notPermitted)
+			throw new IllegalAccessException();
 
 		List<Employee> employees = getRepo().findByDepartment(downloader.get().getDepartment());
 		List<Employee> employeeDTOs = new ArrayList<Employee>();
@@ -170,26 +242,29 @@ public class EmployeeService {
 		return foundEmployees;
 	}
 
-	public Employee getOwner() throws IOException {
-		Optional<Employee> owner = this.getRepo().findByRole("OWNER");
+	public List<Module> getAllExtensionModules() {
+		return moduleRepo.findByBase(false);
+	}
 
-		if (owner.isEmpty()) {
-			return null;
+	public Map<String, Boolean> getExtensionModulesDTOs() {
+		Map<String, Boolean> conditions = new HashMap<String, Boolean>();
+		List<Module> modules = getAllExtensionModules();
+		for (Module module : modules) {
+			StringBuilder moduleName = new StringBuilder(module.getName());
+			moduleName.setCharAt(0, Character.toUpperCase(moduleName.charAt(0)));
+			String name = moduleName.toString();
+			conditions.put(name, module.isActive());
 		}
-		return owner.get();
+		return conditions;
 	}
-
-	public List<Employee> getManagers() {
-		return this.getRepo().findAllByRole("MANAGER");
-	}
-
+	
 	public Boolean requestLeave(String employeeID, boolean paid, String startDate, String endDate) throws IOException {
 		List<Employee> admins = getRepo().findAllByRole("ADMIN");
 		if (admins.size() < 1) {
 			throw new IOException();
 		}
 		Employee employee = getEmployee(employeeID);
-		
+
 		String paidStr = "paid";
 		if (paid) {
 			paidStr = "un" + paidStr;
@@ -230,12 +305,12 @@ public class EmployeeService {
 			}
 			getRepo().save(admin);
 		}
-		
+
 		String message = "Your leave request for the period from " + startDateStr + " to " + endDateStr + " has been approved";
 		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
-		
+
 		getRepo().save(employee);
-		
+
 	}
 
 	public void denyLeave(String employeeID, String startDateStr, String endDateStr) throws IOException {
@@ -266,34 +341,19 @@ public class EmployeeService {
 
 		String message = "Your leave for the period from " + start + " to " + end + " has been removed.";
 		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
-		
+
 		employee.getLeaves().remove(Integer.parseInt(leave));
 		getRepo().save(employee);
 	}
 
-	public Employee registerEmployee(String data) {
-		Employee employee = new Employee();
-
-		setEmployeeInfo(data, employee);
-
-		String encodedPassword = this.passwordEncoder.encode(employee.getNationalID());
-		employee.setPassword(encodedPassword);
-
-		String message = "Your profile information has been updated by the Administrator.";
-		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
-
-		this.getRepo().save(employee);
-		return employee;
-	}
-
 	public void deleteEmployee(String employeeID) {
 		getRepo().deleteById(employeeID);
-		
+
 		List<Day> schedule = scheduleRepo.findAll();
 
-		for(Day day : schedule) {
-			for(EmployeeDailyReference  edr : day.getEmployees()) {
-				if(edr.getIDRef().equals(employeeID)) {
+		for (Day day : schedule) {
+			for (EmployeeDailyReference edr : day.getEmployees()) {
+				if (edr.getIDRef().equals(employeeID)) {
 					day.getEmployees().remove(edr);
 					scheduleRepo.save(day);
 					break;
@@ -301,52 +361,10 @@ public class EmployeeService {
 			}
 		}
 	}
-	
-	public Employee updatePassword(String newPassword, String employeeID) throws IOException {
-		Employee employee = getEmployee(employeeID);
-
-		String encodedPassword = this.passwordEncoder.encode(newPassword);
-		employee.setPassword(encodedPassword);
-
-		this.getRepo().save(employee);
-
-		return employee;
-	}
 
 	public void updateSalary(double newSalary, Employee employee) {
 		employee.setSalary(newSalary);
 		this.getRepo().save(employee);
-	}
-
-	public Employee updateEmployeeInfo(String employeeID, String data) throws IOException {
-		Employee employee = getEmployee(employeeID);
-
-		setEmployeeInfo(data, employee);
-
-		String message = "Your profile information has been updated by the Administrator.";
-		new Notification(message).add("plain-notification").sendAndSave(employee, employeeRepo);
-
-		List<Day> schedule = scheduleRepo.findAll();
-		dayLoop:
-		for(Day day : schedule) {
-			for(EmployeeDailyReference  edr : day.getEmployees()) {
-				if(edr.getIDRef().equals(employee.getID())) {
-					if(!edr.getDepartment().equals(employee.getDepartment()) || edr.getLevel() != employee.getLevel()) {
-						day.getEmployees().remove(edr);
-						scheduleRepo.save(day);
-						continue dayLoop;
-					}
-					edr.setFirstName(employee.getFirstName());
-					edr.setLastName(employee.getLastName());
-					edr.setNationalID(employee.getNationalID());
-					scheduleRepo.save(day);
-					break;
-				}
-			}
-		}
-		
-		getRepo().save(employee);
-		return employee;
 	}
 
 	private void setEmployeeInfo(String data, Employee employee) {
@@ -373,36 +391,26 @@ public class EmployeeService {
 		}
 	}
 
-	public Module getModule(String name) throws IOException {
-		Optional<Module> moduleOptional = moduleRepo.findByName(name);
-		if (moduleOptional.isEmpty()) {
-			throw new IOException();
+	public void injectLoggedInEmployeeInfo(Model model, EmployeeDetails employeeDetails){
+		model.addAttribute("employeeName", employeeDetails.getFirstName() + " " + employeeDetails.getLastName());
+		model.addAttribute("employeeEmail", employeeDetails.getUsername());
+		model.addAttribute("employeeID", employeeDetails.getID());
+		Employee user = null;
+		try {
+			user = getEmployee(employeeDetails.getID());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return moduleOptional.get();
-	}
-
-	public List<Module> getAllModules() {
-		return moduleRepo.findAll();
-	}
-
-	public Map<String, Boolean> getExtensionModulesDTOs() {
-		Map<String, Boolean> conditions = new HashMap<String, Boolean>();
-		List<Module> modules = getAllExtensionModules();
-		for (Module module : modules) {
-			StringBuilder moduleName = new StringBuilder(module.getName());
-			moduleName.setCharAt(0, Character.toUpperCase(moduleName.charAt(0)));
-			String name = moduleName.toString();
-			conditions.put(name, module.isActive());
+		int unread = 0;
+		for (int i = 0; i < user.getNotifications().size(); i++) {
+			if (!user.getNotifications().get(i).getRead()) {
+				unread++;
+			}
 		}
-		return conditions;
-	}
 
-	public List<Module> getAllExtensionModules() {
-		return moduleRepo.findByBase(false);
-	}
-
-	public void updateModule(Module module) {
-		moduleRepo.save(module);
+		model.addAttribute("extModules", getExtensionModulesDTOs());
+		model.addAttribute("notifications", user.getNotifications());
+		model.addAttribute("unread", unread);
 	}
 
 	public EmployeeRepo getRepo() {
