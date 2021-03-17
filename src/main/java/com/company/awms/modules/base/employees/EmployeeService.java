@@ -130,6 +130,7 @@ public class EmployeeService {
 			employeeDTO.setLastName(employee.getLastName());
 			employeeDTO.setDepartment(employee.getDepartment());
 			employeeDTO.setId(employee.getID());
+			employeeDTO.setRole(employee.getRole());
 			employeeDTOs.add(employeeDTO);
 		}
 		return employeeDTOs;

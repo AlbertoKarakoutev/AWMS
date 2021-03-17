@@ -73,6 +73,7 @@
 		                                <th scope="col">Family Name</th>
 		
 						<c:if test="${role == '[ADMIN]'}">
+							<th scope="col">role</th>
 		                                	<th scope="col">Department</th>
 							<th scope="col">Edit</th>
 						</c:if>
@@ -95,6 +96,9 @@
 					</td>
 
 						<c:if test="${role == '[ADMIN]'}">
+							<td>
+								<h4>${employee.getRole())}</h4>
+							</td>
 	                                		<td>
 								<h4>${departments.get(employee.getDepartment())}</h4>
 							</td>
