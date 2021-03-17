@@ -43,13 +43,13 @@ public class DocumentController {
 
     @PostMapping(value = "/public/upload")
     public String uploadPublicDocument(@RequestParam MultipartFile file,
-            @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+            @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam boolean limitedAccess) {
         if (!active) {
             return "errors/notFound";
         }
 
         try {
-            documentService.uploadPublicDocument(file, employeeDetails.getID());
+            documentService.uploadPublicDocument(file, employeeDetails.getID(), limitedAccess);
 
             List<DocInfoDTO> documents = this.documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
             model.addAttribute("documents", documents);

@@ -9,4 +9,5 @@ public interface ForumThreadRepo extends MongoRepository<ForumThread, String> {
 	//Optional<ForumThread> findByTitle(String title);
 	List<ForumThread> findByDepartment(String department);
 	List<ForumThread> findByIssuerID(String issuerID);
+	List<ForumThread> findByLimitedAccess(boolean limitedAccess);
 }

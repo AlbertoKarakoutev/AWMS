@@ -66,9 +66,14 @@ public class DocumentService {
 		} else {
 			departmentDocuments = this.documentRepo.findByDepartment(employee.getDepartment());
 			for (Doc document : departmentDocuments) {
-				if (employee.getLevel() >= document.getLevel()) {
+				if(!document.isLimitedAccess()) {
 					DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(), document.getType(), document.getUploaderID(), employee.getFirstName() + " " + employee.getLastName());
 					accessibleDocumentsInfo.add(documentInfo);
+				}else {
+					if (employee.getLevel() >= document.getLevel()) {
+						DocInfoDTO documentInfo = new DocInfoDTO(document.getID(), document.getName(), document.getSize(), document.getType(), document.getUploaderID(), employee.getFirstName() + " " + employee.getLastName());
+						accessibleDocumentsInfo.add(documentInfo);
+					}
 				}
 			}
 		}
@@ -92,7 +97,7 @@ public class DocumentService {
 		return personalDocumentsInfo;
 	}
 
-	private Doc createNewDoc(MultipartFile file, String ownerID, Employee owner) throws IOException {
+	private Doc createNewDoc(MultipartFile file, String ownerID, Employee owner, boolean limitedAccess) throws IOException {
 		Binary data = new Binary(BsonBinarySubType.BINARY, file.getBytes());
 		String fileName = file.getOriginalFilename();
 		String fileType = file.getContentType();
@@ -101,22 +106,22 @@ public class DocumentService {
 		long fileSize = file.getSize();
 		LocalDateTime dateTime = LocalDateTime.now();
 
-		return new Doc(data, level, department, fileName, fileType, ownerID, dateTime, fileSize);
+		return new Doc(data, level, department, fileName, fileType, ownerID, dateTime, fileSize, limitedAccess);
 	}
 
-	public void uploadPublicDocument(MultipartFile file, String uploaderID) throws IOException {
+	public void uploadPublicDocument(MultipartFile file, String uploaderID, boolean limitedAccess) throws IOException {
 		Employee uploader = getEmployee(uploaderID);
 
-		Doc document = createNewDoc(file, uploaderID, uploader);
+		Doc document = createNewDoc(file, uploaderID, uploader, limitedAccess);
 
 		this.documentRepo.save(document);
 	}
 
 	// only the admin can upload personal docs
-	public void uploadPersonalDocument(MultipartFile file, String ownerID) throws IOException {
+	public void uploadPersonalDocument(MultipartFile file, String ownerID, boolean limitedAccess) throws IOException {
 		Employee owner = getEmployee(ownerID);
 
-		Doc document = createNewDoc(file, ownerID, owner);
+		Doc document = createNewDoc(file, ownerID, owner, limitedAccess);
 
 		owner.getPersonalDocuments().add(document);
 		this.employeeRepo.save(owner);
@@ -131,8 +136,10 @@ public class DocumentService {
 
 		Doc documentToDownload = documentToDownloadOptional.get();
 
-		if (!isAccessible(documentToDownload.getDepartment(), documentToDownload.getLevel(), downloaderID)) {
-			throw new IllegalAccessException("Document not accessible!");
+		if(documentToDownload.isLimitedAccess()) {
+			if (!isAccessible(documentToDownload.getDepartment(), documentToDownload.getLevel(), downloaderID)) {
+				throw new IllegalAccessException("Document not accessible!");
+			}
 		}
 
 		documentToDownload.getDownloaderIDs().add(downloaderID);
@@ -195,7 +202,7 @@ public class DocumentService {
 		List<Doc> personalDocuments = owner.getPersonalDocuments();
 
 		if (personalDocuments.size() <= documentID) {
-			throw new IllegalArgumentException("Document with id " + documentID + " doesn't exists");
+			throw new IllegalArgumentException("Document with id " + documentID + " doesn't exist!");
 		}
 
 		personalDocuments.remove(documentID);

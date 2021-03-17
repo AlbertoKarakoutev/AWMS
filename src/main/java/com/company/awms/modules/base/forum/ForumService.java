@@ -45,19 +45,22 @@ public class ForumService {
 		return thread.get();
 	}
 
-	public ThreadReplyDTO getThreadWithRepliesByID(String threadID) throws IOException {
+	public ThreadReplyDTO getThreadWithRepliesByID(String threadID, String employeeID) throws IOException, IllegalAccessException {
 		ForumThread thread = getThread(threadID);
-
+		
+		Optional<Employee> employeeOptional = employeeRepo.findById(employeeID);
+		if(employeeOptional.isEmpty()) {
+			throw new IOException();
+		}
+		if(thread.isLimitedAccess()) {
+			if (employeeOptional.get().getLevel() < thread.getLevel() || !employeeOptional.get().getDepartment().equals(thread.getDepartment())) {
+				throw new IllegalAccessException();
+			}
+		}
+		
 		List<ForumReply> replies = this.forumReplyRepo.findByThreadID(threadID);
 
 		return new ThreadReplyDTO(thread, replies);
-	}
-
-	public List<ForumThread> getAllThreads() {
-		List<ForumThread> allThreads = this.forumThreadRepo.findAll();
-		allThreads.sort(new ForumComparator());
-
-		return allThreads;
 	}
 
 	public List<ForumThread> getAccessibleThreads(String employeeID) throws IOException {
@@ -75,10 +78,14 @@ public class ForumService {
 		if (adminIDs.contains(employeeOptional.get().getID())) {
 			accessibleThreads = forumThreadRepo.findAll();
 		} else {
-			List<ForumThread> departmentThreads = forumThreadRepo.findByDepartment(employeeOptional.get().getDepartment());
-			for (ForumThread thread : departmentThreads) {
-				if (employeeOptional.get().getLevel() >= thread.getLevel()) {
+			
+			for(ForumThread thread : forumThreadRepo.findByDepartment(employeeOptional.get().getDepartment())) {
+				if(!thread.isLimitedAccess()) {
 					accessibleThreads.add(thread);
+				}else {
+					if(employeeOptional.get().getLevel() >= thread.getLevel()) {
+						accessibleThreads.add(thread);
+					}
 				}
 			}
 		}
@@ -86,18 +93,18 @@ public class ForumService {
 		return accessibleThreads;
 	}
 	
-	public List<ForumThread> getAllAnsweredThreads() {
-		List<ForumThread> allThreads = getAllThreads();
-		allThreads.removeIf(t -> !t.getAnswered());
+	public List<ForumThread> getAllAnsweredThreads(String employeeID) throws IOException {
+		List<ForumThread> accessibleThreads = getAccessibleThreads(employeeID);
+		accessibleThreads.removeIf(t -> !t.getAnswered());
 
-		return allThreads;
+		return accessibleThreads;
 	}
 
-	public List<ForumThread> getAllUnansweredThreads() {
-		List<ForumThread> allThreads = getAllThreads();
-		allThreads.removeIf(ForumThread::getAnswered);
+	public List<ForumThread> getAllUnansweredThreads(String employeeID) throws IOException {
+		List<ForumThread> accessibleThreads = getAccessibleThreads(employeeID);
+		accessibleThreads.removeIf(ForumThread::getAnswered);
 
-		return allThreads;
+		return accessibleThreads;
 	}
 
 	public List<ForumThread> getAllThreadsFromEmployee(String issuerID) {
@@ -139,11 +146,11 @@ public class ForumService {
 		return foundThreads;
 	}
 	
-	public ForumThread addNewThread(EmployeeDetails employeeDetails, String title, String body) {
+	public ForumThread addNewThread(EmployeeDetails employeeDetails, String title, String body, boolean limitedAccess) {
 
 		Employee uploader = employeeRepo.findById(employeeDetails.getID()).get();
 
-		ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(), false, employeeDetails.getFirstName() + " " + employeeDetails.getLastName(), uploader.getDepartment(), uploader.getLevel());
+		ForumThread newThread = new ForumThread(employeeDetails.getID(), body, title, LocalDateTime.now(), false, employeeDetails.getFirstName() + " " + employeeDetails.getLastName(), uploader.getDepartment(), uploader.getLevel(), limitedAccess);
 
 		List<Employee> sameDepartmentEmployees = employeeRepo.findByDepartment(uploader.getDepartment());
 		
@@ -166,7 +173,13 @@ public class ForumService {
 		String message = uploader.getFirstName() + " " + uploader.getLastName() + " has uploaded a new topic in the Forum, called \"" + saved.getTitle() + "\".";
 
 		for (Employee notified : sameDepartmentEmployees) {
-			new Notification(message).add("new-thread").add(uploader.getID()).add(saved.getID()).sendAndSave(notified, employeeRepo);
+			if(notified.getLevel() >= uploader.getLevel()) {
+				new Notification(message).add("new-thread").add(uploader.getID()).add(saved.getID()).sendAndSave(notified, employeeRepo);
+			}else {
+				if(!limitedAccess) {
+					new Notification(message).add("new-thread").add(uploader.getID()).add(saved.getID()).sendAndSave(notified, employeeRepo);
+				}
+			}
 		}
 
 		return newThread;
@@ -202,7 +215,6 @@ public class ForumService {
 		return oldThread;
 	}
 
-	
 	public void deleteThread(String threadID) {
 		forumThreadRepo.deleteById(threadID);	
 	}

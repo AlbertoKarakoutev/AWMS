@@ -28,17 +28,24 @@
                     <h1 class="ty-page-title">${thread != null ? "Edit Topic" : "Create Topic"}</h1>
                 </header>
                 <div class="my-3">
-                    <form method="POST" action="${thread != null ? String.format("/forum/thread/%s/edit", thread.getID()) : '/forum/add'}">
+                    <form method="POST" action="${thread != null ? String.format('/forum/thread/%s/edit', thread.getID()) : '/forum/add'}">
                         <div class="form-group">
-                            <label for="exampleInputEmail1">Title</label>
-                            <input type="text" name="title" class="form-control" value="${thread != null ? thread.getTitle() : null}" id="threadTitle" aria-describedby="threadTitle" placeholder="Enter Title" required>
+                            <label for="threadTitle">Title</label>
+                            <input type="text" name="title" class="form-control" value="${thread != null ? thread.getTitle() : null}" id="threadTitle" aria-describedby="threadTitle" placeholder="Example title..." required>
                             <small id="threadTitleHelp" class="form-text text-muted">Title</small>
                         </div>
                         <div class="form-group">
                             <label for="threadContent">Body</label>
-                            <textarea name="body" class="form-control" id="threadContent" rows="8" required>${thread != null ? thread.getBody() : ""}</textarea>
+                            <textarea name="body" class="form-control" placeholder="Example body..." id="threadContent" rows="8" required>${thread != null ? thread.getBody() : ""}</textarea>
                             <small id="threadContentHelp" class="form-text text-muted">Body</small>
                         </div>
+                        <div class="form-group">
+	                        <label for="limitedAccess">Limited access: </label>
+	                        <select name="limitedAccess" class="form-control" id="limitedAccess" ${thread!=null ? "disabled" : ""}>
+	                        	<option value="false" ${thread != null && !thread.isLimitedAccess() ? "selected" : ""}>No</option>
+	                        	<option value="true" ${thread != null && thread.isLimitedAccess() ? "selected" : ""}>Yes</option>
+	                        </select>
+	                </div>
                         <button type="submit" class="btn btn-dark">${thread != null ? "Edit": "Create"}</button>
                     </form>
                 </div>

@@ -43,7 +43,7 @@ public class ForumController {
 		}
 
 		try {
-			List<ForumThread> threads = this.forumService.getAllThreads();
+			List<ForumThread> threads = this.forumService.getAccessibleThreads(employeeDetails.getID());
 			model.addAttribute("threads", threads);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
@@ -61,7 +61,7 @@ public class ForumController {
 		}
 
 		try {
-			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID);
+			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(threadID, employeeDetails.getID());
 			model.addAttribute("thread", threadAndReplies.getForumThread());
 			model.addAttribute("replies", threadAndReplies.getForumReplies());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -82,7 +82,7 @@ public class ForumController {
 		}
 
 		try {
-			List<ForumThread> threads = this.forumService.getAllAnsweredThreads();
+			List<ForumThread> threads = this.forumService.getAllAnsweredThreads(employeeDetails.getID());
 			model.addAttribute("threads", threads);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
@@ -100,7 +100,7 @@ public class ForumController {
 		}
 
 		try {
-			List<ForumThread> threads = this.forumService.getAllUnansweredThreads();
+			List<ForumThread> threads = this.forumService.getAllUnansweredThreads(employeeDetails.getID());
 			model.addAttribute("threads", threads);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
 
@@ -211,13 +211,13 @@ public class ForumController {
 	}
 
 	@PostMapping(value = "/add")
-	public String addThread(@RequestParam String title, @RequestParam String body, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String addThread(@RequestParam String title, @RequestParam String body, @RequestParam boolean limitedAccess, @AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
 		if (!active) {
 			return "erorrs/notFound";
 		}
 
 		try {
-			ForumThread forumThread = this.forumService.addNewThread(employeeDetails, title, body);
+			ForumThread forumThread = this.forumService.addNewThread(employeeDetails, title, body, limitedAccess);
 
 			model.addAttribute("thread", forumThread);
 			injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -237,7 +237,7 @@ public class ForumController {
 
 		try {
 			this.forumService.addNewReply(employeeDetails, body, threadID);
-			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID);
+			ThreadReplyDTO threadAndReplies = forumService.getThreadWithRepliesByID(threadID, employeeDetails.getID());
 			model.addAttribute("thread", threadAndReplies.getForumThread());
 			model.addAttribute("replies", threadAndReplies.getForumReplies());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -290,7 +290,7 @@ public class ForumController {
 
 			oldThread = this.forumService.editThread(body, title, oldThread);
 
-			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(oldThreadID);
+			ThreadReplyDTO threadAndReplies = this.forumService.getThreadWithRepliesByID(oldThreadID, employeeDetails.getID());
 			model.addAttribute("thread", oldThread);
 			model.addAttribute("replies", threadAndReplies.getForumReplies());
 			injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -303,7 +303,7 @@ public class ForumController {
 			return "erorrs/internalServerError";
 		}
 	}
-
+	
 	@GetMapping("/search")
 	public String searchForum(@RequestParam String searchTerm, @AuthenticationPrincipal EmployeeDetails employeeDetails,
 	            Model model) {
@@ -312,9 +312,7 @@ public class ForumController {
 	        }
 
 	        try {
-	            List<ForumThread> threads;
-	            threads =  forumService.getAccessibleThreads(employeeDetails.getID());
-
+	            List<ForumThread> threads  =  forumService.getAccessibleThreads(employeeDetails.getID());
 	            List<ForumThread> foundThreads = forumService.searchForum(threads, searchTerm);
 	            model.addAttribute("threads", foundThreads);
 	            injectLoggedInEmployeeInfo(model, employeeDetails);
@@ -355,8 +353,5 @@ public class ForumController {
 			return "erorrs/internalServerError";
 		}
 	}
-	
-	public static boolean getActive() {
-		return active;
-	}
+
 }

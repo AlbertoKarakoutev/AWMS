@@ -17,12 +17,13 @@ public class ForumThread {
 	private String issuerName;
 	private LocalDateTime dateTime;
 	private String department;
+	boolean limitedAccess;
 	private int level;
 	private boolean isAnswered;
 
 	public ForumThread() {}
 	
-	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered, String issuerName, String department, int level) {
+	public ForumThread(String issuerID, String body, String title, LocalDateTime time, boolean isAnswered, String issuerName, String department, int level, boolean limitedAccess) {
 		this.issuerID = issuerID;
 		this.issuerName = issuerName;
 		this.title = title;
@@ -31,6 +32,7 @@ public class ForumThread {
 		this.isAnswered = isAnswered;
 		this.department = department;
 		this.level = level;
+		this.limitedAccess = limitedAccess;
 	}
 
 	public String getID() {
@@ -69,6 +71,10 @@ public class ForumThread {
 		return issuerName;
 	}
 
+	public boolean isLimitedAccess() {
+		return limitedAccess;
+	}
+	
 	public void setDateTime(LocalDateTime dateTime) {
 		this.dateTime = dateTime;
 	}

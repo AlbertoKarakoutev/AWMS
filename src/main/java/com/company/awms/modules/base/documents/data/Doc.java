@@ -19,6 +19,7 @@ public class Doc {
 	private String name;
 	private String type;
 	private String uploaderID;
+	private boolean limitedAccess;
 	private LocalDateTime uploadDateTime;
 	private List<String> downloaderIDs = new ArrayList<>();
 	private long size;
@@ -27,7 +28,7 @@ public class Doc {
 	}
 
 	public Doc(Binary data, int level, String department, String name, String type, String uploaderID,
-			   LocalDateTime uploadDateTime, long size) {
+			   LocalDateTime uploadDateTime, long size, boolean limitedAccess) {
 		this.data = data;
 		this.level = level;
 		this.department = department;
@@ -36,6 +37,7 @@ public class Doc {
 		this.uploaderID = uploaderID;
 		this.uploadDateTime = uploadDateTime;
 		this.size = size;
+		this.limitedAccess = limitedAccess;
 	}
 
 	public Doc(int accessLevel) {
@@ -82,6 +84,10 @@ public class Doc {
 		return this.uploadDateTime;
 	}
 
+	public boolean isLimitedAccess() {
+		return this.limitedAccess;
+	}
+	
 	public void setData(Binary data){
 		this.data = data;
 	}
