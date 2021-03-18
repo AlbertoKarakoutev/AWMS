@@ -51,7 +51,7 @@
 						</div>
 		                        </div>
 		                        <div class="form-group">
-			                        <select class="form-control" name="paidStr" id="paid">
+			                        <select class="form-control" name="paid" id="paid">
 			                        	<option value="true">Paid</option>
 			                        	<option value="false" selected>Unpaid</option>
 			                        </select>
