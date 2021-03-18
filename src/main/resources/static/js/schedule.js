@@ -23,27 +23,27 @@ function getDayData(day){
 
 			let employeeModalBody  = document.getElementById("day-modal-body");
 			employeeModalBody.innerHTML = "";
-			for(let i = 0; i < res["employees"].length; i++){
+			for(let i = 0; i < res["employees"]["employees"].length; i++){
 				if(role === "ADMIN"){
 					let thisDate = Date.parse(dayDate);
 					if(thisDate >= Date.now()){
-						button = "<td><button class='btn btn-dark' onclick=\"deleteWorkDay('"+i+"', '"+res["employees"][i]["nationalID"]+"', '"+String(dayDate)+"')\">Delete</button></td>"
+						button = "<td><button class='btn btn-dark' onclick=\"deleteWorkDay('"+i+"', '"+res["employees"]["employees"][i]["nationalID"]+"', '"+String(dayDate)+"')\">Delete</button></td>"
 					}
 				}else if(role === "EMPLOYEE"){
 					let thisDate = Date.parse(dayDate);
 					if(thisDate >= Date.now()){
 						let workDay = res["workDayForEmployee"];
 						if(workDay===false){
-							button = "<td><button class='btn btn-dark' data-dismiss='modal' data-toggle='modal' data-target='#swap-modal' onclick=\"getSwapRequestData('"+res["employees"][i]["nationalID"]+"', '"+String(dayDate)+"')\">Swap Shifts</button></td>"
+							button = "<td><button class='btn btn-dark' data-dismiss='modal' data-toggle='modal' data-target='#swap-modal' onclick=\"getSwapRequestData('"+res["employees"]["employees"][i]["nationalID"]+"', '"+String(dayDate)+"')\">Swap Shifts</button></td>"
 						}
 					}
 				}else if(role ==="MANAGER"){
 					let thisDate = Date.parse(dayDate);
 					if(thisDate >= Date.now()){
-						button = "<td><button class='btn btn-dark' onclick='getTaskData(\""+res["employees"][i]["nationalID"]+"\" , \""+String(dayDate)+"\" , \""+i+"\")' >Add a Task</button></td>";
+						button = "<td><button class='btn btn-dark' onclick='getTaskData(\""+res["employees"]["employees"][i]["nationalID"]+"\" , \""+String(dayDate)+"\" , \""+i+"\")' >Add a Task</button></td>";
 					}
 				}
-				let newRow = "<td>"+res["employees"][i]["firstName"] + " " +res["employees"][i]["lastName"] +"</td><td>"+res["employees"][i]["workTimeInfo"]+"<td>"+button;
+				let newRow = "<td>"+res["employees"]["employees"][i]["firstName"] + " " +res["employees"]["employees"][i]["lastName"] +"</td><td>"+res["employees"]["employees"][i]["workTimeInfo"]+"<td>"+button;
 				employeeModalBody.insertAdjacentHTML("beforeend", "<tr id='employee-row-"+i+"'>"+newRow+"</tr");
 			}
 			if(role === "ADMIN"){
