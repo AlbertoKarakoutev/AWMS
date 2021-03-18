@@ -2,6 +2,7 @@ package com.company.awms.modules.base.employees;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,10 +30,21 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/manager/department/")
-	public String getDepartmentEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String managerID) {
+	public String getDepartmentEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam String managerID, @RequestParam Optional<Integer> page) {
 		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<Employee> employees = employeeService.getDepartmentEmployeesDTOs(managerID);
+			List<Employee> employees = employeeService.getDepartmentEmployeesDTOsByPage(managerID, 1);
+			
+			if(page.isPresent()) {
+				employees = employeeService.getDepartmentEmployeesDTOsByPage(managerID, page.get());
+				model.addAttribute("page", page.get());
+			}else {
+				model.addAttribute("page", 1);
+			}
+
+			model.addAttribute("type", "all");
+			model.addAttribute("link", "/employee/manager/department/?managerID="+managerID+"&&");
+			model.addAttribute("pageCount", (int)Math.ceil((double)employeeService.getDepartmentEmployeesDTOs(managerID).size()/10));
 			model.addAttribute("employees", employees);
 			return "base/employees/employees";
 		} catch (IllegalAccessException e) {

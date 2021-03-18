@@ -2,6 +2,7 @@ package com.company.awms.modules.base.documents;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -43,12 +44,7 @@ public class DocumentController {
 		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
 			documentService.uploadPublicDocument(file, employeeDetails.getID(), limitedAccess);
-
-			List<DocInfoDTO> documents = documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
-			model.addAttribute("documents", documents);
-			model.addAttribute("type", "public");
-
-			return "base/documents/documents";
+			return "redirect:/document/public";
 		} catch (IOException e) {
 			return "errors/badRequest";
 		} catch (Exception e) {
@@ -63,12 +59,7 @@ public class DocumentController {
 		try {
 			documentService.deletePublicDocument(documentID, employeeDetails.getID());
 
-			List<DocInfoDTO> documents = documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
-
-			model.addAttribute("documents", documents);
-			model.addAttribute("type", "public");
-
-			return "base/documents/documents";
+			return "redirect:/document/public";
 		} catch (IllegalArgumentException e) {
 			return "errors/notFound";
 		} catch (IllegalAccessException e) {
@@ -78,13 +69,21 @@ public class DocumentController {
 			return "errors/internalServerError";
 		}
 	}
-
+	
 	@GetMapping(value = "/public")
-	public String getAccessibleDocuments(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getAccessibleDocumentsByPage(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam Optional<Integer> page) {
 		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<DocInfoDTO> documents = documentService.getAccessibleDocumentsInfo(employeeDetails.getID());
+			List<DocInfoDTO> documents = documentService.getAccessibleDocumentsInfoByPage(employeeDetails.getID(), 1);
+			
+			if(page.isPresent()) {
+				documents = documentService.getAccessibleDocumentsInfoByPage(employeeDetails.getID(), page.get());
+				model.addAttribute("page", page.get());
+			}else {
+				model.addAttribute("page", 1);
+			}
 
+			model.addAttribute("pageCount", (int)Math.ceil((double)documentService.getAccessibleDocumentsInfo(employeeDetails.getID()).size()/10));
 			model.addAttribute("documents", documents);
 			model.addAttribute("type", "public");
 

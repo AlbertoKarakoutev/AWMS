@@ -144,19 +144,61 @@ public class ForumService {
 
 		return accessibleThreads;
 	}
+	
+	public List<ForumThread> getAccessibleThreadsByPage(String employeeID, int page) throws IOException {
+		List<ForumThread> accessibleThreads = getAccessibleThreads(employeeID);
+		List<ForumThread> accessibleThreadsPage = new ArrayList<>();
 
-	public List<ForumThread> getAllAnsweredThreads(String employeeID) throws IOException {
+		if(page-1*10 > accessibleThreads.size()) {
+			return getAccessibleThreadsByPage(employeeID, 1);
+		}
+		
+		for(int i = 0; i < accessibleThreads.size(); i++) {
+			if(i >= (page-1)*10 && i < page*10){
+				accessibleThreadsPage.add(accessibleThreads.get(i));
+			}
+		}
+		
+		return accessibleThreadsPage;
+	}
+
+	public List<ForumThread> getAllAnsweredThreads(String employeeID, int page) throws IOException {
 		List<ForumThread> accessibleThreads = getAccessibleThreads(employeeID);
 		accessibleThreads.removeIf(t -> !t.getAnswered());
 
-		return accessibleThreads;
+		List<ForumThread> accessibleThreadsPage = new ArrayList<>();
+
+		if(page-1*10 > accessibleThreads.size()) {
+			return getAccessibleThreadsByPage(employeeID, 1);
+		}
+		
+		for(int i = 0; i < accessibleThreads.size(); i++) {
+			if(i >= (page-1)*10 && i < page*10){
+				accessibleThreadsPage.add(accessibleThreads.get(i));
+			}
+		}
+		
+		return accessibleThreadsPage;
+		
 	}
 
-	public List<ForumThread> getAllUnansweredThreads(String employeeID) throws IOException {
+	public List<ForumThread> getAllUnansweredThreads(String employeeID, int page) throws IOException {
 		List<ForumThread> accessibleThreads = getAccessibleThreads(employeeID);
 		accessibleThreads.removeIf(ForumThread::getAnswered);
 
-		return accessibleThreads;
+		List<ForumThread> accessibleThreadsPage = new ArrayList<>();
+
+		if(page-1*10 > accessibleThreads.size()) {
+			return getAccessibleThreadsByPage(employeeID, 1);
+		}
+		
+		for(int i = 0; i < accessibleThreads.size(); i++) {
+			if(i >= (page-1)*10 && i < page*10){
+				accessibleThreadsPage.add(accessibleThreads.get(i));
+			}
+		}
+		
+		return accessibleThreadsPage;
 	}
 
 	public List<ForumThread> getAllThreadsFromEmployee(String issuerID) {

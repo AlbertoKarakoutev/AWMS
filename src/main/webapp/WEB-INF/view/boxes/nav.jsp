@@ -5,14 +5,14 @@
 <%@	taglib prefix="sec"
 	uri="http://www.springframework.org/security/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-default navbar-expand-lg">
 	<button class="navbar-toggler" type="button" data-toggle="collapse"
 		data-target="#navigation" aria-controls="navigation"
 		aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"> <i class="fas fa-bars"></i>
 		</span>
 	</button>
-	<div class="collapse navbar-collapse" id="navigation">
+	<div class="collapsed navbar-collapse" id="navigation">
 		<header class="user-container p-2">
 			<div class="avatar-container">
 				<div class="small-avatar"></div>

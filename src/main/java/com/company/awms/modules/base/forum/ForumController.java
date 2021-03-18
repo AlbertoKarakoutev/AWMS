@@ -2,6 +2,7 @@ package com.company.awms.modules.base.forum;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,10 +35,20 @@ public class ForumController {
 	}
 
 	@GetMapping("")
-	public String getAccessibleThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getAccessibleThreadsByPage(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model,  @RequestParam Optional<Integer> page) {
 		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<ForumThread> threads = forumService.getAccessibleThreads(employeeDetails.getID());
+			List<ForumThread> threads = forumService.getAccessibleThreadsByPage(employeeDetails.getID(), 1);
+			
+			if(page.isPresent()) {
+				threads = forumService.getAccessibleThreadsByPage(employeeDetails.getID(), page.get());
+				model.addAttribute("page", page.get());
+			}else {
+				model.addAttribute("page", 1);
+			}
+			
+			model.addAttribute("path", "");
+			model.addAttribute("pageCount", (int)Math.ceil((double)forumService.getAccessibleThreads(employeeDetails.getID()).size()/10));
 			model.addAttribute("threads", threads);
 
 			return "base/forum/forum";
@@ -65,10 +76,19 @@ public class ForumController {
 	}
 
 	@GetMapping("answered")
-	public String getAllAnsweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getAllAnsweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam Optional<Integer> page ) {
 		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<ForumThread> threads = forumService.getAllAnsweredThreads(employeeDetails.getID());
+			List<ForumThread> threads = forumService.getAllAnsweredThreads(employeeDetails.getID(), 1);
+			if(page.isPresent()) {
+				threads = forumService.getAccessibleThreadsByPage(employeeDetails.getID(), page.get());
+				model.addAttribute("page", page.get());
+			}else {
+				model.addAttribute("page", 1);
+			}
+			
+			model.addAttribute("path", "/answered");
+			model.addAttribute("pageCount", (int)Math.ceil((double)forumService.getAccessibleThreads(employeeDetails.getID()).size()/10));
 			model.addAttribute("threads", threads);
 
 			return "base/forum/forum";
@@ -79,10 +99,18 @@ public class ForumController {
 	}
 
 	@GetMapping("unanswered")
-	public String getAllUnansweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getAllUnansweredThreads(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam Optional<Integer> page) {
 		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<ForumThread> threads = forumService.getAllUnansweredThreads(employeeDetails.getID());
+			List<ForumThread> threads = forumService.getAllUnansweredThreads(employeeDetails.getID(), 1);
+			if(page.isPresent()) {
+				threads = forumService.getAccessibleThreadsByPage(employeeDetails.getID(), page.get());
+				model.addAttribute("page", page.get());
+			}else {
+				model.addAttribute("page", 1);
+			}
+			model.addAttribute("path", "/unanswered");
+			model.addAttribute("pageCount", (int)Math.ceil((double)forumService.getAccessibleThreads(employeeDetails.getID()).size()/10));
 			model.addAttribute("threads", threads);
 
 			return "base/forum/forum";
@@ -230,6 +258,9 @@ public class ForumController {
 		try {
 			List<ForumThread> threads = forumService.getAccessibleThreads(employeeDetails.getID());
 			List<ForumThread> foundThreads = forumService.searchForum(threads, searchTerm);
+			
+			model.addAttribute("path", "search");
+			model.addAttribute("pageCount", (int)Math.ceil((double)forumService.getAccessibleThreads(employeeDetails.getID()).size()/10));
 			model.addAttribute("threads", foundThreads);
 
 			return "base/forum/forum";

@@ -5,6 +5,7 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,21 @@ public class AdminController {
 
 	// Employee methods
 	@GetMapping("/employee/all")
-	public String getEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model) {
+	public String getEmployees(@AuthenticationPrincipal EmployeeDetails employeeDetails, Model model, @RequestParam Optional<Integer> page) {
 		employeeService.injectLoggedInEmployeeInfo(model, employeeDetails);
 		try {
-			List<Employee> employees = employeeService.getAllEmployeesDTOs();
+			List<Employee> employees = employeeService.getAllEmployeesDTOsByPage(1);
+			
+			if(page.isPresent()) {
+				employees = employeeService.getAllEmployeesDTOsByPage(page.get());
+				model.addAttribute("page", page.get());
+			}else {
+				model.addAttribute("page", 1);
+			}
+
+			model.addAttribute("pageCount", (int)Math.ceil((double)employeeService.getAllEmployeesDTOs().size()/10));
+			model.addAttribute("link", "/admin/employee/all/?");
+			model.addAttribute("type", "all");
 			model.addAttribute("employees", employees);
 			model.addAttribute("departments", adminService.getDepartmentDTOs());
 
@@ -147,6 +159,8 @@ public class AdminController {
 		try {
 			List<Employee> employee = new ArrayList<>();
 			employee.add(employeeService.updateEmployeeInfo(employeeId, data));
+			
+			model.addAttribute("type", "single");
 			model.addAttribute("departments", adminService.getDepartmentDTOs());
 			model.addAttribute("employees", employee);
 			return "base/employees/employees";
@@ -162,6 +176,8 @@ public class AdminController {
 		try {
 			List<Employee> employees = employeeService.getAllEmployees();
 			List<Employee> foundEmployees = employeeService.searchEmployees(employees, searchTerm, type);
+			
+			model.addAttribute("type", "search");
 			model.addAttribute("employees", foundEmployees);
 			model.addAttribute("departments", adminService.getDepartmentDTOs());
 			return "base/employees/employees";

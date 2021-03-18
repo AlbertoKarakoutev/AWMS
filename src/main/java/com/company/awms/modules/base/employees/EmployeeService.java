@@ -118,11 +118,11 @@ public class EmployeeService {
 	}
 
 	public List<Employee> getManagers() {
-		return this.getRepo().findAllByRole("MANAGER");
+		return getRepo().findAllByRole("MANAGER");
 	}
 
 	public List<Employee> getAllEmployeesDTOs() {
-		List<Employee> employees = this.getRepo().findAll();
+		List<Employee> employees = getRepo().findAll();
 		List<Employee> employeeDTOs = new ArrayList<Employee>();
 		for (Employee employee : employees) {
 			Employee employeeDTO = new Employee();
@@ -135,6 +135,24 @@ public class EmployeeService {
 		}
 		return employeeDTOs;
 	}
+	
+	public List<Employee> getAllEmployeesDTOsByPage(int page) {
+		List<Employee> employees = getAllEmployeesDTOs();
+		
+		List<Employee> employeesPage = new ArrayList<>();
+
+		if(page-1*10 > employees.size()) {
+			return getAllEmployeesDTOsByPage(1);
+		}
+		
+		for(int i = 0; i < employees.size(); i++) {
+			if(i >= (page-1)*10 && i < page*10){
+				employeesPage.add(employees.get(i));
+			}
+		}
+		
+		return employeesPage;
+	}
 
 	public List<Employee> getAllEmployees() throws IOException {
 		List<Employee> employees = this.getRepo().findAll();
@@ -144,6 +162,43 @@ public class EmployeeService {
 		}
 
 		return employees;
+	}
+
+	public List<Employee> getDepartmentEmployeesDTOsByPage(String employeeID, int page) throws IllegalAccessException {
+		boolean notPermitted = true;
+		Optional<Employee> downloader = getRepo().findById(employeeID);
+		for (Employee manager : getRepo().findAllByRole("MANAGER")) {
+			if (manager.getID().equals(employeeID)) {
+				notPermitted = false;
+			}
+		}
+		if (notPermitted)
+			throw new IllegalAccessException();
+
+		List<Employee> employees = getRepo().findByDepartment(downloader.get().getDepartment());
+		List<Employee> employeeDTOs = new ArrayList<Employee>();
+		for (Employee employee : employees) {
+			Employee employeeDTO = new Employee();
+			employeeDTO.setFirstName(employee.getFirstName());
+			employeeDTO.setLastName(employee.getLastName());
+			employeeDTO.setDepartment(employee.getDepartment());
+			employeeDTO.setId(employee.getID());
+			employeeDTOs.add(employeeDTO);
+		}
+		
+		List<Employee> employeesPage = new ArrayList<>();
+
+		if(page-1*10 > employees.size()) {
+			return getDepartmentEmployeesDTOsByPage(employeeID, 1);
+		}
+		
+		for(int i = 0; i < employees.size(); i++) {
+			if(i >= (page-1)*10 && i < page*10){
+				employeesPage.add(employees.get(i));
+			}
+		}
+		
+		return employeesPage;
 	}
 
 	public List<Employee> getDepartmentEmployeesDTOs(String employeeID) throws IllegalAccessException {
@@ -167,9 +222,10 @@ public class EmployeeService {
 			employeeDTO.setId(employee.getID());
 			employeeDTOs.add(employeeDTO);
 		}
-		return employeeDTOs;
+		
+		return employees;
 	}
-
+	
 	public List<Employee> searchEmployees(List<Employee> employees, String searchTerm, String type) {
 		List<Employee> foundEmployees = new ArrayList<>();
 		Pattern pattern = Pattern.compile(searchTerm, Pattern.CASE_INSENSITIVE);

@@ -40,7 +40,7 @@
 								<form class="form-inline" method='get' action='/document/public/search/'>
 									<div class="form-group m-0">
 										<input class="form-control" type="text" name='name' placeholder="Search document"
-											aria-label="Search documents...">
+											aria-label="Search documents..." required>
 									</div>
 									<button class="btn btn-dark ml-2" type="submit">Search</button>
 								</form>
@@ -87,7 +87,12 @@
 							<tbody>
 								<c:forEach items="${documents}" var="document" varStatus="loop">
 									<tr>
-										<th scope="row">${loop.index + 1}</th>
+										<c:if test='${type == "public"}'>
+											<th scope="row">${(page-1)*10 + loop.index + 1}</th>
+										</c:if>
+										<c:if test='${type != "public"}'>
+											<th scope="row">${loop.index + 1}</th>
+										</c:if>
 										<td>
 											<h4>${document.getName()}</h4>
 										</td>
@@ -123,19 +128,27 @@
 						</table>
 					</div>
 				</div>
-				<nav aria-label="Page navigation example">
-					<ul class="pagination justify-content-center">
-						<li class="page-item"><a class="page-link" href="#" title='previous page'> <span
-								aria-hidden="true">&laquo;</span> <span class="sr-only">Previous</span>
-						</a></li>
-						<li class="page-item"><a class="page-link" href="#">1</a></li>
-						<li class="page-item"><a class="page-link" href="#">2</a></li>
-						<li class="page-item"><a class="page-link" href="#">3</a></li>
-						<li class="page-item"><a class="page-link" href="#" title='next page'> <span
-								aria-hidden="true">&raquo;</span> <span class="sr-only">Next</span>
-						</a></li>
-					</ul>
-				</nav>
+				<c:if test='${type == "public"}'>
+					<nav>
+						<ul class="pagination justify-content-center">
+							<c:if test='${Integer.parseInt(page) > 1}'>
+								<li class="page-item"><a class="page-link" href="/document/public/?page=1"> <span
+										aria-hidden="true">&laquo;</span> <span class="sr-only"></span></a>
+								</li>
+								<li class="page-item"><a class="page-link" href="/document/public/?page=${page-1}">${page-1}</a></li>
+							</c:if>
+							
+							<li class="page-item active"><a class="page-link" href="#">${page}</a></li>
+							
+							<c:if test='${Integer.parseInt(page) < pageCount}'>
+								<li class="page-item"><a class="page-link" href="/document/public/?page=${page+1}">${page+1}</a></li>
+								<li class="page-item"><a class="page-link" href="/document/public/?page=${pageCount}"> <span
+									aria-hidden="true">&raquo;</span> <span class="sr-only"></span></a>
+								</li>
+							</c:if>
+						</ul>
+					</nav>
+				</c:if>
 				<footer>
 					<%@include file="../../boxes/footer.jsp"%>
 				</footer>

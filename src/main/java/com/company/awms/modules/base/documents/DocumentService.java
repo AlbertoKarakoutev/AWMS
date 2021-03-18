@@ -44,6 +44,23 @@ public class DocumentService {
 
 	// Access to all public documents info form the same dpt. and same or lower
 	// level
+	public List<DocInfoDTO> getAccessibleDocumentsInfoByPage(String employeeID, int page) throws IOException {
+		List<DocInfoDTO> accessibleDocumentsInfo = getAccessibleDocumentsInfo(employeeID);
+		List<DocInfoDTO> accessibleDocumentsInfoPage = new ArrayList<>();
+
+		if(page-1*10 > accessibleDocumentsInfo.size()) {
+			return getAccessibleDocumentsInfoByPage(employeeID, 1);
+		}
+		
+		for(int i = 0; i < accessibleDocumentsInfo.size(); i++) {
+			if(i >= (page-1)*10 && i < page*10){
+				accessibleDocumentsInfoPage.add(accessibleDocumentsInfo.get(i));
+			}
+		}
+		
+		return accessibleDocumentsInfoPage;
+	}
+
 	public List<DocInfoDTO> getAccessibleDocumentsInfo(String employeeID) throws IOException {
 		List<DocInfoDTO> accessibleDocumentsInfo = new ArrayList<>();
 
@@ -77,10 +94,10 @@ public class DocumentService {
 				}
 			}
 		}
-
+		
 		return accessibleDocumentsInfo;
 	}
-
+	
 	// Access to all private documents info
 	public List<DocInfoDTO> getPersonalDocumentsInfo(String employeeID) throws IOException {
 		List<DocInfoDTO> personalDocumentsInfo = new ArrayList<>();
