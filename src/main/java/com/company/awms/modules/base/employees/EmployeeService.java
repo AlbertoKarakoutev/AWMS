@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import com.company.awms.modules.base.admin.data.Department;
+import com.company.awms.modules.base.admin.data.DepartmentRepo;
 import com.company.awms.modules.base.admin.data.Module;
 import com.company.awms.modules.base.admin.data.ModuleRepo;
 import com.company.awms.modules.base.employees.data.Employee;
@@ -32,14 +34,17 @@ public class EmployeeService {
 	private EmployeeRepo employeeRepo;
 	private ModuleRepo moduleRepo;
 	private ScheduleRepo scheduleRepo;
+	DepartmentRepo departmentRepo;
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public EmployeeService(EmployeeRepo employeeRepo, ModuleRepo moduleRepo, ScheduleRepo scheduleRepo, PasswordEncoder passwordEncoder) {
+	public EmployeeService(EmployeeRepo employeeRepo, ModuleRepo moduleRepo, ScheduleRepo scheduleRepo, DepartmentRepo departmentRepo, PasswordEncoder passwordEncoder) {
 		this.employeeRepo = employeeRepo;
 		this.moduleRepo = moduleRepo;
 		this.scheduleRepo = scheduleRepo;
+		this.departmentRepo = departmentRepo;
 		this.passwordEncoder = passwordEncoder;
+		
 	}
 
 	public Employee getEmployee(String employeeID) throws IOException {
@@ -439,9 +444,25 @@ public class EmployeeService {
 		employee.setPhoneNumber(newInfo.get("phoneNumber"));
 		employee.setDepartment(newInfo.get("department").split(":")[0]);
 		employee.setRole(newInfo.get("role"));
-		employee.setPayPerHour(Double.parseDouble(newInfo.get("payPerHour")));
+		if(newInfo.get("payPerHour") != null && !(newInfo.get("payPerHour").equals(""))) {
+			employee.setPayPerHour(Double.parseDouble(newInfo.get("payPerHour")));
+		}
+		if(newInfo.get("salary") != null && !(newInfo.get("salary").equals(""))) {
+			employee.setSalary(Double.parseDouble(newInfo.get("salary")));
+		}
 		try {
-			employee.setLevel(Integer.parseInt(newInfo.get("level")));
+			int level = Integer.parseInt(newInfo.get("level"));
+			Optional<Department> department = departmentRepo.findByDepartmentCode(newInfo.get("department").split(":")[0]);
+			if (!department.isEmpty()) {
+				if(!department.get().isUniversalSchedule()) {
+					employee.setLevel(0);
+				}else {
+					if(department.get().getLevels().size() < level) {
+						level = department.get().getLevels().size();
+					}
+					employee.setLevel(level);
+				}
+			}
 		} catch (Exception e) {
 			System.out.println("Level is 0");
 			employee.setLevel(0);

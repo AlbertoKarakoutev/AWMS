@@ -28,13 +28,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //		http.addFilterBefore(new CaptchaAuthenticationFilter("/login", "/login?error"),
 //				UsernamePasswordAuthenticationFilter.class);
 
-		http.authorizeRequests().antMatchers("/login").permitAll().antMatchers("/").authenticated()
-				.antMatchers("/document/**").authenticated().antMatchers("/schedule/**").authenticated()
-				.antMatchers("/forum/**").authenticated().antMatchers("/salary/**").authenticated()
-				.antMatchers("/contacts/**").authenticated().antMatchers("/admin/**").hasAuthority("ADMIN").and().csrf()
-				.disable().formLogin().defaultSuccessUrl("/").and().formLogin().loginPage("/login")
-				.defaultSuccessUrl("/").and().logout().logoutSuccessUrl("/login").and().requiresChannel().anyRequest()
-				.requiresSecure();
+		http.authorizeRequests().antMatchers("/login").permitAll().antMatchers("/css/**/**").permitAll().antMatchers("/js/**").permitAll()
+		.antMatchers("/webjars/**").permitAll().antMatchers("/").authenticated()
+		.antMatchers("/**").authenticated().antMatchers("/admin/**").hasAuthority("ADMIN").and().csrf()
+		.disable().formLogin().defaultSuccessUrl("/").and().formLogin().loginPage("/login")
+		.defaultSuccessUrl("/").and().logout().logoutSuccessUrl("/login").and().requiresChannel().anyRequest()
+		.requiresSecure();
 	}
 
 	@Bean

@@ -44,9 +44,6 @@
 										National ID: <span class="font-weight-bold">${employee.getNationalID()}</span>
 									</div>
 									<div class="col-12 col-md-6">
-										Salary: <span class="font-weight-bold">${employee.getSalary()}</span>
-									</div>
-									<div class="col-12 col-md-6">
 										Phone Number: <span class="font-weight-bold">${employee.getPhoneNumber()}</span>
 									</div>
 									<div class="col-12 col-md-6">

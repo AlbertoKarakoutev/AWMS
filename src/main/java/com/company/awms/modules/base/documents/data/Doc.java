@@ -88,6 +88,10 @@ public class Doc {
 		return this.limitedAccess;
 	}
 	
+	public void setID(String id) {
+		this.id = id;
+	}
+	
 	public void setData(Binary data){
 		this.data = data;
 	}

@@ -26,7 +26,7 @@
 			<section class="content">
 				<div class="p-4">
 					<header class="py-3">
-						<h1 class="ty-page-title">Active Modules</h1>
+						<h1 class="ty-page-title">Modules</h1>
 					</header>
 					<div class="my-3 d-flex flex-row-reverse">
 						<button class="btn btn-dark module-update" id="updateModules">Update</button>
@@ -34,32 +34,54 @@
 					<table class="table">
 						<thead>
 							<tr>
-								<th scope="col" class="col-11">Module Name</th>
+								<th scope="col" class="col-11">Extension Modules</th>
 								<th scope="col" class="col-1">Active</th>
 							</tr>
 						</thead>
 						<tbody>
-							<%
-							Map<String, Boolean> modules = (Map<String, Boolean>) request.getAttribute("modules");
+							<%Map<String, Boolean> modules = (Map<String, Boolean>) request.getAttribute("modules");
 							for (Map.Entry<String, Boolean> module : modules.entrySet()) {
-							%>
+								String key = module.getKey();
+								if(!key.equals("Schedule")&&!key.equals("Documents")&&!key.equals("Employees")&&!key.equals("Forum")&&!key.equals("Contacts")){%>
+									<tr>
+										<td class="col-11">
+											<h4 class="module-name"><%=key%></h4>
+										</td>
+										<td class="col-1">
+											<div class="text-center">
+												<c:set var="check" value="<%=(boolean) (modules.get(key))%>" />
+												<input type="checkbox" id="<%=key%>" name="<%=key%>" ${check ? "checked" : ""}>
+											</div>
+										</td>
+									</tr>
+							<%}}%>
+
+						</tbody>
+					</table>
+					<table class="table">
+						<thead>
 							<tr>
-								<td class="col-11">
-									<h4 class="module-name"><%=module.getKey()%></h4>
-								</td>
-								<td class="col-1">
-									<div class="text-center">
-										<c:set var="check" value="<%=(boolean) (modules.get(module.getKey()))%>" />
-										<input type="checkbox" id="<%=module.getKey()%>"
-											name="<%=module.getKey()%>" ${check ? "checked" : ""}
-											<%if(!module.getKey().equals("Salary")){%>
-											disabled="disabled" <%}%>>
-									</div>
-								</td>
+								<th scope="col" class="col-11">Base Modules</th>
+								<th scope="col" class="col-1">Active</th>
 							</tr>
-							<%
-								}
-							%>
+						</thead>
+						<tbody>
+							<%for (Map.Entry<String, Boolean> module : modules.entrySet()) {
+								String key = module.getKey();
+								if(key.equals("Schedule") ||key.equals("Documents")||key.equals("Employees")||key.equals("Forum")||key.equals("Contacts")){%>
+								<tr>
+									<td class="col-11">
+										<h4 class="module-name"><%=key%></h4>
+									</td>
+									<td class="col-1">
+										<div class="text-center">
+											<c:set var="check" value="<%=(boolean) (modules.get(key))%>"/>
+											<input type="checkbox" id="<%=key%>"
+												name="<%=key%>" checked	disabled="disabled">
+										</div>
+									</td>
+								</tr>
+								<%}}%>
 
 						</tbody>
 					</table>
