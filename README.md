@@ -20,6 +20,7 @@ Software, intended for a functional and utilised company worflow. It incomporate
                 * (Optional) Folder: data (Containing any repos and POJO classes for the module)  
                 __The database would need to be updated if new POJOs and repos are added as a module!__
                 __Please ensure that the system is not currently running while working with the Module Manager to avoid bugs and system crashes!__
+		__(Linux Users) Ensure that the modules have full permissions before installing them!__
   
 *   Run - Navigate to the system's base directory. Go into the _target_ folder. Open a shell and run ***java -jar awms-1.0.0.war***     
 
